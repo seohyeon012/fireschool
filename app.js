@@ -508,7 +508,7 @@ function renderCharItems() {
 }
 
 function switchTab(btn, tab) {
-  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ctab2').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   charTab = tab;
   renderCharItems();
@@ -526,6 +526,10 @@ function loadCharState() {
   const charSt = getChar();
   const hatEl  = document.getElementById('char-hat-disp');
   if (hatEl) hatEl.textContent = CHAR_DATA.hat[charSt.hat] || '';
+  // 업그레이드 카운트 (목표: 50건 처리)
+  const st = getStats();
+  const remaining = Math.max(0, 50 - st.tasks);
+  setText('upgrade-cnt', remaining);
 }
 
 /* ══ 유틸 ══ */

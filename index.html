@@ -475,33 +475,44 @@
 
   <!-- ══ 캐릭터 화면 ══ -->
   <div id="screen-character" class="screen">
-    <header class="top-bar">
-      <h1 class="page-ttl">👤 캐릭터</h1>
-    </header>
-    <div class="char-layout">
-      <div class="char-preview">
-        <div class="char-box">
-          <div class="char-hat-disp" id="char-hat-disp"></div>
-          <img src="assets/pai.svg" class="char-main" alt="파이">
-          <div class="char-lv-badge">Level 1</div>
+    <div class="char-page">
+
+      <!-- 왼쪽: 캐릭터 카드 -->
+      <div class="char-left-col">
+        <div class="char-portrait-card">
+          <div class="char-portrait-bg">
+            <div class="char-acc-disp" id="char-hat-disp"></div>
+            <img src="assets/pai.svg" class="char-portrait-img" alt="파이">
+          </div>
+          <div class="char-portrait-lv">Level 1</div>
         </div>
-        <button class="btn-store" onclick="alert('소방서 상점 준비 중!')">🛒 소방서 상점</button>
+        <button class="char-name-btn">Fi_파이1</button>
       </div>
-      <div class="char-customize">
-        <div class="char-tabs">
-          <button class="ctab active" onclick="switchTab(this,'hat')">모자</button>
-          <button class="ctab" onclick="switchTab(this,'clothes')">옷</button>
-          <button class="ctab" onclick="switchTab(this,'expression')">표정</button>
+
+      <!-- 오른쪽: 커스터마이징 -->
+      <div class="char-right-col">
+        <!-- 탭 헤더 -->
+        <div class="char-tab-header">
+          <button class="ctab2 active" onclick="switchTab(this,'hat')">모자</button>
+          <button class="ctab2"        onclick="switchTab(this,'clothes')">옷</button>
+          <button class="ctab2"        onclick="switchTab(this,'expression')">표정</button>
         </div>
-        <div class="char-items" id="char-items"></div>
-      </div>
-    </div>
-    <div class="friend-section">
-      <div class="friend-card">
-        <span class="friend-ico">🤝</span>
-        <div>
-          <p class="friend-title">친구 최대 2명 초대 가능</p>
-          <p class="friend-sub">친구 없이도 앱을 사용할 수 있어요.<br>프로그램 화면에서 친구 소환사가 가능해요!</p>
+
+        <!-- 아이템 그리드 -->
+        <div class="char-grid" id="char-items"></div>
+
+        <!-- 하단 정보 -->
+        <div class="char-upgrade-info">
+          소방서 업그레이드까지 <strong id="upgrade-cnt">n</strong>건수 처리해야합니다.
+        </div>
+
+        <!-- 친구 섹션 -->
+        <div class="char-friend-row">
+          <span>🤝</span>
+          <div>
+            <p class="cfr-title">친구 최대 2명 초대 가능</p>
+            <p class="cfr-sub">친구 없이도 앱을 사용할 수 있어요. 프로그램 화면에서 친구 소환사가 가능해요!</p>
+          </div>
         </div>
       </div>
     </div>
