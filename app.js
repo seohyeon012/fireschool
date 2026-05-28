@@ -85,6 +85,7 @@ function updateHomeScreen() {
   const rate  = tot > 0 ? Math.round(st.c / tot * 100) : 0;
 
   setText('task-cnt',   st.tasks);
+  updateHomeDynamic(notes, st);
   setText('stat-notes', notes.length);
   setText('stat-rate',  rate + '%');
   setText('stat-streak',st.streak);
@@ -569,4 +570,44 @@ function showToast(msg) {
   t.style.opacity = '1';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.style.opacity = '0'; }, 2200);
+}
+
+/* ══ 홈 화면 동적 업데이트 ══ */
+function updateHomeDynamic(notes, st) {
+  // 날짜 표시
+  const d = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  const times = d.getHours() < 12 ? '오전' : '오후';
+  const dateEl = document.getElementById('home-date');
+  if (dateEl) {
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    dateEl.textContent = `${y}. ${m}. ${day} 일자 업무`;
+  }
+  const hudTime = document.getElementById('hud-time');
+  if (hudTime) hudTime.textContent = `${days[d.getDay()]}요일 ${times}`;
+
+  // EXP 계산 (누적 정답 기반)
+  const exp = Math.min(100, st.c * 5);
+  const expBar = document.getElementById('exp-bar');
+  const expVal = document.getElementById('exp-val');
+  if (expBar) expBar.style.width = exp + '%';
+  if (expVal) expVal.textContent = `${exp}/100`;
+
+  // 구조 수
+  const rescueVal = document.getElementById('rescue-val');
+  if (rescueVal) rescueVal.textContent = `${Math.min(st.c, 5)}/5`;
+
+  // 대기 지식 수
+  const today = todayStr();
+  const todayNotes = notes.filter(n => n.date === today);
+  setText('waiting-cnt', todayNotes.length);
+
+  // 밀린 업무 (unchecked 노트)
+  const overdue = notes.filter(n => !n.checked).length;
+  const overdueBtn = document.getElementById('btn-overdue');
+  if (overdueBtn) overdueBtn.textContent = `오늘 밀린 업무 (${overdue}건)`;
+  setText('overdue-cnt', overdue);
+
+  // 업무 보고 수
+  setText('report-cnt', st.tasks);
 }
