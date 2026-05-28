@@ -3,548 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>지식소방서 🔥</title>
+  <title>지식 증권거래소 📊</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
 
+  <!-- 티커 테이프 -->
+  <div class="ticker-wrap">
+    <div class="ticker-inner" id="ticker-inner">대기 중...</div>
+  </div>
+
+  <!-- ══ 어닝 시즌 팝업 ══ -->
+  <div id="earning-popup" class="overlay hidden">
+    <div class="popup-card earning-card">
+      <div class="earning-badge">📊 EARNINGS SEASON</div>
+      <h2 class="earning-month" id="earning-month">5월 성과 리포트</h2>
+      <div class="earning-score-wrap">
+        <div class="earning-score" id="earning-score">0</div>
+        <div class="earning-label">종합 점수</div>
+      </div>
+      <div class="earning-rows" id="earning-rows"></div>
+      <div class="market-announce" id="market-announce"></div>
+      <button class="btn-primary w-full" onclick="closeEarning()">리포트 확인</button>
+    </div>
+  </div>
+
+  <!-- ══ ETF 생성 팝업 ══ -->
+  <div id="etf-popup" class="overlay hidden">
+    <div class="popup-card">
+      <h3 class="popup-title">🔗 지식 ETF 생성</h3>
+      <p class="popup-sub">관련 종목을 묶으면 하나 복습할 때<br>연결 종목 전체가 함께 오릅니다</p>
+      <div class="cost-badge">10 🪙 소요</div>
+      <input type="text" id="etf-name-input" class="form-input" placeholder="ETF 이름 (예: 고등수학 ETF)">
+      <div class="etf-select-list" id="etf-select-list"></div>
+      <div class="popup-actions">
+        <button class="btn-ghost" onclick="document.getElementById('etf-popup').classList.add('hidden')">취소</button>
+        <button class="btn-primary" onclick="createEtf()">생성하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 매도 확인 팝업 ══ -->
+  <div id="sell-popup" class="overlay hidden">
+    <div class="popup-card">
+      <div class="sell-icon-big">📉</div>
+      <h3 class="popup-title" id="sell-popup-title">종목 매도</h3>
+      <p class="popup-sub" id="sell-popup-desc">이 종목을 포트폴리오에서 제거합니다.</p>
+      <div class="popup-actions">
+        <button class="btn-ghost" onclick="document.getElementById('sell-popup').classList.add('hidden')">취소</button>
+        <button class="btn-danger" onclick="confirmSell()">매도 확정</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ 홈 화면 ══ -->
   <div id="screen-home" class="screen active">
 
-    <!-- 상단 날짜 바 -->
-    <div class="home-topbar">
-      <span class="home-date" id="home-date">2026. 00. 00 일자 업무</span>
-      <button class="gear-btn" onclick="navigateTo('character')">⚙️</button>
-    </div>
-
-    <!-- 메인 영역 -->
-    <div class="home-main">
-
-      <!-- 왼쪽 메뉴 버튼 -->
-      <div class="left-menu">
-        <button class="menu-pill salmon" onclick="navigateTo('history')">
-          <span class="pill-icon">🪦</span>
-          <span class="pill-text">진압 못한 문제 다시보기</span>
-        </button>
-        <button class="menu-pill red" onclick="goStartQuiz()">
-          <span class="pill-icon">🔥</span>
-          <span class="pill-text">자진 화재 진압하러 가기</span>
-        </button>
-        <button class="menu-pill yellow" onclick="navigateTo('add')">
-          <span class="pill-icon">✏️</span>
-          <span class="pill-text">과목 수정/추가하기</span>
-        </button>
+    <div class="market-header">
+      <div>
+        <div class="app-name">지식 증권거래소</div>
+        <div class="kospi-row">
+          <span class="kospi-label">지식 KOSPI</span>
+          <span class="kospi-val" id="kospi-val">—</span>
+          <span class="kospi-chg" id="kospi-chg"></span>
+        </div>
       </div>
-
-      <!-- 중앙 게임 창 -->
-      <div class="game-window">
-
-        <!-- 게임 내부 상단 HUD -->
-        <div class="game-hud">
-          <div class="hud-char">
-            <div class="hud-avatar">
-              <img src="assets/pai.svg" width="32" height="36" alt="파이">
-              <span class="hud-lv">Level 1</span>
-            </div>
-            <div class="hud-info">
-              <div class="hud-name">Fi</div>
-              <div class="hud-rank">꼬마소방관</div>
-            </div>
-          </div>
-          <div class="hud-time" id="hud-time">토요일 오후</div>
-          <div class="hud-stats">
-            <div class="hud-stat">
-              <span class="hs-lbl">Exp</span>
-              <div class="exp-track"><div class="exp-fill" id="exp-bar" style="width:25%"></div></div>
-              <span class="hs-val" id="exp-val">25/100</span>
-            </div>
-            <div class="hud-stat">
-              <span class="hs-lbl">구조</span>
-              <span class="hs-val" id="rescue-val">0/5</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 게임 씬 (이소메트릭 SVG) -->
-        <div class="game-scene-wrap">
-          <svg class="game-scene-svg" viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-
-            <!-- ── 하늘/배경 ── -->
-            <defs>
-              <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#C8E6A0"/>
-                <stop offset="100%" stop-color="#A8CC80"/>
-              </linearGradient>
-              <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#C4905A"/>
-                <stop offset="100%" stop-color="#A87040"/>
-              </linearGradient>
-            </defs>
-
-            <!-- 배경 -->
-            <rect width="700" height="340" fill="url(#skyGrad)"/>
-
-            <!-- 땅 -->
-            <polygon points="0,155 700,110 700,340 0,340" fill="url(#groundGrad)"/>
-
-            <!-- 흙 질감 패치들 -->
-            <ellipse cx="200" cy="280" rx="70" ry="20" fill="rgba(100,60,20,0.15)"/>
-            <ellipse cx="500" cy="300" rx="90" ry="18" fill="rgba(100,60,20,0.1)"/>
-
-            <!-- 잔디 영역 -->
-            <ellipse cx="590" cy="148" rx="110" ry="48" fill="#5A8830"/>
-            <ellipse cx="110" cy="195" rx="80" ry="32" fill="#4A7820"/>
-            <ellipse cx="650" cy="290" rx="60" ry="22" fill="#4A7820"/>
-
-            <!-- ── 나무들 ── -->
-            <!-- 나무 1 -->
-            <rect x="538" y="132" width="8" height="24" fill="#6B4018"/>
-            <circle cx="542" cy="118" r="28" fill="#2A6010"/>
-            <circle cx="548" cy="108" r="21" fill="#3A8020"/>
-            <circle cx="535" cy="113" r="17" fill="#4A9830"/>
-
-            <!-- 나무 2 -->
-            <rect x="586" y="128" width="7" height="22" fill="#6B4018"/>
-            <circle cx="590" cy="114" r="25" fill="#2A6010"/>
-            <circle cx="594" cy="106" r="18" fill="#3A8020"/>
-            <circle cx="582" cy="111" r="15" fill="#4A9830"/>
-
-            <!-- 나무 3 -->
-            <rect x="638" y="120" width="7" height="20" fill="#6B4018"/>
-            <circle cx="641" cy="107" r="22" fill="#2A6010"/>
-            <circle cx="645" cy="100" r="16" fill="#4A9830"/>
-
-            <!-- 나무 4 (왼쪽) -->
-            <rect x="65" y="175" width="7" height="20" fill="#6B4018"/>
-            <circle cx="68" cy="163" r="22" fill="#2A6010"/>
-            <circle cx="72" cy="156" r="16" fill="#3A8020"/>
-
-            <!-- 나무 5 (왼쪽) -->
-            <rect x="105" y="183" width="6" height="18" fill="#6B4018"/>
-            <circle cx="108" cy="171" r="18" fill="#2A6010"/>
-            <circle cx="112" cy="165" r="13" fill="#4A9830"/>
-
-            <!-- ── 텐트 (왼쪽) ── -->
-            <!-- 텐트 몸체 -->
-            <polygon points="30,295 30,215 110,185 190,215 190,295" fill="#7A8A4A"/>
-            <!-- 텐트 지붕 -->
-            <polygon points="30,215 110,185 190,215" fill="#5A6A2A"/>
-            <!-- 텐트 입구 -->
-            <polygon points="95,295 110,230 125,295" fill="#3A4A1A"/>
-            <!-- 텐트 줄 -->
-            <line x1="30" y1="215"  x2="8"   y2="248" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2"/>
-            <line x1="190" y1="215" x2="212" y2="248" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2"/>
-            <circle cx="8"   cy="250" r="4" fill="#777"/>
-            <circle cx="212" cy="250" r="4" fill="#777"/>
-            <!-- 텐트 측면 그림자 -->
-            <polygon points="30,215 30,295 10,285 10,225" fill="rgba(0,0,0,0.15)"/>
-            <!-- 텐트 내부 물건들 -->
-            <rect x="40" y="260" width="20" height="15" rx="3" fill="#CC4400" opacity="0.7"/>
-            <rect x="65" y="265" width="14" height="10" rx="2" fill="#885500" opacity="0.7"/>
-
-            <!-- ── 메인 건물 (지식구조대) ── -->
-            <!-- 건물 왼쪽 측면 (이소메트릭) -->
-            <polygon points="340,295 340,140 365,130 365,283" fill="#B8A878"/>
-            <!-- 건물 본체 -->
-            <rect x="365" y="140" width="210" height="155" fill="#D4C898"/>
-            <!-- 건물 지붕 (이소메트릭) -->
-            <polygon points="340,140 365,130 575,130 550,140" fill="#CC2200"/>
-            <!-- 지붕 왼쪽 측면 -->
-            <polygon points="340,140 365,130 365,120 340,130" fill="#AA1600"/>
-            <!-- 창문들 -->
-            <rect x="378" y="162" width="55" height="60" rx="4" fill="#C8DCF0"/>
-            <rect x="380" y="164" width="51" height="56" rx="3" fill="rgba(180,210,240,0.7)"/>
-            <line x1="405" y1="164" x2="405" y2="220" stroke="#AAC0D8" stroke-width="2"/>
-            <line x1="380" y1="191" x2="431" y2="191" stroke="#AAC0D8" stroke-width="2"/>
-            <!-- 창문 광택 -->
-            <rect x="382" y="166" width="20" height="12" rx="2" fill="rgba(255,255,255,0.35)"/>
-            <!-- 간판: 지식구조대 -->
-            <rect x="365" y="148" width="185" height="32" rx="5" fill="#CC2200"/>
-            <rect x="367" y="150" width="181" height="28" rx="4" fill="#BB1A00"/>
-            <text x="457" y="170" text-anchor="middle" fill="#FFD700" font-size="16" font-weight="900" font-family="'Noto Sans KR',Arial" letter-spacing="2">지식구조대</text>
-            <!-- 차고 문 -->
-            <rect x="450" y="185" width="115" height="110" rx="3" fill="#8B6030"/>
-            <rect x="452" y="187" width="111" height="106" rx="2" fill="#9A7040"/>
-            <line x1="452" y1="205" x2="563" y2="205" stroke="#6B4820" stroke-width="2"/>
-            <line x1="452" y1="222" x2="563" y2="222" stroke="#6B4820" stroke-width="2"/>
-            <line x1="452" y1="239" x2="563" y2="239" stroke="#6B4820" stroke-width="2"/>
-            <line x1="452" y1="256" x2="563" y2="256" stroke="#6B4820" stroke-width="2"/>
-            <line x1="452" y1="273" x2="563" y2="273" stroke="#6B4820" stroke-width="2"/>
-            <!-- 차고 문 핸들 -->
-            <rect x="498" y="285" width="20" height="6" rx="3" fill="#FFD700"/>
-
-            <!-- ── 소방차 ── -->
-            <!-- 차체 -->
-            <rect x="580" y="228" width="108" height="52" rx="6" fill="#CC2200"/>
-            <!-- 캡 -->
-            <rect x="580" y="212" width="68" height="20" rx="5" fill="#BB1800"/>
-            <!-- 앞유리 -->
-            <rect x="585" y="214" width="32" height="15" rx="3" fill="rgba(180,220,255,0.45)"/>
-            <!-- 사이렌 바 -->
-            <rect x="594" y="205" width="40" height="9" rx="4" fill="#1A1A1A"/>
-            <circle cx="602" cy="209" r="3" fill="#FF1111"/>
-            <circle cx="614" cy="209" r="3" fill="#1133FF"/>
-            <circle cx="626" cy="209" r="3" fill="white"/>
-            <!-- 황금 반사선 -->
-            <rect x="580" y="254" width="108" height="6" fill="#FFD700" opacity="0.7"/>
-            <!-- 소방차 측면 글자 -->
-            <text x="634" y="248" text-anchor="middle" fill="white" font-size="11" font-weight="900" font-family="Arial">119</text>
-            <!-- 바퀴 -->
-            <circle cx="602" cy="283" r="13" fill="#1A1A1A"/>
-            <circle cx="602" cy="283" r="8" fill="#444"/>
-            <circle cx="602" cy="283" r="4" fill="#222"/>
-            <circle cx="665" cy="283" r="13" fill="#1A1A1A"/>
-            <circle cx="665" cy="283" r="8" fill="#444"/>
-            <circle cx="665" cy="283" r="4" fill="#222"/>
-            <!-- 호스릴 -->
-            <circle cx="688" cy="250" r="11" fill="#AA1000" stroke="#CC2000" stroke-width="1.5"/>
-            <circle cx="688" cy="250" r="7"  fill="#BB1800"/>
-            <circle cx="688" cy="250" r="3.5" fill="#FF3300"/>
-
-            <!-- ── 캐릭터 1 (파이 - 메인) ── -->
-            <!-- 그림자 -->
-            <ellipse cx="295" cy="298" rx="20" ry="6" fill="rgba(0,0,0,0.22)"/>
-            <!-- 부츠 -->
-            <rect x="283" y="286" width="11" height="14" rx="5" fill="#111"/>
-            <rect x="296" y="286" width="11" height="14" rx="5" fill="#111"/>
-            <ellipse cx="289" cy="300" rx="8" ry="4" fill="#080808"/>
-            <ellipse cx="302" cy="300" rx="8" ry="4" fill="#080808"/>
-            <!-- 바지 -->
-            <rect x="283" y="268" width="25" height="22" rx="4" fill="#1A3A6A"/>
-            <!-- 벨트 -->
-            <rect x="283" y="264" width="25" height="6" rx="3" fill="#8A6010"/>
-            <!-- 상의 -->
-            <rect x="280" y="238" width="31" height="30" rx="7" fill="#CC2200"/>
-            <!-- 반사 스트라이프 -->
-            <rect x="280" y="249" width="31" height="5" fill="#FFD700" opacity="0.85"/>
-            <!-- 팔 -->
-            <rect x="270" y="238" width="12" height="26" rx="6" fill="#CC2200"/>
-            <rect x="308" y="238" width="12" height="26" rx="6" fill="#CC2200"/>
-            <rect x="270" y="249" width="12" height="5"  fill="#FFD700" opacity="0.75"/>
-            <rect x="308" y="249" width="12" height="5"  fill="#FFD700" opacity="0.75"/>
-            <!-- 장갑 -->
-            <ellipse cx="276" cy="267" rx="8" ry="6" fill="#AA1000"/>
-            <ellipse cx="314" cy="267" rx="8" ry="6" fill="#AA1000"/>
-            <!-- 목 -->
-            <rect x="288" y="228" width="14" height="12" rx="5" fill="#FFCC9A"/>
-            <!-- 귀 -->
-            <circle cx="278" cy="216" r="6" fill="#FFCC9A"/>
-            <circle cx="312" cy="216" r="6" fill="#FFCC9A"/>
-            <!-- 머리 -->
-            <circle cx="295" cy="212" r="22" fill="#FFCC9A"/>
-            <!-- 헬멧 -->
-            <path d="M274 212 Q274 192 295 190 Q316 192 316 212 Z" fill="#FFD700"/>
-            <path d="M272 213 Q295 221 318 213 L316 218 Q295 226 274 218 Z" fill="#CC8800"/>
-            <!-- 눈 -->
-            <ellipse cx="288" cy="214" rx="5" ry="5.5" fill="white"/>
-            <ellipse cx="302" cy="214" rx="5" ry="5.5" fill="white"/>
-            <circle cx="289" cy="215" r="3" fill="#1A0500"/>
-            <circle cx="303" cy="215" r="3" fill="#1A0500"/>
-            <circle cx="290" cy="213" r="1.2" fill="white"/>
-            <circle cx="304" cy="213" r="1.2" fill="white"/>
-            <!-- 눈썹 -->
-            <path d="M284 209 Q288 206 293 208" stroke="#3A1800" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-            <path d="M297 208 Q302 206 306 209" stroke="#3A1800" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-            <!-- 코 -->
-            <ellipse cx="295" cy="219" rx="2.5" ry="1.8" fill="#E08040"/>
-            <!-- 입 (웃음) -->
-            <path d="M288 224 Q295 230 302 224" stroke="#CC5533" stroke-width="2" fill="#FF8866" stroke-linecap="round"/>
-            <!-- 볼 -->
-            <ellipse cx="281" cy="220" rx="6" ry="4" fill="#FFB0A0" opacity="0.5"/>
-            <ellipse cx="309" cy="220" rx="6" ry="4" fill="#FFB0A0" opacity="0.5"/>
-            <!-- 119 배지 -->
-            <circle cx="286" cy="245" r="6" fill="#FFD700"/>
-            <circle cx="286" cy="245" r="5" fill="#CC1800"/>
-            <text x="286" y="248" text-anchor="middle" fill="#FFD700" font-size="4" font-weight="900" font-family="Arial">119</text>
-
-            <!-- ── 캐릭터 2 (동료) ── -->
-            <ellipse cx="350" cy="294" rx="17" ry="5" fill="rgba(0,0,0,0.2)"/>
-            <!-- 부츠 -->
-            <rect x="340" y="282" width="9" height="12" rx="4" fill="#111"/>
-            <rect x="351" y="282" width="9" height="12" rx="4" fill="#111"/>
-            <ellipse cx="345" cy="294" rx="7" ry="3.5" fill="#080808"/>
-            <ellipse cx="356" cy="294" rx="7" ry="3.5" fill="#080808"/>
-            <!-- 바지 -->
-            <rect x="339" y="266" width="22" height="20" rx="4" fill="#1A3A6A"/>
-            <!-- 상의 -->
-            <rect x="336" y="240" width="27" height="28" rx="6" fill="#CC2200"/>
-            <rect x="336" y="251" width="27" height="4" fill="#FFD700" opacity="0.8"/>
-            <!-- 팔 -->
-            <rect x="327" y="240" width="11" height="23" rx="5" fill="#CC2200"/>
-            <rect x="362" y="240" width="11" height="23" rx="5" fill="#CC2200"/>
-            <!-- 목 -->
-            <rect x="344" y="230" width="12" height="11" rx="4" fill="#FFCC9A"/>
-            <!-- 귀 -->
-            <circle cx="335" cy="220" r="5" fill="#FFCC9A"/>
-            <circle cx="364" cy="220" r="5" fill="#FFCC9A"/>
-            <!-- 머리 -->
-            <circle cx="350" cy="216" r="19" fill="#FFCC9A"/>
-            <!-- 헬멧 -->
-            <path d="M332 216 Q332 198 350 196 Q368 198 368 216 Z" fill="#CC2200"/>
-            <path d="M330 217 Q350 224 370 217 L368 221 Q350 228 332 221 Z" fill="#AA1800"/>
-            <!-- 눈 -->
-            <ellipse cx="344" cy="218" rx="4" ry="4.5" fill="white"/>
-            <ellipse cx="356" cy="218" rx="4" ry="4.5" fill="white"/>
-            <circle cx="345" cy="219" r="2.5" fill="#1A0500"/>
-            <circle cx="357" cy="219" r="2.5" fill="#1A0500"/>
-            <circle cx="346" cy="217" r="1" fill="white"/>
-            <circle cx="358" cy="217" r="1" fill="white"/>
-            <!-- 입 -->
-            <path d="M345 226 Q350 230 355 226" stroke="#CC5533" stroke-width="1.8" fill="#FF8866" stroke-linecap="round"/>
-            <!-- 볼 -->
-            <ellipse cx="337" cy="223" rx="5" ry="3.5" fill="#FFB0A0" opacity="0.5"/>
-            <ellipse cx="363" cy="223" rx="5" ry="3.5" fill="#FFB0A0" opacity="0.5"/>
-
-          </svg>
-        </div>
-
-        <!-- 게임 하단 바 -->
-        <div class="game-bottom-bar">
-          <!-- 미니맵 -->
-          <div class="minimap">
-            <div class="mm-label">흙바닥</div>
-            <div class="mm-view">
-              <svg viewBox="0 0 80 60" width="80" height="60">
-                <rect width="80" height="60" fill="#C4905A"/>
-                <polygon points="0,40 80,28 80,60 0,60" fill="#B07838"/>
-                <ellipse cx="60" cy="30" rx="20" ry="10" fill="#5A8830"/>
-                <rect x="35" y="22" width="22" height="18" fill="#C8B880"/>
-                <rect x="35" y="22" width="22" height="4" fill="#CC2200"/>
-                <rect x="8" y="30" width="16" height="20" fill="#7A8A4A"/>
-                <circle cx="52" cy="18" r="6" fill="#2A6010"/>
-                <circle cx="65" cy="16" r="5" fill="#2A6010"/>
-                <!-- 캐릭터 점들 -->
-                <circle cx="30" cy="44" r="2.5" fill="#FFCC9A"/>
-                <circle cx="38" cy="43" r="2"   fill="#FFCC9A"/>
-              </svg>
-            </div>
-          </div>
-
-          <!-- 액션 버튼들 -->
-          <div class="game-actions">
-            <div class="action-notice">업무보고 <strong id="report-cnt">0</strong>건</div>
-            <button class="game-act-btn" onclick="navigateTo('history')">
-              <span class="gab-ico">🏃</span>
-              <span>훈련하기</span>
-            </button>
-            <button class="game-act-btn" onclick="goStartQuiz()">
-              <span class="gab-ico">🚒</span>
-              <span>출동대기</span>
-            </button>
-            <button class="game-act-btn accent" onclick="navigateTo('history')">
-              <span class="gab-ico">📋</span>
-              <span>업무보고</span>
-            </button>
-          </div>
-        </div>
-      </div><!-- .game-window -->
-    </div><!-- .home-main -->
-
-    <!-- 하단 액션 버튼 -->
-    <div class="home-bottom">
-      <button class="btn-overdue" id="btn-overdue" onclick="navigateTo('history')">
-        오늘 밀린 업무 (<span id="overdue-cnt">0</span>건)
-      </button>
-      <button class="btn-process" onclick="goStartQuiz()">지금 처리하기</button>
+      <div class="header-right">
+        <div class="market-chip" id="market-chip">🟢 정상</div>
+        <div class="coin-chip">🪙 <span id="coin-val">0</span></div>
+      </div>
     </div>
 
-    <!-- 우하단 지식 뱃지 -->
-    <div class="knowledge-badge" onclick="navigateTo('add')">
-      <span class="kb-clock">🕐</span>
-      <span>오늘 대기중인 지식(<span id="waiting-cnt">0</span>)</span>
-    </div>
+    <!-- 복습 필요 -->
+    <div id="urgent-wrap"></div>
 
-  </div><!-- #screen-home -->
-
-  <!-- ══ 학습 기록 화면 ══ -->
-  <div id="screen-history" class="screen">
-    <header class="top-bar">
-      <h1 class="page-ttl">📋 학습 기록</h1>
-    </header>
-    <div class="date-filter-row">
-      <button class="dtag active" data-f="year"  onclick="filterDate(this)">연도</button>
-      <button class="dtag"        data-f="month" onclick="filterDate(this)">월</button>
-      <button class="dtag"        data-f="day"   onclick="filterDate(this)">일</button>
+    <!-- 전체 종목 -->
+    <div class="home-section">
+      <div class="section-row">
+        <span class="section-ttl">📈 보유 종목</span>
+        <span class="stock-cnt" id="stock-cnt">0개</span>
+      </div>
+      <div id="stock-list"></div>
+      <div class="empty-home hidden" id="empty-home">
+        <div class="eh-ico">📭</div>
+        <p>상장된 종목이 없어요</p>
+        <button class="btn-ghost-sm" onclick="navigateTo('ipo')">+ 첫 종목 IPO하기</button>
+      </div>
     </div>
-    <div id="history-list" class="note-list-wrap"></div>
   </div>
 
-  <!-- ══ 노트 추가 화면 ══ -->
-  <div id="screen-add" class="screen">
-    <header class="top-bar">
-      <h1 class="page-ttl">📝 노트 추가</h1>
-    </header>
+  <!-- ══ 종목 상세 화면 ══ -->
+  <div id="screen-detail" class="screen">
+    <div class="detail-bar">
+      <button class="back-btn" onclick="goBack()">‹ 뒤로</button>
+      <div class="detail-sector-tag" id="d-sector">섹터</div>
+    </div>
+    <div class="detail-price-section">
+      <div class="d-name" id="d-name">종목명</div>
+      <div class="d-price-row">
+        <span class="d-price" id="d-price">₩100</span>
+        <span class="d-chg" id="d-chg">+0.0%</span>
+      </div>
+    </div>
+
+    <!-- 주가 차트 -->
+    <div class="chart-card">
+      <svg id="price-chart" viewBox="0 0 320 90" preserveAspectRatio="none" class="chart-svg"></svg>
+      <div class="chart-foot">
+        <span>7일 전</span><span>오늘</span>
+      </div>
+    </div>
+
+    <!-- ETF 연결 뱃지 -->
+    <div class="etf-link-badge hidden" id="etf-link-badge">
+      🔗 <span id="etf-link-name">ETF</span> — 복습 시 연결 종목 +3 동반 상승
+    </div>
+
+    <!-- 투자 보고서 -->
+    <div class="detail-section">
+      <div class="ds-title">📋 투자 보고서</div>
+      <div class="ds-content" id="d-content"></div>
+      <div class="ds-meta">
+        <span>상장일 <strong id="d-added">—</strong></span>
+        <span>마지막 복습 <strong id="d-review">—</strong></span>
+      </div>
+    </div>
+
+    <!-- 매수/매도 -->
+    <div class="detail-actions">
+      <button class="btn-buy" onclick="toggleReviewInput()">📈 매수 (복습)</button>
+      <button class="btn-sell-sm" onclick="openSellPopup()">📉 매도</button>
+    </div>
+    <div class="review-wrap hidden" id="review-wrap">
+      <textarea id="review-text" class="form-textarea" placeholder="추가로 공부한 내용을 입력하세요 (선택)"></textarea>
+      <button class="btn-primary w-full" onclick="submitReview()">복습 완료 📈 주가 상승</button>
+    </div>
+  </div>
+
+  <!-- ══ IPO 화면 ══ -->
+  <div id="screen-ipo" class="screen">
+    <div class="ipo-header">
+      <div class="ipo-title">🚀 신규 상장 (IPO)</div>
+      <div class="ipo-sub">새 지식을 포트폴리오에 추가하세요<br>공모가 ₩100에서 시작, 시간이 지나면 자동 하락</div>
+    </div>
     <div class="form-wrap">
       <div class="form-row">
-        <input type="text" id="note-title" class="form-input" placeholder="제목 이름">
+        <label class="form-label">종목명</label>
+        <input type="text" id="ipo-name" class="form-input" placeholder="예: 이차방정식 근의 공식">
       </div>
       <div class="form-row">
-        <label class="form-label">색상 선택</label>
-        <div class="color-grid" id="color-grid">
-          <button class="col-btn"     data-c="#555555" style="background:#555555" onclick="pickColor(this)"></button>
-          <button class="col-btn sel" data-c="#CC2200" style="background:#CC2200" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#FF6B35" style="background:#FF6B35" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#FFB800" style="background:#FFB800" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#2ECC40" style="background:#2ECC40" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#0074D9" style="background:#0074D9" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#9B59B6" style="background:#9B59B6" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#BBBBBB" style="background:#BBBBBB" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#FF8A80" style="background:#FF8A80" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#FFCC80" style="background:#FFCC80" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#FFF176" style="background:#FFF176" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#A5D6A7" style="background:#A5D6A7" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#90CAF9" style="background:#90CAF9" onclick="pickColor(this)"></button>
-          <button class="col-btn"     data-c="#CE93D8" style="background:#CE93D8" onclick="pickColor(this)"></button>
+        <label class="form-label">섹터</label>
+        <div class="sector-grid">
+          <button class="sec-pill active" data-s="수학"   onclick="pickSector(this)">📐 수학</button>
+          <button class="sec-pill" data-s="영어"   onclick="pickSector(this)">📖 영어</button>
+          <button class="sec-pill" data-s="과학"   onclick="pickSector(this)">🔬 과학</button>
+          <button class="sec-pill" data-s="역사"   onclick="pickSector(this)">🏛️ 역사</button>
+          <button class="sec-pill" data-s="국어"   onclick="pickSector(this)">✍️ 국어</button>
+          <button class="sec-pill" data-s="프로그래밍" onclick="pickSector(this)">💻 프로그래밍</button>
+          <button class="sec-pill" data-s="기타"   onclick="pickSector(this)">📌 기타</button>
         </div>
       </div>
-      <div class="form-row form-inline">
-        <label class="form-label">첨부 파일 수</label>
-        <input type="number" id="attach-count" class="form-input-sm" value="0" min="0">
-      </div>
       <div class="form-row">
-        <textarea id="note-content" class="form-textarea"
-          placeholder="오늘 공부한 내용을 입력하세요...&#10;퀴즈 문제를 만드는 데 활용됩니다 🔥"></textarea>
+        <label class="form-label">투자 보고서 (공부 내용)</label>
+        <textarea id="ipo-content" class="form-textarea tall" placeholder="오늘 공부한 내용을 적어두세요.&#10;나중에 복습할 때 이 내용이 표시됩니다."></textarea>
       </div>
-      <button class="btn-primary btn-full" onclick="saveNote()">변경</button>
+      <button class="btn-ipo" onclick="listStock()">🚀 상장하기</button>
     </div>
   </div>
 
-  <!-- ══ 퀴즈 화면 ══ -->
-  <div id="screen-quiz" class="screen quiz-screen">
-    <div class="fire-bg" id="fire-bg"></div>
-    <div class="quiz-ui">
-      <div class="quiz-topbar">
-        <span class="qscore">🎯 <span id="q-score">0</span>점</span>
-        <div class="qtimer-wrap">
-          <div class="qtimer-track"><div class="qtimer-bar" id="timer-bar"></div></div>
-          <span class="qtimer-num" id="timer-txt">30</span>
+  <!-- ══ 포트폴리오 화면 ══ -->
+  <div id="screen-portfolio" class="screen">
+    <div class="port-header">
+      <div class="port-title">💼 내 포트폴리오</div>
+      <div class="port-stats">
+        <div class="port-stat">
+          <div class="ps-val" id="port-total">₩0</div>
+          <div class="ps-lbl">총 지식 자산</div>
         </div>
-        <span class="qprog"><span id="q-cur">1</span>/<span id="q-tot">5</span></span>
-      </div>
-      <div class="quiz-card" id="quiz-card">
-        <span class="quiz-subj-tag" id="quiz-subj">과목</span>
-        <p class="quiz-q-text" id="quiz-q">문제 내용</p>
-        <div class="quiz-body-text" id="quiz-body"></div>
-      </div>
-      <button class="btn-answer" id="btn-answer" onclick="openAnswer()">정답 입력하기</button>
-      <div class="ans-input-wrap hidden" id="ans-wrap">
-        <input type="text" id="ans-input" class="ans-input" placeholder="정답을 입력하세요...">
-        <button class="btn-submit-ans" onclick="submitAns()">
-          <img src="assets/truck.svg" width="24" height="12" alt=""> 제출
-        </button>
+        <div class="port-stat">
+          <div class="ps-val green" id="port-avg">0%</div>
+          <div class="ps-lbl">평균 주가</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ══ 결과 화면 ══ -->
-  <div id="screen-result" class="screen">
-    <header class="top-bar fire-bar">
+    <!-- 코인 카드 -->
+    <div class="coin-card">
       <div>
-        <h1 class="page-ttl white">화재 진압 건수</h1>
-        <p class="page-sub white">(전체 문제 중 맞춘 문제 수)</p>
+        <div class="cc-amount">🪙 <span id="port-coin">0</span></div>
+        <div class="cc-desc">지식 코인 · 월말 배당 지급 (주가 70↑ 종목)</div>
       </div>
-    </header>
-    <div class="result-big-score">
-      <span id="big-score">0</span><span class="score-unit">점</span>
+      <button class="btn-etf-create" onclick="openEtfPopup()">+ ETF</button>
     </div>
-    <div class="result-bars">
-      <div class="rbar-row">
-        <span class="rbar-lbl">정답률</span>
-        <div class="rbar-track"><div class="rbar-fill green-fill" id="bar-correct"></div></div>
-        <span class="rbar-pct" id="pct-correct">0%</span>
-      </div>
-      <div class="rbar-row">
-        <span class="rbar-lbl">오답률</span>
-        <div class="rbar-track"><div class="rbar-fill red-fill" id="bar-wrong"></div></div>
-        <span class="rbar-pct" id="pct-wrong">0%</span>
+
+    <!-- ETF -->
+    <div class="port-section">
+      <div class="ps-title">🔗 지식 ETF</div>
+      <div id="etf-list"></div>
+      <div class="ps-empty hidden" id="etf-empty">
+        코인 10개로 관련 종목을 ETF로 묶어보세요
       </div>
     </div>
-    <div class="result-section">
-      <h3 class="rsec-title">📈 지난번 대비 좋아진 점</h3>
-      <div class="rsec-box" id="r-improve">이번이 첫 번째 퀴즈예요!</div>
+
+    <!-- AI 추천 -->
+    <div class="port-section">
+      <div class="ps-title">🤖 AI 매도 추천</div>
+      <div id="ai-list"></div>
     </div>
-    <div class="result-section">
-      <h3 class="rsec-title">💬 피드백</h3>
-      <div class="rsec-box" id="r-feedback"></div>
-    </div>
-    <button class="btn-primary btn-full" onclick="navigateTo('home')" style="margin:0 14px 14px;width:calc(100% - 28px)">🏠 홈으로 돌아가기</button>
-  </div>
 
-  <!-- ══ 캐릭터 화면 ══ -->
-  <div id="screen-character" class="screen">
-    <div class="char-page">
-
-      <!-- 왼쪽: 캐릭터 카드 -->
-      <div class="char-left-col">
-        <div class="char-portrait-card">
-          <div class="char-portrait-bg">
-            <div class="char-acc-disp" id="char-hat-disp"></div>
-            <img src="assets/pai.svg" class="char-portrait-img" alt="파이">
-          </div>
-          <div class="char-portrait-lv">Level 1</div>
-        </div>
-        <button class="char-name-btn">Fi_파이1</button>
-      </div>
-
-      <!-- 오른쪽: 커스터마이징 -->
-      <div class="char-right-col">
-        <!-- 탭 헤더 -->
-        <div class="char-tab-header">
-          <button class="ctab2 active" onclick="switchTab(this,'hat')">모자</button>
-          <button class="ctab2"        onclick="switchTab(this,'clothes')">옷</button>
-          <button class="ctab2"        onclick="switchTab(this,'expression')">표정</button>
-        </div>
-
-        <!-- 아이템 그리드 -->
-        <div class="char-grid" id="char-items"></div>
-
-        <!-- 하단 정보 -->
-        <div class="char-upgrade-info">
-          소방서 업그레이드까지 <strong id="upgrade-cnt">n</strong>건수 처리해야합니다.
-        </div>
-
-        <!-- 친구 섹션 -->
-        <div class="char-friend-row">
-          <span>🤝</span>
-          <div>
-            <p class="cfr-title">친구 최대 2명 초대 가능</p>
-            <p class="cfr-sub">친구 없이도 앱을 사용할 수 있어요. 프로그램 화면에서 친구 소환사가 가능해요!</p>
-          </div>
-        </div>
-      </div>
+    <!-- 섹터 분포 -->
+    <div class="port-section">
+      <div class="ps-title">📊 섹터 분포</div>
+      <div id="sector-dist"></div>
     </div>
   </div>
 
-  <!-- ══ 정답 오버레이 ══ -->
-  <div id="ans-overlay" class="overlay hidden">
-    <div class="overlay-box" id="overlay-box">
-      <div class="overlay-icon" id="overlay-icon">✅</div>
-      <div class="overlay-msg"  id="overlay-msg">정답!</div>
-      <div class="overlay-ans"  id="overlay-ans"></div>
-      <button class="btn-primary" onclick="nextQ()">다음 문제 →</button>
-    </div>
-  </div>
-
-  <!-- ══ 하단 네비게이션 ══ -->
+  <!-- 네비게이션 -->
   <nav class="bottom-nav">
     <button class="nav-btn active" id="nav-home"      onclick="navigateTo('home')">
-      <span class="nv-ico">🏠</span><span class="nv-lbl">홈</span>
+      <span>📊</span><span class="nv-lbl">시장</span>
     </button>
-    <button class="nav-btn"        id="nav-history"   onclick="navigateTo('history')">
-      <span class="nv-ico">📋</span><span class="nv-lbl">기록</span>
+    <button class="nav-btn nav-ipo-btn" id="nav-ipo"  onclick="navigateTo('ipo')">
+      <span class="plus-txt">+</span><span class="nv-lbl">IPO</span>
     </button>
-    <button class="nav-btn nav-plus" id="nav-add"     onclick="navigateTo('add')">
-      <span class="nv-ico plus-ico">+</span>
-    </button>
-    <button class="nav-btn"        id="nav-quiz"      onclick="goStartQuiz()">
-      <img src="assets/flame.svg" width="24" height="24" class="nv-flame" alt="">
-      <span class="nv-lbl">퀴즈</span>
-    </button>
-    <button class="nav-btn"        id="nav-character" onclick="navigateTo('character')">
-      <span class="nv-ico">👤</span><span class="nv-lbl">캐릭터</span>
+    <button class="nav-btn" id="nav-portfolio"        onclick="navigateTo('portfolio')">
+      <span>💼</span><span class="nv-lbl">포트폴리오</span>
     </button>
   </nav>
 
