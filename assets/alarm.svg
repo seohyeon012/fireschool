@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="strobe" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#FF8800" stop-opacity="1"/>
+      <stop offset="40%"  stop-color="#FF3300" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#880000" stop-opacity="0.2"/>
+    </radialGradient>
+    <radialGradient id="lens" cx="35%" cy="30%" r="65%">
+      <stop offset="0%"   stop-color="#FFDD66"/>
+      <stop offset="60%"  stop-color="#FF5500"/>
+      <stop offset="100%" stop-color="#CC1100"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer glow rings -->
+  <circle cx="50" cy="50" r="48" fill="rgba(255,60,0,0.12)"/>
+  <circle cx="50" cy="50" r="40" fill="rgba(255,60,0,0.15)"/>
+
+  <!-- Rays of light -->
+  <g stroke="rgba(255,120,0,0.35)" stroke-width="3" stroke-linecap="round">
+    <line x1="50" y1="4"  x2="50" y2="14"/>
+    <line x1="50" y1="86" x2="50" y2="96"/>
+    <line x1="4"  y1="50" x2="14" y2="50"/>
+    <line x1="86" y1="50" x2="96" y2="50"/>
+    <line x1="14" y1="14" x2="21" y2="21"/>
+    <line x1="86" y1="14" x2="79" y2="21"/>
+    <line x1="14" y1="86" x2="21" y2="79"/>
+    <line x1="86" y1="86" x2="79" y2="79"/>
+  </g>
+
+  <!-- Housing outer ring -->
+  <circle cx="50" cy="50" r="34" fill="#CC1800"/>
+  <circle cx="50" cy="50" r="34" fill="none" stroke="#FF2200" stroke-width="2"/>
+  <!-- Housing inner ring (chrome) -->
+  <circle cx="50" cy="50" r="30" fill="#881000"/>
+  <circle cx="50" cy="50" r="30" fill="none" stroke="#555" stroke-width="1.5"/>
+
+  <!-- STROBE LIGHT -->
+  <circle cx="50" cy="50" r="24" fill="url(#strobe)"/>
+  <!-- Lens -->
+  <circle cx="50" cy="50" r="20" fill="url(#lens)"/>
+  <!-- Lens sheen -->
+  <ellipse cx="43" cy="42" rx="8" ry="6" fill="rgba(255,255,255,0.30)"/>
+  <!-- Bright core -->
+  <circle cx="50" cy="50" r="9"  fill="#FFCC00"/>
+  <circle cx="50" cy="50" r="5"  fill="#FFEE88"/>
+  <circle cx="50" cy="50" r="2.5" fill="white"/>
+
+  <!-- Cross reflection in lens -->
+  <rect x="48" y="32" width="4" height="36" rx="2" fill="rgba(255,230,100,0.30)"/>
+  <rect x="32" y="48" width="36" height="4"  rx="2" fill="rgba(255,230,100,0.30)"/>
+
+  <!-- Top mount bolt -->
+  <circle cx="50" cy="14" r="5.5" fill="#888"/>
+  <circle cx="50" cy="14" r="3.5" fill="#555"/>
+  <circle cx="50" cy="14" r="1.5" fill="#333"/>
+  <!-- Bottom mount bolt -->
+  <circle cx="50" cy="86" r="5.5" fill="#888"/>
+  <circle cx="50" cy="86" r="3.5" fill="#555"/>
+  <circle cx="50" cy="86" r="1.5" fill="#333"/>
+
+  <!-- Housing arch top detail -->
+  <path d="M20 40 Q20 18 50 17 Q80 18 80 40" stroke="#FF3300" stroke-width="2" fill="none"/>
+  <!-- Housing bottom detail -->
+  <path d="M20 60 Q20 82 50 83 Q80 82 80 60" stroke="#881000" stroke-width="1.5" fill="none"/>
+</svg>

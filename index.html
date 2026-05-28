@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지식소방서 🔥</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ 홈 화면 ══ -->
+  <div id="screen-home" class="screen active">
+    <header class="top-bar fire-bar">
+      <div class="tb-left">
+        <span class="rank-pill">🎖️ 소방관 2등급</span>
+      </div>
+      <div class="tb-right">
+        <span class="task-badge">업무 <strong id="task-cnt">0</strong>건</span>
+        <button class="icon-btn" onclick="navigateTo('character')">
+          <img src="assets/pai.svg" width="30" height="30" alt="캐릭터">
+        </button>
+      </div>
+    </header>
+
+    <!-- 오늘 기억 카드 -->
+    <div class="today-card">
+      <div class="today-card-header">
+        <span class="today-date" id="today-date"></span>
+        <span class="today-badge-pill">오늘 기억</span>
+        <button class="icon-btn sm" onclick="navigateTo('add')">⚙️</button>
+      </div>
+      <div class="today-note-list" id="home-note-list">
+        <div class="empty-state-sm">
+          <p>아직 오늘 공부 기록이 없어요</p>
+          <button class="btn-link" onclick="navigateTo('add')">+ 추가하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비주얼 영역 -->
+    <div class="home-visual">
+      <div class="home-station">
+        <div class="hs-roof">
+          <div class="hs-emblem">
+            <svg viewBox="0 0 36 36" width="26" height="26">
+              <circle cx="18" cy="18" r="17" fill="#FFD700"/>
+              <circle cx="18" cy="18" r="14" fill="#CC1800"/>
+              <path d="M18 9 Q22 14 20 19 Q24 16 22.5 22 Q18 20 13.5 22 Q12 16 16 19 Q14 14 18 9Z" fill="#FFD700"/>
+            </svg>
+          </div>
+          <span class="hs-sign">지식소방서</span>
+        </div>
+        <div class="hs-body">
+          <div class="hs-win"></div>
+          <div class="hs-win"></div>
+          <div class="hs-win"></div>
+        </div>
+        <div class="hs-base">
+          <div class="hs-lamp"></div>
+          <div class="hs-garage">
+            <div class="hs-stripe"></div><div class="hs-stripe"></div>
+            <div class="hs-stripe"></div><div class="hs-stripe"></div>
+            <div class="hs-handle"></div>
+          </div>
+          <div class="hs-lamp"></div>
+        </div>
+        <div class="hs-truck">
+          <img src="assets/truck.svg" width="110" alt="소방차">
+        </div>
+      </div>
+
+      <div class="pai-area">
+        <div class="speech-bub" id="pai-speech">오늘도 지식을 불태워요!</div>
+        <img src="assets/pai.svg" class="pai-img" id="pai" alt="파이">
+        <span class="pai-name">파이</span>
+      </div>
+
+      <img src="assets/flame.svg" class="deco-flame fl1" alt="">
+      <img src="assets/flame.svg" class="deco-flame fl2" alt="">
+    </div>
+
+    <!-- 통계 -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-n" id="stat-notes">0</div>
+        <div class="stat-l">저장 노트</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n" id="stat-rate">0%</div>
+        <div class="stat-l">정답률</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n" id="stat-streak">0</div>
+        <div class="stat-l">연속 정답</div>
+      </div>
+    </div>
+
+    <!-- 시작 버튼 -->
+    <button class="btn-start" onclick="goStartQuiz()">
+      <img src="assets/flame.svg" width="22" height="22" alt=""> 진심을 담아서 시작하기
+    </button>
+  </div>
+
+  <!-- ══ 학습 기록 화면 ══ -->
+  <div id="screen-history" class="screen">
+    <header class="top-bar">
+      <h1 class="page-ttl">📋 학습 기록</h1>
+    </header>
+    <div class="date-filter-row">
+      <button class="dtag active" data-f="year"  onclick="filterDate(this)">연도</button>
+      <button class="dtag"        data-f="month" onclick="filterDate(this)">월</button>
+      <button class="dtag"        data-f="day"   onclick="filterDate(this)">일</button>
+    </div>
+    <div id="history-list" class="note-list-wrap"></div>
+  </div>
+
+  <!-- ══ 노트 추가 화면 ══ -->
+  <div id="screen-add" class="screen">
+    <header class="top-bar">
+      <h1 class="page-ttl">📝 노트 추가</h1>
+    </header>
+    <div class="form-wrap">
+      <div class="form-row">
+        <input type="text" id="note-title" class="form-input" placeholder="제목 이름">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">색상 선택</label>
+        <div class="color-grid" id="color-grid">
+          <!-- row 1 dark -->
+          <button class="col-btn" data-c="#555555" style="background:#555555" onclick="pickColor(this)"></button>
+          <button class="col-btn sel" data-c="#CC2200" style="background:#CC2200" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#FF6B35" style="background:#FF6B35" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#FFB800" style="background:#FFB800" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#2ECC40" style="background:#2ECC40" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#0074D9" style="background:#0074D9" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#9B59B6" style="background:#9B59B6" onclick="pickColor(this)"></button>
+          <!-- row 2 light -->
+          <button class="col-btn" data-c="#BBBBBB" style="background:#BBBBBB" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#FF8A80" style="background:#FF8A80" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#FFCC80" style="background:#FFCC80" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#FFF176" style="background:#FFF176" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#A5D6A7" style="background:#A5D6A7" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#90CAF9" style="background:#90CAF9" onclick="pickColor(this)"></button>
+          <button class="col-btn" data-c="#CE93D8" style="background:#CE93D8" onclick="pickColor(this)"></button>
+        </div>
+      </div>
+
+      <div class="form-row form-inline">
+        <label class="form-label">첨부 파일 수</label>
+        <input type="number" id="attach-count" class="form-input-sm" value="0" min="0">
+      </div>
+
+      <div class="form-row">
+        <textarea id="note-content" class="form-textarea"
+          placeholder="오늘 공부한 내용을 입력하세요...&#10;퀴즈 문제를 만드는 데 활용됩니다 🔥"></textarea>
+      </div>
+
+      <button class="btn-primary btn-full" onclick="saveNote()">변경</button>
+    </div>
+  </div>
+
+  <!-- ══ 퀴즈 화면 ══ -->
+  <div id="screen-quiz" class="screen quiz-screen">
+    <div class="fire-bg" id="fire-bg"></div>
+
+    <div class="quiz-ui">
+      <div class="quiz-topbar">
+        <span class="qscore">🎯 <span id="q-score">0</span>점</span>
+        <div class="qtimer-wrap">
+          <div class="qtimer-track">
+            <div class="qtimer-bar" id="timer-bar"></div>
+          </div>
+          <span class="qtimer-num" id="timer-txt">30</span>
+        </div>
+        <span class="qprog"><span id="q-cur">1</span>/<span id="q-tot">5</span></span>
+      </div>
+
+      <div class="quiz-card" id="quiz-card">
+        <span class="quiz-subj-tag" id="quiz-subj">과목</span>
+        <p class="quiz-q-text" id="quiz-q">문제 내용</p>
+        <div class="quiz-body-text" id="quiz-body"></div>
+      </div>
+
+      <button class="btn-answer" id="btn-answer" onclick="openAnswer()">
+        정답 입력하기
+      </button>
+      <div class="ans-input-wrap hidden" id="ans-wrap">
+        <input type="text" id="ans-input" class="ans-input" placeholder="정답을 입력하세요...">
+        <button class="btn-submit-ans" onclick="submitAns()">
+          <img src="assets/truck.svg" width="24" height="12" alt=""> 제출
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 결과 화면 ══ -->
+  <div id="screen-result" class="screen">
+    <header class="top-bar fire-bar">
+      <div>
+        <h1 class="page-ttl white">화재 진압 건수</h1>
+        <p class="page-sub white">(전체 문제 중 맞춘 문제 수)</p>
+      </div>
+    </header>
+
+    <div class="result-big-score">
+      <span id="big-score">0</span>
+      <span class="score-unit">점</span>
+    </div>
+
+    <div class="result-bars">
+      <div class="rbar-row">
+        <span class="rbar-lbl">정답률</span>
+        <div class="rbar-track"><div class="rbar-fill green-fill" id="bar-correct"></div></div>
+        <span class="rbar-pct" id="pct-correct">0%</span>
+      </div>
+      <div class="rbar-row">
+        <span class="rbar-lbl">오답률</span>
+        <div class="rbar-track"><div class="rbar-fill red-fill" id="bar-wrong"></div></div>
+        <span class="rbar-pct" id="pct-wrong">0%</span>
+      </div>
+    </div>
+
+    <div class="result-section">
+      <h3 class="rsec-title">📈 지난번 대비 좋아진 점</h3>
+      <div class="rsec-box" id="r-improve">이번이 첫 번째 퀴즈예요!</div>
+    </div>
+    <div class="result-section">
+      <h3 class="rsec-title">💬 피드백</h3>
+      <div class="rsec-box" id="r-feedback"></div>
+    </div>
+
+    <button class="btn-primary btn-full" onclick="navigateTo('home')">🏠 홈으로 돌아가기</button>
+  </div>
+
+  <!-- ══ 캐릭터 화면 ══ -->
+  <div id="screen-character" class="screen">
+    <header class="top-bar">
+      <h1 class="page-ttl">👤 캐릭터</h1>
+    </header>
+
+    <div class="char-layout">
+      <!-- 왼쪽: 캐릭터 미리보기 -->
+      <div class="char-preview">
+        <div class="char-box">
+          <div class="char-hat-disp" id="char-hat-disp"></div>
+          <img src="assets/pai.svg" class="char-main" alt="파이">
+          <div class="char-lv-badge">Level 1</div>
+        </div>
+        <button class="btn-store" onclick="alert('소방서 상점 준비 중!')">🛒 소방서 상점</button>
+      </div>
+
+      <!-- 오른쪽: 커스터마이징 -->
+      <div class="char-customize">
+        <div class="char-tabs">
+          <button class="ctab active" onclick="switchTab(this,'hat')">모자</button>
+          <button class="ctab" onclick="switchTab(this,'clothes')">옷</button>
+          <button class="ctab" onclick="switchTab(this,'expression')">표정</button>
+        </div>
+        <div class="char-items" id="char-items"></div>
+      </div>
+    </div>
+
+    <div class="friend-section">
+      <div class="friend-card">
+        <span class="friend-ico">🤝</span>
+        <div>
+          <p class="friend-title">친구 최대 2명 초대 가능</p>
+          <p class="friend-sub">친구 없이도 앱을 사용할 수 있어요.<br>프로그램 화면에서 친구 소환사가 가능해요!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 정답 결과 오버레이 ══ -->
+  <div id="ans-overlay" class="overlay hidden">
+    <div class="overlay-box" id="overlay-box">
+      <div class="overlay-icon" id="overlay-icon">✅</div>
+      <div class="overlay-msg"  id="overlay-msg">정답!</div>
+      <div class="overlay-ans"  id="overlay-ans"></div>
+      <button class="btn-primary" onclick="nextQ()">다음 문제 →</button>
+    </div>
+  </div>
+
+  <!-- ══ 하단 네비게이션 ══ -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-home"      onclick="navigateTo('home')">
+      <span class="nv-ico">🏠</span><span class="nv-lbl">홈</span>
+    </button>
+    <button class="nav-btn"        id="nav-history"   onclick="navigateTo('history')">
+      <span class="nv-ico">📋</span><span class="nv-lbl">기록</span>
+    </button>
+    <button class="nav-btn nav-plus" id="nav-add"     onclick="navigateTo('add')">
+      <span class="nv-ico plus-ico">+</span>
+    </button>
+    <button class="nav-btn"        id="nav-quiz"      onclick="goStartQuiz()">
+      <img src="assets/flame.svg" width="24" height="24" class="nv-flame" alt="">
+      <span class="nv-lbl">퀴즈</span>
+    </button>
+    <button class="nav-btn"        id="nav-character" onclick="navigateTo('character')">
+      <span class="nv-ico">👤</span><span class="nv-lbl">캐릭터</span>
+    </button>
+  </nav>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
