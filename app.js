@@ -144,7 +144,7 @@ function initAuth() {
   }
   const profile = getProfile();
   if (!profile) {
-    saveProfileData({ name: '데모', age: 20, onboardingDone: false });
+    saveProfileData({ name: '노서현', age: 20, onboardingDone: false });
     showOverlay('onboarding');
   } else if (!profile.onboardingDone) {
     showOverlay('onboarding');
@@ -1113,7 +1113,7 @@ function renderAiRecommendSection() {
 
 function requestAiRecommend() {
   const d = getData();
-  if (!d.isPremium) { showPremiumModal(); return; }
+  if (!isAdmin || !d.isPremium) { showPremiumModal(); return; }
 
   const btn = document.querySelector('#aside-ai-card .btn-ghost-sm');
   if (btn) { btn.disabled = true; btn.textContent = '분석 중...'; }
@@ -1621,7 +1621,7 @@ function sellHolding(stockId) {
 /* [Feature 7] AI 요약 */
 function aiSummarize(stockId, entryIdx, summaryElId) {
   const d = getData();
-  if (!d.isPremium) { showPremiumModal(); return; }
+  if (!isAdmin || !d.isPremium) { showPremiumModal(); return; }
 
   const h = d.holdings[stockId];
   if (!h) return;
@@ -1724,7 +1724,7 @@ function copyReport() {
 
 function aiEnhanceReport() {
   const d = getData();
-  if (!d.isPremium) { showPremiumModal(); return; }
+  if (!isAdmin || !d.isPremium) { showPremiumModal(); return; }
 
   const contentEl = document.getElementById('report-content');
   if (!contentEl) return;
@@ -1778,7 +1778,7 @@ function togglePremiumTest() {
 
 function updatePremiumUI() {
   const d = getData();
-  const isPremium = d.isPremium || false;
+  const isPremium = isAdmin && (d.isPremium || false);
 
   // 토글 버튼 상태 (관리자만 표시)
   const adminPremSection = document.getElementById('admin-premium-section');
@@ -1817,7 +1817,7 @@ function updatePremiumUI() {
 
 function pickWfSectorOrPremium(btn) {
   const d = getData();
-  if (!d.isPremium) { showPremiumModal(); return; }
+  if (!isAdmin || !d.isPremium) { showPremiumModal(); return; }
   pickWfSector(btn);
 }
 
