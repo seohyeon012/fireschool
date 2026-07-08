@@ -224,6 +224,7 @@
               <button class="filter-pill" data-f="국어" onclick="setSectorFilter('국어')">국어</button>
               <button class="filter-pill" data-f="프로그래밍" onclick="setSectorFilter('프로그래밍')">프로그래밍</button>
               <button class="filter-pill" data-f="기타" onclick="setSectorFilter('기타')">기타</button>
+              <button class="filter-pill filter-pill-premium" onclick="showPremiumModal()">🔒 숨겨진 과목</button>
             </div>
           </div>
 
@@ -297,7 +298,6 @@
         <div id="wf-init-price-row" class="wf-ppb-row">
           <div class="wf-section-label">초기 주가 설정 <span class="wf-ppb-hint">(처음 발행 시 — 내가 정함)</span></div>
           <div class="wf-ppb-btns">
-            <button class="wf-ppb-btn" data-ip="10"  onclick="pickWfInitPrice(this)">C10</button>
             <button class="wf-ppb-btn active" data-ip="20" onclick="pickWfInitPrice(this)">C20</button>
             <button class="wf-ppb-btn" data-ip="30"  onclick="pickWfInitPrice(this)">C30</button>
             <button class="wf-ppb-btn" data-ip="50"  onclick="pickWfInitPrice(this)">C50</button>

@@ -699,6 +699,8 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 }
 .filter-pill:hover { border-color: var(--sub); color: var(--text); }
 .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.filter-pill-premium { border-color: var(--yellow) !important; color: var(--yellow) !important; font-weight: 700; }
+.filter-pill-premium:hover { background: rgba(245,200,66,0.15) !important; border-color: var(--yellow) !important; }
 
 /* ── 필터 결과 없음 ── */
 .filter-empty { text-align: center; padding: 36px 0; color: var(--sub); }
