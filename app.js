@@ -260,7 +260,7 @@ let modalChartInstance = null;
 let modalZoom          = 7;
 let _currentChartHistory = [];
 let wfSector           = '수학';
-let wfInitialPrice     = 20;
+let wfInitialPrice     = 10;
 let wfAttachment       = null;   // { name, type, size, data } base64
 let selectedBuyIndices = new Set();
 
@@ -335,10 +335,10 @@ function openWriteKnowledge() {
   document.getElementById('wf-text').value  = '';
   document.getElementById('wf-title').focus();
   selectWfSector('수학');
-  wfInitialPrice = 20;
+  wfInitialPrice = 10;
   clearAttachment();
   const ipInput = document.getElementById('wf-init-price-input');
-  if (ipInput) ipInput.value = 20;
+  if (ipInput) ipInput.value = 10;
   updatePpbVisibility();
 }
 
@@ -439,8 +439,9 @@ function calcAutoPricePerBuy(sector) {
 }
 
 function pickWfInitPriceInput(input) {
-  const val = parseInt(input.value) || 20;
-  if (val < 20) { input.value = 20; wfInitialPrice = 20; }
+  const val = parseInt(input.value) || 1;
+  if (val < 1)  { input.value = 1;  wfInitialPrice = 1; }
+  else if (val > 20) { input.value = 20; wfInitialPrice = 20; }
   else wfInitialPrice = val;
 }
 
