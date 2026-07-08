@@ -124,6 +124,29 @@
   </div>
 </div>
 
+<!-- ══ 관리자 로그인 ══ -->
+<div id="screen-admin-login" class="full-overlay hidden">
+  <div class="admin-login-card">
+    <div class="admin-login-icon">🔐</div>
+    <div class="admin-login-title">관리자 로그인</div>
+    <p class="admin-login-sub">관리자 계정으로 로그인하면 프리미엄 설정과 유저 현황을 관리할 수 있습니다.</p>
+    <div class="form-row">
+      <label class="form-label">이름</label>
+      <input type="text" id="admin-name-input" class="form-input" placeholder="이름 입력">
+    </div>
+    <div class="form-row">
+      <label class="form-label">비밀번호</label>
+      <input type="password" id="admin-pw-input" class="form-input" placeholder="비밀번호 입력"
+             onkeydown="if(event.key==='Enter') tryAdminLogin()">
+    </div>
+    <p class="admin-login-error hidden" id="admin-login-error">이름 또는 비밀번호가 틀렸습니다.</p>
+    <div class="admin-login-actions">
+      <button class="btn-ghost" onclick="skipAdminLogin()">일반 사용자로 입장</button>
+      <button class="btn-primary" onclick="tryAdminLogin()">로그인</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 메인 앱 ══ -->
 <div id="app" class="hidden">
 
@@ -290,13 +313,13 @@
           <button class="wf-sec-btn" data-s="기타"  onclick="pickWfSector(this)">📌 기타</button>
         </div>
         <div class="wf-sec-row wf-sec-locked-row">
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 철학</button>
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 의학</button>
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 경제</button>
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 법학</button>
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 물리</button>
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 화학</button>
-          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 언어</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="철학" onclick="pickWfSectorOrPremium(this)">🔒 철학</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="의학" onclick="pickWfSectorOrPremium(this)">🔒 의학</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="경제" onclick="pickWfSectorOrPremium(this)">🔒 경제</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="법학" onclick="pickWfSectorOrPremium(this)">🔒 법학</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="물리" onclick="pickWfSectorOrPremium(this)">🔒 물리</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="화학" onclick="pickWfSectorOrPremium(this)">🔒 화학</button>
+          <button class="wf-sec-btn wf-sec-locked" data-s="언어" onclick="pickWfSectorOrPremium(this)">🔒 언어</button>
           <div class="wf-premium-unlock-hint" onclick="showPremiumModal()">✨ 프리미엄으로 잠금 해제</div>
         </div>
 
@@ -546,14 +569,20 @@
         <button class="btn-ghost" onclick="document.getElementById('screen-onboarding').classList.remove('hidden')">앱 사용 가이드 다시 보기</button>
       </div>
 
-      <!-- 프리미엄 테스트 -->
-      <div class="settings-section">
-        <div class="ss-title">✨ 프리미엄 테스트 모드</div>
+      <!-- 관리자 전용: 프리미엄 테스트 -->
+      <div class="settings-section hidden" id="admin-premium-section">
+        <div class="ss-title">✨ 프리미엄 모드 <span class="admin-badge">관리자</span></div>
         <div class="ss-premium-toggle-row">
           <span class="ss-toggle-label" id="premium-toggle-label">프리미엄 비활성</span>
           <button class="toggle-btn" id="premium-toggle-btn" onclick="togglePremiumTest()">OFF</button>
         </div>
-        <p style="font-size:11px;color:var(--sub);margin-top:6px">AI 요약, 학교급별 분류 등 프리미엄 기능을 테스트합니다</p>
+        <p style="font-size:11px;color:var(--sub);margin-top:6px">유저에게 프리미엄 기능을 ON/OFF 테스트합니다</p>
+      </div>
+
+      <!-- 관리자 전용: 유저 현황 -->
+      <div class="settings-section hidden" id="admin-stats-section">
+        <div class="ss-title">📊 유저 현황 <span class="admin-badge">관리자</span></div>
+        <div id="admin-user-stats"></div>
       </div>
 
       <!-- 계정 -->
@@ -621,6 +650,10 @@
     <ul class="pm-benefits">
       <li>🔓 잠긴 섹터 7개 추가 해제<br><span class="pm-benefit-sub">철학 · 의학 · 경제 · 법학 · 물리 · 화학 · 언어</span></li>
       <li>📈 매수 가능 섹터 수 <strong>무제한</strong></li>
+      <li>✨ AI 요약 기능<br><span class="pm-benefit-sub">구매한 지식을 AI가 핵심만 요약해 드려요</span></li>
+      <li>🎯 AI 시험기간 종목 추천<br><span class="pm-benefit-sub">시험 직전, 가장 잘 정리된 주식을 AI가 골라줘요</span></li>
+      <li>📋 AI 지식 리포트 작성<br><span class="pm-benefit-sub">내가 산 지식을 섹터별로 정리한 AI 리포트</span></li>
+      <li>🏫 학교급별 섹터 분류<br><span class="pm-benefit-sub">초·중·고·대학교별 맞춤 종목 필터링</span></li>
       <li>📊 전체 시장 포트폴리오 분석</li>
       <li>⚡ 시장 이벤트 우선 알림</li>
     </ul>

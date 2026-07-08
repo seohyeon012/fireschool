@@ -149,7 +149,7 @@ function initAuth() {
   } else if (!profile.onboardingDone) {
     showOverlay('onboarding');
   } else {
-    launchApp();
+    showAdminLogin();
   }
 }
 
@@ -158,6 +158,35 @@ function showOverlay(name) {
     document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== name);
   });
   document.getElementById('app').classList.toggle('hidden', name !== 'app');
+}
+
+function showAdminLogin() {
+  document.getElementById('screen-admin-login').classList.remove('hidden');
+}
+
+function tryAdminLogin() {
+  const name = document.getElementById('admin-name-input').value.trim();
+  const pw   = document.getElementById('admin-pw-input').value;
+  const errEl = document.getElementById('admin-login-error');
+  if (name === '노서현' && pw === '0908') {
+    isAdmin = true;
+    document.getElementById('screen-admin-login').classList.add('hidden');
+    document.getElementById('admin-pw-input').value = '';
+    document.getElementById('admin-name-input').value = '';
+    if (errEl) errEl.classList.add('hidden');
+    launchApp();
+  } else {
+    if (errEl) errEl.classList.remove('hidden');
+  }
+}
+
+function skipAdminLogin() {
+  isAdmin = false;
+  document.getElementById('screen-admin-login').classList.add('hidden');
+  document.getElementById('admin-pw-input').value = '';
+  document.getElementById('admin-name-input').value = '';
+  document.getElementById('admin-login-error').classList.add('hidden');
+  launchApp();
 }
 
 function launchApp() {
@@ -275,6 +304,7 @@ function historyLabels(h) { return (h || []).map((p, i) => (typeof p === 'number
 /* ── 상태 변수 ── */
 let currentScreen       = 'home';
 let prevScreen          = null;
+let isAdmin             = false;
 let currentDetailId     = null;
 let filterSector        = 'all';
 let filterQuery         = '';
@@ -1750,7 +1780,12 @@ function updatePremiumUI() {
   const d = getData();
   const isPremium = d.isPremium || false;
 
-  // 토글 버튼 상태
+  // 토글 버튼 상태 (관리자만 표시)
+  const adminPremSection = document.getElementById('admin-premium-section');
+  const adminStatsSection = document.getElementById('admin-stats-section');
+  if (adminPremSection)  adminPremSection.classList.toggle('hidden', !isAdmin);
+  if (adminStatsSection) adminStatsSection.classList.toggle('hidden', !isAdmin);
+
   const toggleBtn   = document.getElementById('premium-toggle-btn');
   const toggleLabel = document.getElementById('premium-toggle-label');
   if (toggleBtn)   { toggleBtn.textContent = isPremium ? 'ON' : 'OFF'; toggleBtn.className = isPremium ? 'toggle-btn on' : 'toggle-btn'; }
@@ -1759,6 +1794,64 @@ function updatePremiumUI() {
   // 학교급별 버튼 표시/숨김
   const schoolBtn = document.getElementById('nav-school-level');
   if (schoolBtn) schoolBtn.classList.toggle('hidden', !isPremium);
+
+  // 잠긴 섹터 버튼 업데이트
+  const PREMIUM_EMOJI = { '철학':'🧠','의학':'🩺','경제':'💹','법학':'⚖️','물리':'⚛️','화학':'🧪','언어':'🗣️' };
+  document.querySelectorAll('.wf-sec-locked, .wf-sec-btn[data-s]').forEach(btn => {
+    const sec = btn.dataset.s;
+    if (!sec) return;
+    const isLocked = ['철학','의학','경제','법학','물리','화학','언어'].includes(sec);
+    if (!isLocked) return;
+    if (isPremium) {
+      btn.classList.remove('wf-sec-locked');
+      btn.textContent = `${PREMIUM_EMOJI[sec]||''} ${sec}`;
+    } else {
+      btn.classList.add('wf-sec-locked');
+      btn.textContent = `🔒 ${sec}`;
+    }
+  });
+
+  // 유저 현황 렌더
+  if (isAdmin) renderUserStats();
+}
+
+function pickWfSectorOrPremium(btn) {
+  const d = getData();
+  if (!d.isPremium) { showPremiumModal(); return; }
+  pickWfSector(btn);
+}
+
+function renderUserStats() {
+  const el = document.getElementById('admin-user-stats');
+  if (!el) return;
+  const d = getData();
+  const holdings = Object.values(d.holdings || {});
+  const sectors  = Object.entries(d.mySectors || {});
+  const totalBought = holdings.reduce((a, h) => a + h.sharesOwned, 0);
+  const totalKnowledge = sectors.reduce((a, [, s]) => a + (s.shares?.length || 0), 0);
+  const holdVal = holdings.reduce((a, h) => {
+    const m = getMarketStock(h.stockId);
+    return a + (m ? m.price * h.sharesOwned : 0);
+  }, 0);
+  const myVal = sectors.reduce((a, [, s]) => a + s.price, 0);
+  const recentLogs = (d.activityLog || []).slice(-5).reverse();
+
+  el.innerHTML = `
+    <div class="admin-stats-grid">
+      <div class="admin-stat"><span class="admin-stat-lbl">섹터 수</span><span class="admin-stat-val">${sectors.length}</span></div>
+      <div class="admin-stat"><span class="admin-stat-lbl">지식 항목</span><span class="admin-stat-val">${totalKnowledge}</span></div>
+      <div class="admin-stat"><span class="admin-stat-lbl">총 매수</span><span class="admin-stat-val">${totalBought}주</span></div>
+      <div class="admin-stat"><span class="admin-stat-lbl">잔액</span><span class="admin-stat-val">C${Math.round(d.balance||0)}</span></div>
+      <div class="admin-stat"><span class="admin-stat-lbl">매입평가</span><span class="admin-stat-val">C${Math.round(holdVal)}</span></div>
+      <div class="admin-stat"><span class="admin-stat-lbl">발행주가</span><span class="admin-stat-val">C${Math.round(myVal)}</span></div>
+    </div>
+    <div class="admin-stat-lbl" style="margin:10px 0 6px">최근 활동</div>
+    ${recentLogs.length ? recentLogs.map(l => {
+      const time = new Date(l.ts).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const typeLabel = l.type==='buy'?'📈 매수':l.type==='write'?'✏️ 입력':'🔄 기타';
+      return `<div class="admin-log-row"><span class="admin-log-type">${typeLabel}</span><span class="admin-log-time">${time}</span></div>`;
+    }).join('') : '<div style="font-size:12px;color:var(--sub)">활동 없음</div>'}
+  `;
 }
 
 /* ══ 설정 ══ */
@@ -1886,7 +1979,7 @@ function closeOnboarding() {
   profile.onboardingDone = true;
   saveProfileData(profile);
   document.getElementById('screen-onboarding').classList.add('hidden');
-  if (document.getElementById('app').classList.contains('hidden')) launchApp();
+  if (document.getElementById('app').classList.contains('hidden')) showAdminLogin();
 }
 
 function prefillProfileSetup(user) {
