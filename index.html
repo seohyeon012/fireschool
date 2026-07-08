@@ -169,6 +169,9 @@
       <button class="sn-btn" id="nav-portfolio" onclick="navigateTo('portfolio')">
         <span>💼</span><span>포트폴리오</span>
       </button>
+      <button class="sn-btn hidden" id="nav-school-level" onclick="navigateTo('school-level')">
+        <span>🏫</span><span>학교급별</span>
+      </button>
     </div>
 
     <div class="sn-bottom">
@@ -231,7 +234,10 @@
           <div class="home-section">
             <div class="section-row">
               <span class="section-ttl">📈 전체 종목</span>
-              <span class="stock-cnt" id="market-stock-count">0개 종목</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="btn-ghost-sm" id="sector-group-toggle" onclick="toggleSectorGroupMode()">섹터별 모아보기</button>
+                <span class="stock-cnt" id="market-stock-count">0개 종목</span>
+              </div>
             </div>
             <div id="market-list"></div>
             <div class="empty-home hidden" id="market-empty">
@@ -304,6 +310,10 @@
           </div>
         </div>
 
+        <div class="wf-section-label">주 이름(종목명)</div>
+        <input type="text" id="wf-stock-name" class="wf-title-input"
+               placeholder="예: 김민준의 수학주 (섹터명 포함 필수)" style="margin-bottom:10px">
+
         <div class="wf-section-label">주 제목</div>
         <input type="text" id="wf-title" class="wf-title-input"
                placeholder="예: 피타고라스 정리, 가정법 과거, React Hooks…">
@@ -371,15 +381,45 @@
         <div class="chart-expand-hint">🔍 확대</div>
       </div>
 
+      <!-- 판매자 프로필 카드 -->
+      <div id="seller-profile-card" class="seller-profile-card hidden">
+        <div class="sp-left">
+          <div class="sp-avatar" id="sp-avatar">?</div>
+          <div class="sp-info">
+            <div class="sp-name" id="sp-name">—</div>
+            <div class="sp-sector" id="sp-sector">—</div>
+            <div class="sp-issued" id="sp-issued">0주 발행</div>
+          </div>
+        </div>
+        <div class="sp-right">
+          <div class="sp-rating" id="sp-rating">★ 4.0</div>
+          <button class="btn-rate" onclick="openRatingPanel()">⭐ 평가하기</button>
+        </div>
+      </div>
+      <!-- 평가 패널 -->
+      <div id="rating-panel" class="rating-panel hidden">
+        <div class="rp-title">별점 선택</div>
+        <div class="rp-stars" id="rp-stars">
+          <button onclick="submitRating(1)">★</button>
+          <button onclick="submitRating(2)">★★</button>
+          <button onclick="submitRating(3)">★★★</button>
+          <button onclick="submitRating(4)">★★★★</button>
+          <button onclick="submitRating(5)">★★★★★</button>
+        </div>
+      </div>
+
       <!-- 타인 주식: 지식 선택 매수 -->
       <div id="detail-buy-section" class="detail-section hidden">
         <div class="buy-kn-header">
           <span class="buy-kn-title">📚 지식 선택 후 매수</span>
           <span id="d-my-shares" class="d-my-shares-badge">미보유</span>
         </div>
-        <input type="text" id="buy-search" class="buy-search-input"
-               placeholder="🔍 지식 검색 (예: 피타고라스, DO, WILL...)"
-               oninput="filterBuyKnowledge(this.value)">
+        <div class="buy-kn-actions-row">
+          <input type="text" id="buy-search" class="buy-search-input"
+                 placeholder="🔍 지식 검색 (예: 피타고라스, DO, WILL...)"
+                 oninput="filterBuyKnowledge(this.value)" style="margin-bottom:0;flex:1">
+          <button class="btn-ghost-sm" onclick="selectAllBuyEntries()">전체 선택</button>
+        </div>
         <div id="buy-knowledge-list" class="buy-knowledge-list"></div>
         <div class="buy-confirm-row">
           <div class="buy-confirm-info">
@@ -436,6 +476,12 @@
         <div class="port-sum-item"><span class="port-sum-lbl">📥 매입 평가액</span><span id="port-holdings-val" class="port-sum-val">C—</span></div>
         <div class="port-sum-item"><span class="port-sum-lbl">✏️ 발행 주가 합계</span><span id="port-my-val" class="port-sum-val">C—</span></div>
         <div class="port-sum-item port-sum-total"><span class="port-sum-lbl">📊 총 자산</span><span id="port-total-val" class="port-sum-val">C—</span></div>
+        <div class="port-sum-item port-sum-roi"><span class="port-sum-lbl">📈 수익률</span><span id="port-roi-val" class="port-sum-val">—%</span></div>
+      </div>
+
+      <!-- 포트폴리오 액션 버튼 -->
+      <div class="port-action-row">
+        <button class="btn-ghost" onclick="openReportModal()">📋 리포트 작성</button>
       </div>
 
       <!-- 매입 보유 -->
@@ -500,6 +546,16 @@
         <button class="btn-ghost" onclick="document.getElementById('screen-onboarding').classList.remove('hidden')">앱 사용 가이드 다시 보기</button>
       </div>
 
+      <!-- 프리미엄 테스트 -->
+      <div class="settings-section">
+        <div class="ss-title">✨ 프리미엄 테스트 모드</div>
+        <div class="ss-premium-toggle-row">
+          <span class="ss-toggle-label" id="premium-toggle-label">프리미엄 비활성</span>
+          <button class="toggle-btn" id="premium-toggle-btn" onclick="togglePremiumTest()">OFF</button>
+        </div>
+        <p style="font-size:11px;color:var(--sub);margin-top:6px">AI 요약, 학교급별 분류 등 프리미엄 기능을 테스트합니다</p>
+      </div>
+
       <!-- 계정 -->
       <div class="settings-section">
         <div class="ss-title">🔒 계정</div>
@@ -507,8 +563,37 @@
       </div>
     </div>
 
+    <!-- ════ 학교급별 ════ -->
+    <div id="screen-school-level" class="screen">
+      <div class="page-header">
+        <span class="page-ttl">🏫 학교급별 섹터 분류</span>
+      </div>
+      <div class="sl-tabs">
+        <button class="sl-tab active" data-level="elementary" onclick="setSchoolLevel('elementary')">초등</button>
+        <button class="sl-tab" data-level="middle" onclick="setSchoolLevel('middle')">중등</button>
+        <button class="sl-tab" data-level="high" onclick="setSchoolLevel('high')">고등</button>
+        <button class="sl-tab" data-level="university" onclick="setSchoolLevel('university')">대학</button>
+      </div>
+      <div id="school-level-list" class="school-level-list"></div>
+    </div>
+
   </div><!-- /content-area -->
 </div><!-- /app -->
+
+<!-- ══ 리포트 모달 ══ -->
+<div id="report-modal" class="chart-modal-overlay hidden" onclick="closeReportModal(event)">
+  <div class="report-modal-card">
+    <div class="report-modal-header">
+      <span class="chart-modal-ttl">📋 보유 지식 리포트</span>
+      <div class="report-modal-btns">
+        <button class="btn-ghost-sm" onclick="copyReport()">📋 복사</button>
+        <button class="btn-ghost-sm" id="btn-ai-report" onclick="aiEnhanceReport()">✨ AI 도움 받기 <span class="premium-badge">PRO</span></button>
+      </div>
+      <button class="chart-modal-close" onclick="closeReportModal()">✕</button>
+    </div>
+    <div id="report-content" class="report-content"></div>
+  </div>
+</div>
 
 <!-- ══ 차트 모달 ══ -->
 <div id="chart-modal" class="chart-modal-overlay hidden" onclick="closeChartModal(event)">

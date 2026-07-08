@@ -10,7 +10,7 @@ const STARTING_BALANCE = 200;
 const REVIEW_PERFECT   = 35;
 const REVIEW_HAZY      = 20;
 const REVIEW_FORGOT    = 0;
-const WRITE_REWARD     = 5;    // 지식 입력 시 C 보상
+const WRITE_REWARD     = 5;
 const DECAY_NORMAL     = 0.045;
 const DECAY_BOOM       = 0.025;
 const DECAY_RECESSION  = 0.07;
@@ -26,16 +26,33 @@ const SECTOR_EMOJI = {
   '수학':'📐','영어':'📖','과학':'🔬','역사':'🏛️','국어':'✍️','프로그래밍':'💻','기타':'📌'
 };
 
-/* ── 데모 시장 (다른 유저 주식) ── */
-function mkHist(steps, finalPrice) {
+// 학교급별 섹터 분류
+const SCHOOL_LEVELS = {
+  elementary:  ['국어','수학','과학','역사'],
+  middle:      ['국어','수학','과학','역사','영어','기타'],
+  high:        ['국어','수학','과학','역사','영어','기타','프로그래밍'],
+  university:  ['국어','수학','과학','역사','영어','기타','프로그래밍','철학','의학','경제','법학','물리','화학','언어'],
+};
+
+// 금칙어 목록
+const BANNED_WORDS = ['shit','fuck','damn','bitch','ass','bastard','crap','욕','바보','멍청','개새','씨발','병신','미친'];
+
+/* ── 데모 시장 ── */
+// [Feature 2] mkHist 365일 지원: startPrice = finalPrice * 0.25, 노이즈 포함 상승 곡선
+function mkHist(days, finalPrice) {
   const h = [];
-  for (let i = steps; i >= 0; i--) {
+  const startPrice = finalPrice * 0.25;
+  for (let i = days; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const t  = (steps - i) / Math.max(steps, 1);
-    const p  = Math.round((finalPrice * (0.25 + 0.75 * t)) * 10) / 10;
+    const t     = (days - i) / Math.max(days, 1);
+    const trend = startPrice + (finalPrice - startPrice) * t;
+    const noise = (Math.random() * 0.1 - 0.05) * trend;
+    const p     = Math.max(MIN_PRICE, Math.round((trend + noise) * 10) / 10);
     h.push({ v: p, d: d.toISOString().slice(0, 10) });
   }
+  // 마지막 값을 finalPrice로 고정
+  if (h.length) h[h.length - 1].v = finalPrice;
   return h;
 }
 
@@ -44,7 +61,8 @@ const DEMO_MARKET = [
     id: 'demo_1', uid: 'u_alice', creatorName: '김민준', sector: '수학',
     price: 48, pricePerBuy: 15, sharesIssued: 9,
     lastInput: offset(-2), lastBought: offset(-1),
-    priceHistory: mkHist(9, 48),
+    rating: 4.2,
+    priceHistory: mkHist(365, 48),
     shares: [
       { title: '피타고라스 정리', text: '직각삼각형에서 a² + b² = c²가 성립한다. 빗변의 제곱 = 나머지 두 변의 제곱합.', date: offset(-8) },
       { title: '이차방정식 근의 공식', text: 'x = (-b ± √(b²-4ac)) / 2a. 판별식 D = b²-4ac. D>0 두 실근, D=0 중근, D<0 허근.', date: offset(-6) },
@@ -56,7 +74,8 @@ const DEMO_MARKET = [
     id: 'demo_2', uid: 'u_bob', creatorName: '이서연', sector: '영어',
     price: 24, pricePerBuy: 10, sharesIssued: 4,
     lastInput: offset(-1), lastBought: offset(-3),
-    priceHistory: mkHist(4, 24),
+    rating: 3.8,
+    priceHistory: mkHist(365, 24),
     shares: [
       { title: '가정법 과거', text: 'If + 주어 + were/과거동사, 주어 + would/could + 동사원형. 현재 사실의 반대를 가정할 때 사용.', date: offset(-3) },
       { title: '관계대명사 정리', text: '선행사가 사람→who/that, 사물→which/that. 소유격은 whose. 목적격은 생략 가능.', date: offset(-1) },
@@ -66,7 +85,8 @@ const DEMO_MARKET = [
     id: 'demo_3', uid: 'u_carol', creatorName: '박지호', sector: '프로그래밍',
     price: 73, pricePerBuy: 20, sharesIssued: 15,
     lastInput: offset(0), lastBought: offset(0),
-    priceHistory: mkHist(15, 73),
+    rating: 4.7,
+    priceHistory: mkHist(365, 73),
     shares: [
       { title: '빅오 표기법', text: 'O(1) 상수, O(log n) 로그, O(n) 선형, O(n²) 이차. 알고리즘의 시간/공간 복잡도를 표기하는 방법.', date: offset(-10) },
       { title: '동적 프로그래밍(DP)', text: '큰 문제를 부분 문제로 분할하고 메모이제이션으로 중복 계산을 방지. top-down/bottom-up 두 방식 존재.', date: offset(-7) },
@@ -79,7 +99,8 @@ const DEMO_MARKET = [
     id: 'demo_4', uid: 'u_dan', creatorName: '최아름', sector: '과학',
     price: 32, pricePerBuy: 10, sharesIssued: 5,
     lastInput: offset(-4), lastBought: offset(-2),
-    priceHistory: mkHist(5, 32),
+    rating: 4.0,
+    priceHistory: mkHist(365, 32),
     shares: [
       { title: '산화-환원 반응', text: '산화=전자 잃음/수소 잃음/산소 얻음. 환원=그 반대. 산화와 환원은 항상 동시에 발생(산화환원 동시성).', date: offset(-4) },
       { title: '뉴턴 운동 3법칙', text: '1법칙=관성(힘 없으면 등속직선운동), 2법칙=F=ma(가속도 법칙), 3법칙=작용·반작용(크기 같고 방향 반대).', date: offset(-2) },
@@ -89,7 +110,8 @@ const DEMO_MARKET = [
     id: 'demo_5', uid: 'u_eve', creatorName: '정우진', sector: '역사',
     price: 11, pricePerBuy: 10, sharesIssued: 2,
     lastInput: offset(-6), lastBought: offset(-5),
-    priceHistory: mkHist(2, 11),
+    rating: 3.5,
+    priceHistory: mkHist(365, 11),
     shares: [
       { title: '갑오개혁(1894)', text: '신분제·과거제 폐지, 조혼 금지, 재정·군사 근대화. 청일전쟁 이후 일본의 압력 하에 추진된 근대적 개혁.', date: offset(-6) },
     ]
@@ -103,7 +125,7 @@ function offset(days) {
 }
 
 /* ── Firebase ── */
-let currentUserId   = null;
+let currentUserId    = null;
 let currentUserEmail = null;
 let db = null;
 
@@ -155,6 +177,7 @@ function launchApp() {
   applyDecay();
   renderHome();
   updateTicker();
+  updatePremiumUI();
 }
 
 function signInWithGoogle() {
@@ -211,12 +234,14 @@ function profileKey() { return `kse_profile_${currentUserId || 'demo'}`; }
 
 function getData() {
   return LS.get(dataKey()) || {
-    mySectors:   {},
-    holdings:    {},
-    balance:     STARTING_BALANCE,
-    activityLog: [],
+    mySectors:    {},
+    holdings:     {},
+    balance:      STARTING_BALANCE,
+    activityLog:  [],
     marketStatus: 'normal',
     marketExpiry: null,
+    ratings:      {},
+    isPremium:    false,
   };
 }
 function saveData(d) { LS.set(dataKey(), d); }
@@ -248,21 +273,24 @@ function historyValues(h) { return (h || []).map(p => (typeof p === 'number' ? p
 function historyLabels(h) { return (h || []).map((p, i) => (typeof p === 'number' ? `#${i+1}` : p.d)); }
 
 /* ── 상태 변수 ── */
-let currentScreen      = 'home';
-let prevScreen         = null;
-let currentDetailId    = null;
-let filterSector       = 'all';
-let filterQuery        = '';
-let pendingReviewData  = null;
-let chartZoom          = 7;
-let priceChartInstance = null;
-let modalChartInstance = null;
-let modalZoom          = 7;
+let currentScreen       = 'home';
+let prevScreen          = null;
+let currentDetailId     = null;
+let filterSector        = 'all';
+let filterQuery         = '';
+let pendingReviewData   = null;
+let chartZoom           = 7;
+let priceChartInstance  = null;
+let modalChartInstance  = null;
+let modalZoom           = 7;
 let _currentChartHistory = [];
-let wfSector           = '수학';
-let wfInitialPrice     = 10;
-let wfAttachment       = null;   // { name, type, size, data } base64
-let selectedBuyIndices = new Set();
+let wfSector            = '수학';
+let wfInitialPrice      = 10;
+let wfAttachment        = null;
+let selectedBuyIndices  = new Set();
+let sectorGroupMode     = false;   // [Feature 10]
+let currentSchoolLevel  = 'elementary'; // [Feature 8]
+let _reportText         = '';      // [Feature 13]
 
 /* ── 시장 자동 등락 ── */
 function applyDemoFluctuation() {
@@ -278,7 +306,7 @@ function applyDemoFluctuation() {
 }
 
 function applyUserSectorFluctuation() {
-  const d      = getData();
+  const d       = getData();
   const todayStr = today();
   if (d.lastFluctuationDate === todayStr) return;
   const status = d.marketStatus || 'normal';
@@ -333,6 +361,8 @@ function openWriteKnowledge() {
   document.getElementById('write-form').classList.remove('hidden');
   document.getElementById('wf-title').value = '';
   document.getElementById('wf-text').value  = '';
+  const stockNameEl = document.getElementById('wf-stock-name');
+  if (stockNameEl) stockNameEl.value = '';
   document.getElementById('wf-title').focus();
   selectWfSector('수학');
   wfInitialPrice = 10;
@@ -377,7 +407,6 @@ function clearAttachment() {
 function openAttachment(dataUrl, name) {
   if (!dataUrl) return;
   if (dataUrl.startsWith('data:image/')) {
-    // 이미지는 새 탭에서 바로 보여줌
     const w = window.open('', '_blank');
     w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${dataUrl}" style="max-width:100%;max-height:100vh"></body></html>`);
     w.document.title = name || 'image';
@@ -423,35 +452,77 @@ function updatePpbVisibility() {
   if (initRow) initRow.style.display = isNew ? '' : 'none';
 }
 
-/* 시장 상황에 따라 매수당 주가 상승폭 자동 결정 */
 function calcAutoPricePerBuy(sector) {
   const d      = getData();
   const status = d.marketStatus || 'normal';
-  // 기준값: 호황=높음, 불황=낮음
   const base   = status === 'boom' ? 18 : status === 'recession' ? 6 : 10;
-  // 섹터 인기도 보정 (시장에 많이 거래될수록 조금 더 높게)
   const demoStock = DEMO_MARKET.find(m => m.sector === sector);
   const popularity = demoStock ? Math.min(demoStock.sharesIssued / 10, 1) : 0;
   const bonus = Math.round(popularity * 5);
-  // ±2 내 랜덤 변동
   const jitter = Math.round((Math.random() * 4) - 2);
   return Math.max(3, base + bonus + jitter);
 }
 
 function pickWfInitPriceInput(input) {
   const val = parseInt(input.value) || 1;
-  if (val < 1)  { input.value = 1;  wfInitialPrice = 1; }
+  if (val < 1)   { input.value = 1;  wfInitialPrice = 1; }
   else if (val > 20) { input.value = 20; wfInitialPrice = 20; }
   else wfInitialPrice = val;
 }
 
+/* ── [Feature 3] AI 지식 검토 시뮬레이션 ── */
+function aiReviewKnowledge(title, text, callback) {
+  const submitBtn = document.querySelector('.wf-actions .btn-primary');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '🔍 AI 검토 중...';
+  }
+  showToast('🔍 AI 검토 중...');
+
+  setTimeout(() => {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '📋 지식 등록 (1주 발행)';
+    }
+
+    const combined = (title + ' ' + text).toLowerCase();
+
+    // 30자 미만 거절
+    if ((title + text).length < 30) {
+      showToast('❌ 내용이 너무 짧습니다. 30자 이상 입력해 주세요.');
+      callback(false);
+      return;
+    }
+
+    // 금칙어 검사
+    const hasBanned = BANNED_WORDS.some(w => combined.includes(w.toLowerCase()));
+    if (hasBanned) {
+      showToast('❌ 부적절한 표현이 포함되어 있습니다. 수정 후 재시도해 주세요.');
+      callback(false);
+      return;
+    }
+
+    // 승인
+    showToast('✅ AI 검토 완료! 교육적 내용으로 확인됐습니다.');
+    callback(true);
+  }, 800);
+}
 
 function submitKnowledge() {
-  const title = document.getElementById('wf-title').value.trim();
-  const text  = document.getElementById('wf-text').value.trim();
+  const title     = document.getElementById('wf-title').value.trim();
+  const text      = document.getElementById('wf-text').value.trim();
+  const stockName = (document.getElementById('wf-stock-name')?.value || '').trim();
   if (!title) { shake('wf-title'); showToast('❌ 제목을 입력해주세요'); return; }
   if (!text)  { shake('wf-text');  showToast('❌ 내용을 입력해주세요');  return; }
 
+  // AI 검토 후 저장
+  aiReviewKnowledge(title, text, (approved) => {
+    if (!approved) return;
+    _doSaveKnowledge(title, text, stockName);
+  });
+}
+
+function _doSaveKnowledge(title, text, stockName) {
   const d   = getData();
   const sec = wfSector;
 
@@ -468,7 +539,10 @@ function submitKnowledge() {
       lastUpdate:      Date.now(),
       lastHistoryDate: today(),
       addedDate:       today(),
+      stockName:       stockName || null,
     };
+  } else if (stockName) {
+    d.mySectors[sec].stockName = stockName;
   }
 
   const s = d.mySectors[sec];
@@ -507,7 +581,7 @@ function renderBuyKnowledgeList(filterQ) {
   const ownedIdxs = new Set((hold?.boughtEntries || []).map(e => e.idx));
 
   const rows = shares.map((entry, realIdx) => ({ entry, realIdx }))
-    .filter(({ entry }) => !q || entry.text.toLowerCase().includes(q));
+    .filter(({ entry }) => !q || entry.title?.toLowerCase().includes(q) || entry.text.toLowerCase().includes(q));
 
   if (!rows.length) {
     list.innerHTML = `<div class="buy-kn-empty">${q ? '검색 결과 없음' : '등록된 지식이 없습니다'}</div>`;
@@ -547,6 +621,21 @@ function toggleBuyEntry(idx) {
   renderBuyKnowledgeList(q);
 }
 
+/* [Feature 9] 전체 선택 */
+function selectAllBuyEntries() {
+  const mktStock = getMarketStock(currentDetailId);
+  if (!mktStock) return;
+  const d = getData();
+  const hold = d.holdings[currentDetailId];
+  const ownedIdxs = new Set((hold?.boughtEntries || []).map(e => e.idx));
+  const shares = mktStock.shares || [];
+  shares.forEach((_, idx) => {
+    if (!ownedIdxs.has(idx)) selectedBuyIndices.add(idx);
+  });
+  const q = document.getElementById('buy-search')?.value || '';
+  renderBuyKnowledgeList(q);
+}
+
 function updateBuySummary(mktStock) {
   const stock  = mktStock || getMarketStock(currentDetailId);
   const count  = selectedBuyIndices.size;
@@ -577,17 +666,17 @@ function confirmBuySelected() {
   d.balance -= totalCost;
 
   const h = d.holdings[currentDetailId] || {
-    stockId:     currentDetailId,
-    uid:         mktStock.uid,
-    creatorName: mktStock.creatorName,
-    sector:      mktStock.sector,
-    sharesOwned: 0,
-    totalCost:   0,
+    stockId:      currentDetailId,
+    uid:          mktStock.uid,
+    creatorName:  mktStock.creatorName,
+    sector:       mktStock.sector,
+    sharesOwned:  0,
+    totalCost:    0,
     boughtEntries: [],
   };
-  h.sharesOwned    += count;
-  h.totalCost      += totalCost;
-  h.boughtEntries   = h.boughtEntries || [];
+  h.sharesOwned   += count;
+  h.totalCost     += totalCost;
+  h.boughtEntries  = h.boughtEntries || [];
   const shares = mktStock.shares || [];
   selectedBuyIndices.forEach(idx => {
     const src = shares[idx] || {};
@@ -598,7 +687,7 @@ function confirmBuySelected() {
   d.activityLog.push({ ts: Date.now(), type: 'buy', stockId: currentDetailId, count });
   saveData(d);
 
-  // 데모 시장: 선택한 수만큼 주가 상승
+  // 데모 시장: 주가 상승
   const dIdx = DEMO_MARKET.findIndex(m => m.id === currentDetailId);
   if (dIdx >= 0) {
     DEMO_MARKET[dIdx].price = Math.round((DEMO_MARKET[dIdx].price + DEMO_MARKET[dIdx].pricePerBuy * count) * 10) / 10;
@@ -613,9 +702,10 @@ function confirmBuySelected() {
 }
 
 function getMarketStock(stockId) {
+  if (!stockId) return null;
   const demo = DEMO_MARKET.find(m => m.id === stockId);
   if (demo) return demo;
-  if (stockId && stockId.startsWith('my_')) {
+  if (stockId.startsWith('my_')) {
     const sec = stockId.slice(3);
     const d   = getData();
     const s   = d.mySectors[sec];
@@ -725,10 +815,11 @@ function navigateTo(name) {
   document.getElementById(`screen-${name}`)?.classList.add('active');
   document.getElementById(`nav-${name}`)?.classList.add('active');
   document.querySelector('.content-area')?.scrollTo(0, 0);
-  if (name === 'home')         renderHome();
-  if (name === 'myknowledge')  renderMyKnowledge();
-  if (name === 'portfolio')    renderPortfolio();
-  if (name === 'settings')     renderSettings();
+  if (name === 'home')          renderHome();
+  if (name === 'myknowledge')   renderMyKnowledge();
+  if (name === 'portfolio')     renderPortfolio();
+  if (name === 'settings')      renderSettings();
+  if (name === 'school-level')  renderSchoolLevel();
 }
 
 function goBack() { navigateTo(prevScreen || 'home'); }
@@ -755,10 +846,18 @@ function updateKospiBar() {
   const chip = document.getElementById('market-chip');
   if (chip) {
     const st = d.marketStatus;
-    if (st === 'boom')      { chip.textContent = '🟢 호황'; chip.className = 'market-chip boom'; }
+    if (st === 'boom')           { chip.textContent = '🟢 호황'; chip.className = 'market-chip boom'; }
     else if (st === 'recession') { chip.textContent = '🔴 침체'; chip.className = 'market-chip recession'; }
-    else                    { chip.textContent = '🟡 정상'; chip.className = 'market-chip'; }
+    else                          { chip.textContent = '🟡 정상'; chip.className = 'market-chip'; }
   }
+}
+
+/* [Feature 10] 섹터별 모아보기 토글 */
+function toggleSectorGroupMode() {
+  sectorGroupMode = !sectorGroupMode;
+  const btn = document.getElementById('sector-group-toggle');
+  if (btn) btn.textContent = sectorGroupMode ? '전체 목록' : '섹터별 모아보기';
+  renderMarketList();
 }
 
 function renderMarketList() {
@@ -791,27 +890,46 @@ function renderMarketList() {
   }
   emptyEl?.classList.add('hidden');
 
-  listEl.innerHTML = all.map(s => {
-    const chg   = priceChgPct(s.priceHistory);
-    const color = SECTOR_COLORS[s.sector] || '#6B7280';
-    return `
-      <div class="stock-card" onclick="openMarketDetail('${s.id}')">
-        <div class="sc-left">
-          <div class="sc-name">
-            ${SECTOR_EMOJI[s.sector]||''} ${esc(s.sector)}주
-            ${s.isOwn ? '<span class="sc-own-tag">내 발행</span>' : ''}
-          </div>
-          <div class="sc-meta">
-            <span class="sc-creator" style="color:${color}">${esc(s.creatorName)}</span>
-            <span class="sc-shares-cnt">· ${s.sharesIssued||0}주 발행</span>
-          </div>
+  if (sectorGroupMode) {
+    // 섹터별 그룹핑
+    const grouped = {};
+    all.forEach(s => {
+      if (!grouped[s.sector]) grouped[s.sector] = [];
+      grouped[s.sector].push(s);
+    });
+    listEl.innerHTML = Object.entries(grouped).map(([sector, stocks]) => `
+      <div class="sector-group-header">${SECTOR_EMOJI[sector]||''} ${esc(sector)} (${stocks.length}개)</div>
+      ${stocks.map(s => renderStockCardHtml(s)).join('')}
+    `).join('');
+  } else {
+    listEl.innerHTML = all.map(s => renderStockCardHtml(s)).join('');
+  }
+}
+
+function renderStockCardHtml(s) {
+  const chg   = priceChgPct(s.priceHistory);
+  const color = SECTOR_COLORS[s.sector] || '#6B7280';
+  // [Feature 11] stockName 표시
+  const displayName = s.stockName
+    ? `${SECTOR_EMOJI[s.sector]||''} ${esc(s.stockName)}`
+    : `${SECTOR_EMOJI[s.sector]||''} ${esc(s.sector)}주`;
+  return `
+    <div class="stock-card" onclick="openMarketDetail('${s.id}')">
+      <div class="sc-left">
+        <div class="sc-name">
+          ${displayName}
+          ${s.isOwn ? '<span class="sc-own-tag">내 발행</span>' : ''}
         </div>
-        <div class="sc-right">
-          <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
-          <div class="sc-chg ${chg>=0?'green':'red'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+        <div class="sc-meta">
+          <span class="sc-creator" style="color:${color}">${esc(s.creatorName)}</span>
+          <span class="sc-shares-cnt">· ${s.sharesIssued||0}주 발행</span>
         </div>
-      </div>`;
-  }).join('');
+      </div>
+      <div class="sc-right">
+        <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
+        <div class="sc-chg ${chg>=0?'green':'red'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+      </div>
+    </div>`;
 }
 
 function priceChgPct(h) {
@@ -835,22 +953,22 @@ function filterStocks() {
 
 function setSectorFilter(val) {
   filterSector = val;
-  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  // filter-pill-premium 버튼은 active 처리하지 않음
+  document.querySelectorAll('.filter-pill:not(.filter-pill-premium)').forEach(b => b.classList.remove('active'));
   document.querySelector(`.filter-pill[data-f="${val}"]`)?.classList.add('active');
   renderMarketList();
 }
 
-/* ── 홈 오른쪽 패널 ── */
+/* ── [Feature 5] 홈 오른쪽 패널 ── */
 function renderHomeAside() {
   const d      = getData();
-  const todStr = today();
 
   // 보유 현황
   const sumEl = document.getElementById('aside-summary');
   if (sumEl) {
-    const myCount  = Object.keys(d.mySectors).length;
+    const myCount   = Object.keys(d.mySectors).length;
     const holdCount = Object.keys(d.holdings).length;
-    const holdVal  = Object.entries(d.holdings).reduce((a, [id, h]) => {
+    const holdVal   = Object.entries(d.holdings).reduce((a, [id, h]) => {
       const m = getMarketStock(id);
       return a + (m ? m.price * h.sharesOwned : 0);
     }, 0);
@@ -897,6 +1015,84 @@ function renderHomeAside() {
       <div class="aside-stat-row"><span class="aside-stat-lbl">✏️ 지식 입력</span><span class="aside-stat-val">${writes}건</span></div>
       <div class="aside-stat-row"><span class="aside-stat-lbl">📈 매수 거래</span><span class="aside-stat-val">${buys}건</span></div>`;
   }
+
+  // [Feature 5] 핫 종목 / 핫 섹터
+  renderHotSection();
+  // [Feature 6] AI 추천 버튼
+  renderAiRecommendSection();
+}
+
+function renderHotSection() {
+  // 기존 핫 카드가 있으면 제거 후 재생성
+  let hotCard = document.getElementById('aside-hot-card');
+  if (!hotCard) {
+    hotCard = document.createElement('div');
+    hotCard.id = 'aside-hot-card';
+    hotCard.className = 'aside-card';
+    const asideEl = document.querySelector('.home-aside');
+    if (asideEl) asideEl.appendChild(hotCard);
+  }
+
+  const d      = getData();
+  const myName = getProfile()?.name || '나';
+  let all = DEMO_MARKET.map(s => ({ ...s }));
+  Object.entries(d.mySectors).forEach(([sec, s]) => {
+    all.push({ ...s, id: 'my_' + sec, creatorName: myName, sector: sec });
+  });
+
+  // 핫 종목 TOP 3
+  const top3 = [...all].sort((a, b) => (b.sharesIssued||0) - (a.sharesIssued||0)).slice(0, 3);
+
+  // 핫 섹터 TOP 1
+  const sectorMap = {};
+  all.forEach(s => {
+    sectorMap[s.sector] = (sectorMap[s.sector] || 0) + (s.sharesIssued || 0);
+  });
+  const topSector = Object.entries(sectorMap).sort((a, b) => b[1] - a[1])[0];
+
+  hotCard.innerHTML = `
+    <div class="aside-ttl">🔥 지금 핫한 종목</div>
+    ${top3.map((s, i) => `
+      <div class="aside-mover" onclick="openMarketDetail('${s.id}')">
+        <span class="aside-mover-name">${i+1}. ${esc(s.creatorName)}의 ${s.sector}주</span>
+        <span class="aside-stat-val" style="font-size:11px">${s.sharesIssued||0}주</span>
+      </div>`).join('')}
+    <div class="aside-ttl" style="margin-top:10px">📈 핫한 섹터</div>
+    ${topSector ? `<div class="aside-stat-row">
+      <span class="aside-stat-lbl">${SECTOR_EMOJI[topSector[0]]||''} ${topSector[0]}</span>
+      <span class="aside-stat-val">${topSector[1]}주 총 발행</span>
+    </div>` : '<div class="aside-empty">—</div>'}`;
+}
+
+/* [Feature 6] AI 추천 버튼 */
+function renderAiRecommendSection() {
+  let aiCard = document.getElementById('aside-ai-card');
+  if (!aiCard) {
+    aiCard = document.createElement('div');
+    aiCard.id = 'aside-ai-card';
+    aiCard.className = 'aside-card';
+    const asideEl = document.querySelector('.home-aside');
+    if (asideEl) asideEl.appendChild(aiCard);
+  }
+  aiCard.innerHTML = `
+    <div class="aside-ttl">🎯 AI 추천</div>
+    <button class="btn-ghost-sm" style="width:100%;margin-top:4px" onclick="requestAiRecommend()">
+      🎯 AI 추천 받기 <span class="premium-badge">PRO</span>
+    </button>`;
+}
+
+function requestAiRecommend() {
+  const d = getData();
+  if (!d.isPremium) { showPremiumModal(); return; }
+
+  const btn = document.querySelector('#aside-ai-card .btn-ghost-sm');
+  if (btn) { btn.disabled = true; btn.textContent = '분석 중...'; }
+
+  setTimeout(() => {
+    if (btn) { btn.disabled = false; btn.textContent = '🎯 AI 추천 받기'; }
+    const top2 = [...DEMO_MARKET].sort((a, b) => (b.sharesIssued||0) - (a.sharesIssued||0)).slice(0, 2);
+    showToast(`🎯 추천: ${top2.map(s => s.creatorName + '의 ' + s.sector + '주').join(', ')}`);
+  }, 800);
 }
 
 /* ══ 내 지식 화면 ══ */
@@ -917,10 +1113,11 @@ function renderMyKnowledge() {
   listEl.innerHTML = sectors.map(([sec, s]) => {
     const chg = priceChgPct(s.priceHistory);
     const urgentCls = s.price < URGENT_THRESHOLD ? 'sc-urgent' : '';
+    const displayName = s.stockName ? esc(s.stockName) : `${SECTOR_EMOJI[sec]||''} ${esc(sec)}주`;
     return `
       <div class="stock-card ${urgentCls}" onclick="openMarketDetail('my_${sec}')">
         <div class="sc-left">
-          <div class="sc-name">${SECTOR_EMOJI[sec]||''} ${esc(sec)}주</div>
+          <div class="sc-name">${displayName}</div>
           <div class="sc-meta">
             <span style="color:${SECTOR_COLORS[sec]||'#6B7280'};font-size:11px">${s.sharesIssued||0}주 발행</span>
             <span class="sc-shares-cnt">· 최근 입력 ${s.lastInput||'—'}</span>
@@ -948,9 +1145,11 @@ function openMarketDetail(stockId) {
   const stock = getMarketStock(stockId);
   if (!stock) return;
 
-  // 헤더
-  const label = `${esc(stock.creatorName)}의 ${SECTOR_EMOJI[stock.sector]||''} ${esc(stock.sector)}주`;
-  document.getElementById('d-name').innerHTML   = label;
+  // [Feature 11] stockName 표시
+  const displayName = stock.stockName
+    ? `${esc(stock.stockName)} <span style="font-size:14px;color:var(--sub)">(${esc(stock.creatorName)})</span>`
+    : `${esc(stock.creatorName)}의 ${SECTOR_EMOJI[stock.sector]||''} ${esc(stock.sector)}주`;
+  document.getElementById('d-name').innerHTML = displayName;
   document.getElementById('d-sector').textContent = stock.sector;
   document.getElementById('d-sector').style.color = SECTOR_COLORS[stock.sector] || '#6B7280';
   document.getElementById('d-price').textContent  = `C${stock.price.toFixed(1)}`;
@@ -967,6 +1166,27 @@ function openMarketDetail(stockId) {
   if (liEl) liEl.textContent = stock.lastInput || '—';
   const lbEl = document.getElementById('d-last-bought');
   if (lbEl) lbEl.textContent = stock.lastBought || '없음';
+
+  // [Feature 14] 판매자 프로필 카드
+  const sellerCard = document.getElementById('seller-profile-card');
+  const ratingPanel = document.getElementById('rating-panel');
+  if (!isOwn && sellerCard) {
+    sellerCard.classList.remove('hidden');
+    document.getElementById('sp-avatar').textContent = (stock.creatorName || '?')[0].toUpperCase();
+    document.getElementById('sp-name').textContent   = stock.creatorName || '—';
+    document.getElementById('sp-sector').textContent = stock.sector || '—';
+    document.getElementById('sp-issued').textContent = `${stock.sharesIssued||0}주 발행`;
+    const d = getData();
+    const ratings = d.ratings || {};
+    const myRating = ratings[stockId];
+    const baseRating = stock.rating || 4.0;
+    const displayRating = myRating ? ((baseRating + myRating) / 2).toFixed(1) : baseRating.toFixed(1);
+    document.getElementById('sp-rating').textContent = `★ ${displayRating}`;
+    if (ratingPanel) ratingPanel.classList.add('hidden');
+  } else if (sellerCard) {
+    sellerCard.classList.add('hidden');
+    if (ratingPanel) ratingPanel.classList.add('hidden');
+  }
 
   // 액션 영역
   if (isOwn) {
@@ -987,7 +1207,6 @@ function openMarketDetail(stockId) {
     const hold = d.holdings[stockId];
     const myShEl = document.getElementById('d-my-shares');
     if (myShEl) myShEl.textContent = hold ? `${hold.sharesOwned}주 보유` : '미보유';
-    // 검색창 초기화 & 선택 초기화
     selectedBuyIndices.clear();
     const searchEl = document.getElementById('buy-search');
     if (searchEl) searchEl.value = '';
@@ -1033,6 +1252,29 @@ function openMarketDetail(stockId) {
   drawDetailChart(stock.priceHistory || []);
 }
 
+/* [Feature 14] 평가 패널 */
+function openRatingPanel() {
+  const panel = document.getElementById('rating-panel');
+  if (panel) panel.classList.toggle('hidden');
+}
+
+function submitRating(stars) {
+  const d = getData();
+  d.ratings = d.ratings || {};
+  d.ratings[currentDetailId] = stars;
+  saveData(d);
+  document.getElementById('rating-panel').classList.add('hidden');
+  showToast(`⭐ ${stars}점 평가 완료!`);
+  // 평점 업데이트
+  const stock = getMarketStock(currentDetailId);
+  if (stock) {
+    const baseRating = stock.rating || 4.0;
+    const displayRating = ((baseRating + stars) / 2).toFixed(1);
+    const ratingEl = document.getElementById('sp-rating');
+    if (ratingEl) ratingEl.textContent = `★ ${displayRating}`;
+  }
+}
+
 function toggleEntry(i) {
   const bodies = document.querySelectorAll('.ea-body');
   const arrows = document.querySelectorAll('.ea-card .ea-arrow');
@@ -1074,7 +1316,6 @@ function drawDetailChart(rawHistory) {
   const isUp  = values[values.length - 1] >= values[0];
   const color = isUp ? '#3FB950' : '#F85149';
 
-  // minimal thumbnail — no axes, no tooltips, no labels
   priceChartInstance = new Chart(canvas, {
     type: 'line',
     data: { labels: values.map((_, i) => i), datasets: [{ data: values, borderColor: color,
@@ -1083,10 +1324,7 @@ function drawDetailChart(rawHistory) {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 200 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: {
-        x: { display: false },
-        y: { display: false }
-      }
+      scales: { x: { display: false }, y: { display: false } }
     }
   });
 }
@@ -1192,18 +1430,37 @@ function renderPortfolio() {
   const d      = getData();
   const myName = getProfile()?.name || '나';
 
-  const holdVal = Object.entries(d.holdings).reduce((a, [id, h]) => {
+  // [Feature 1] 수익률 계산
+  let holdCurrentVal = 0;
+  let holdTotalCost  = 0;
+  Object.entries(d.holdings).forEach(([id, h]) => {
     const m = getMarketStock(id);
-    return a + (m ? m.price * h.sharesOwned : 0);
-  }, 0);
+    if (m) {
+      holdCurrentVal += m.price * h.sharesOwned;
+      holdTotalCost  += h.totalCost || 0;
+    }
+  });
   const myVal   = Object.values(d.mySectors).reduce((a, s) => a + s.price, 0);
   const balance = d.balance || 0;
 
   const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
   set('port-balance',      `C${Math.round(balance)}`);
-  set('port-holdings-val', `C${Math.round(holdVal)}`);
+  set('port-holdings-val', `C${Math.round(holdCurrentVal)}`);
   set('port-my-val',       `C${Math.round(myVal)}`);
-  set('port-total-val',    `C${Math.round(balance + holdVal + myVal)}`);
+  set('port-total-val',    `C${Math.round(balance + holdCurrentVal + myVal)}`);
+
+  // [Feature 1] 수익률 표시
+  const roiEl = document.getElementById('port-roi-val');
+  if (roiEl) {
+    if (holdTotalCost > 0) {
+      const roi = (holdCurrentVal - holdTotalCost) / holdTotalCost * 100;
+      roiEl.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+      roiEl.style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+    } else {
+      roiEl.textContent = '—%';
+      roiEl.style.color = '';
+    }
+  }
 
   // 매입 보유 목록
   const holdEl   = document.getElementById('holdings-list');
@@ -1220,6 +1477,13 @@ function renderPortfolio() {
         const pnlPct = h.totalCost > 0 ? pnl / h.totalCost * 100 : 0;
         const entries = h.boughtEntries || [];
 
+        // [Feature 4] 매입가 vs 현재가
+        const avgCost  = h.sharesOwned > 0 ? (h.totalCost || 0) / h.sharesOwned : 0;
+        const diff     = curP - avgCost;
+        const diffStr  = (diff >= 0 ? '+' : '') + diff.toFixed(1);
+        const diffColor = diff >= 0 ? 'var(--green)' : 'var(--red)';
+        const pnlPctStr = (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(1);
+
         const blockId = `pkn-${id.replace(/[^a-z0-9]/gi,'_')}`;
         const entriesHtml = entries.length ? entries.map((e, i) => {
           const srcEntry  = (m?.shares || [])[e.idx] || {};
@@ -1228,6 +1492,8 @@ function renderPortfolio() {
             ? `<button class="port-kn-attach-btn" onclick="event.stopPropagation();openPortfolioAttachment('${id}',${i})">📎 ${esc(srcEntry.attachment.name)}</button>`
             : '';
           const ttl = e.title || srcEntry.title || '(제목 없음)';
+          // [Feature 7] AI 요약 버튼
+          const aiSumBtn = `<button class="btn-ai-summary" onclick="event.stopPropagation();aiSummarize('${id}',${i},'${blockId}_e${i}_summary')">✨ AI 요약</button>`;
           return `
             <div class="port-kn-item" id="${blockId}_e${i}">
               <div class="port-kn-title-row" onclick="togglePortKnEntry('${blockId}_e${i}')">
@@ -1237,7 +1503,11 @@ function renderPortfolio() {
               </div>
               <div class="port-kn-content hidden">
                 <div class="port-kn-text">${esc(e.text)}</div>
-                ${attachBtn ? `<div class="port-kn-foot">${attachBtn}</div>` : ''}
+                <div class="port-kn-foot">
+                  ${attachBtn ? attachBtn : ''}
+                  ${aiSumBtn}
+                </div>
+                <div class="ai-summary-result hidden" id="${blockId}_e${i}_summary"></div>
               </div>
             </div>`;
         }).join('') : '<div class="port-kn-none">구매한 지식 항목 없음</div>';
@@ -1250,10 +1520,15 @@ function renderPortfolio() {
                   <span class="sc-creator-small">· ${esc(h.creatorName)}</span>
                 </div>
                 <div class="sc-meta">${h.sharesOwned}주 · 평가액 C${Math.round(curVal)}</div>
+                <div class="sc-meta" style="margin-top:2px;color:${diffColor}">
+                  매입평균 C${avgCost.toFixed(1)} → 현재 C${curP.toFixed(1)}&nbsp;
+                  <strong>${diffStr}C (${pnlPctStr}%)</strong>
+                </div>
               </div>
               <div class="sc-right">
                 <div class="sc-price" style="color:${priceColor(curP)}">C${curP.toFixed(0)}</div>
                 <div class="sc-chg ${pnl>=0?'green':'red'}">${pnl>=0?'▲':'▼'}${Math.abs(pnlPct).toFixed(1)}%</div>
+                <button class="btn-sell-holding" onclick="event.stopPropagation();sellHolding('${id}')">매도</button>
               </div>
             </div>
             <div class="port-kn-section">
@@ -1271,7 +1546,7 @@ function renderPortfolio() {
   }
 
   // 내 발행 주식
-  const issuedEl = document.getElementById('my-issued-list');
+  const issuedEl  = document.getElementById('my-issued-list');
   const mySectors = Object.entries(d.mySectors);
   if (issuedEl) {
     if (!mySectors.length) {
@@ -1295,6 +1570,46 @@ function renderPortfolio() {
   }
 }
 
+/* [Feature 12] 매도 기능 */
+function sellHolding(stockId) {
+  const d = getData();
+  const h = d.holdings[stockId];
+  if (!h) return;
+  const m = getMarketStock(stockId);
+  const curP = m ? m.price : 0;
+  const proceeds = curP * h.sharesOwned;
+  d.balance = (d.balance || 0) + proceeds;
+  delete d.holdings[stockId];
+  d.activityLog = d.activityLog || [];
+  d.activityLog.push({ ts: Date.now(), type: 'sell', stockId });
+  saveData(d);
+  showToast(`💰 ${h.sector}주 전체 매도 완료! +C${Math.round(proceeds)}`);
+  updateBalanceDisplay();
+  renderPortfolio();
+}
+
+/* [Feature 7] AI 요약 */
+function aiSummarize(stockId, entryIdx, summaryElId) {
+  const d = getData();
+  if (!d.isPremium) { showPremiumModal(); return; }
+
+  const h = d.holdings[stockId];
+  if (!h) return;
+  const m = getMarketStock(stockId);
+  const entry = (h.boughtEntries || [])[entryIdx];
+  if (!entry) return;
+  const srcEntry = (m?.shares || [])[entry.idx] || {};
+  const text = entry.text || srcEntry.text || '';
+
+  const summaryEl = document.getElementById(summaryElId);
+  if (!summaryEl) return;
+
+  // 시뮬레이션: 앞 50자 + "..."
+  const summary = text.slice(0, 50) + (text.length > 50 ? '...' : '');
+  summaryEl.innerHTML = `<div class="ai-summary-box">✨ <strong>핵심:</strong> ${esc(summary)}</div>`;
+  summaryEl.classList.remove('hidden');
+}
+
 /* ── 포트폴리오 지식 토글 ── */
 function togglePortKnSection(blockId) {
   const list = document.getElementById(blockId + '_list');
@@ -1314,6 +1629,138 @@ function togglePortKnEntry(entryId) {
   if (tri) tri.textContent = hidden ? '▶' : '▼';
 }
 
+/* ══ [Feature 13] 보유 지식 리포트 ══ */
+function openReportModal() {
+  const d = getData();
+  const holdings = Object.entries(d.holdings);
+  if (!holdings.length) {
+    showToast('매입한 지식이 없습니다');
+    return;
+  }
+
+  // 섹터별 정리
+  const bySector = {};
+  holdings.forEach(([id, h]) => {
+    const sec = h.sector || '기타';
+    if (!bySector[sec]) bySector[sec] = [];
+    const m = getMarketStock(id);
+    (h.boughtEntries || []).forEach((e, i) => {
+      const srcEntry = (m?.shares || [])[e.idx] || {};
+      bySector[sec].push({
+        stockId: id,
+        creator: h.creatorName,
+        title:   e.title || srcEntry.title || '(제목 없음)',
+        text:    e.text  || srcEntry.text  || '',
+        date:    e.date,
+        entryIdx: i,
+      });
+    });
+  });
+
+  _reportText = Object.entries(bySector).map(([sec, items]) => {
+    return `[${sec}]\n` + items.map(it => `  - ${it.title} (${it.creator}, ${it.date})\n    ${it.text}`).join('\n');
+  }).join('\n\n');
+
+  const contentEl = document.getElementById('report-content');
+  if (contentEl) {
+    contentEl.innerHTML = Object.entries(bySector).map(([sec, items]) => `
+      <div class="report-sector-block">
+        <div class="report-sector-title">${SECTOR_EMOJI[sec]||''} ${esc(sec)}</div>
+        ${items.map(it => `
+          <div class="report-item">
+            <div class="report-item-title">${esc(it.title)}</div>
+            <div class="report-item-meta">${esc(it.creator)} · ${it.date}</div>
+            <div class="report-item-text" id="ri_${it.stockId}_${it.entryIdx}">${esc(it.text)}</div>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  document.getElementById('report-modal').classList.remove('hidden');
+}
+
+function closeReportModal(e) {
+  if (e && e.target !== document.getElementById('report-modal')) return;
+  document.getElementById('report-modal').classList.add('hidden');
+}
+
+function copyReport() {
+  if (!_reportText) return;
+  navigator.clipboard.writeText(_reportText).then(() => {
+    showToast('📋 리포트가 클립보드에 복사됐습니다');
+  }).catch(() => {
+    showToast('복사 실패 — 브라우저 권한을 확인하세요');
+  });
+}
+
+function aiEnhanceReport() {
+  const d = getData();
+  if (!d.isPremium) { showPremiumModal(); return; }
+
+  const contentEl = document.getElementById('report-content');
+  if (!contentEl) return;
+  // 각 report-item-text에 "핵심:" 접두사 붙여 요약
+  contentEl.querySelectorAll('.report-item-text').forEach(el => {
+    const txt     = el.textContent || '';
+    const summary = txt.slice(0, 50) + (txt.length > 50 ? '...' : '');
+    el.innerHTML  = `<span style="color:var(--accent);font-weight:700">핵심:</span> ${esc(summary)}`;
+  });
+  showToast('✨ AI 도움 완료! 핵심 요약이 적용됐습니다');
+}
+
+/* ══ [Feature 8] 학교급별 ══ */
+function setSchoolLevel(level) {
+  currentSchoolLevel = level;
+  document.querySelectorAll('.sl-tab').forEach(b => b.classList.toggle('active', b.dataset.level === level));
+  renderSchoolLevel();
+}
+
+function renderSchoolLevel() {
+  const d      = getData();
+  const myName = getProfile()?.name || '나';
+
+  const allowedSectors = SCHOOL_LEVELS[currentSchoolLevel] || [];
+  let all = DEMO_MARKET.map(s => ({ ...s, isOwn: false }));
+  Object.entries(d.mySectors).forEach(([sec, s]) => {
+    all.push({ ...s, id: 'my_' + sec, creatorName: myName, sector: sec, isOwn: true });
+  });
+
+  const filtered = all.filter(s => allowedSectors.includes(s.sector));
+
+  const listEl = document.getElementById('school-level-list');
+  if (!listEl) return;
+
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="port-empty-msg">해당 학교급 종목이 없습니다</div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(s => renderStockCardHtml(s)).join('');
+}
+
+/* ══ [Feature — 프리미엄 테스트 토글] ══ */
+function togglePremiumTest() {
+  const d = getData();
+  d.isPremium = !d.isPremium;
+  saveData(d);
+  updatePremiumUI();
+  showToast(d.isPremium ? '✨ 프리미엄 모드 활성화!' : '프리미엄 모드 비활성화');
+}
+
+function updatePremiumUI() {
+  const d = getData();
+  const isPremium = d.isPremium || false;
+
+  // 토글 버튼 상태
+  const toggleBtn   = document.getElementById('premium-toggle-btn');
+  const toggleLabel = document.getElementById('premium-toggle-label');
+  if (toggleBtn)   { toggleBtn.textContent = isPremium ? 'ON' : 'OFF'; toggleBtn.className = isPremium ? 'toggle-btn on' : 'toggle-btn'; }
+  if (toggleLabel) toggleLabel.textContent = isPremium ? '프리미엄 활성' : '프리미엄 비활성';
+
+  // 학교급별 버튼 표시/숨김
+  const schoolBtn = document.getElementById('nav-school-level');
+  if (schoolBtn) schoolBtn.classList.toggle('hidden', !isPremium);
+}
+
 /* ══ 설정 ══ */
 function renderSettings() {
   const profile = getProfile();
@@ -1328,6 +1775,7 @@ function renderSettings() {
     if (pw) pw.value = '';
   }
   renderHeatmap();
+  updatePremiumUI();
 }
 
 function saveProfile() {
@@ -1383,7 +1831,6 @@ function handleImport(e) {
     try {
       const parsed = JSON.parse(ev.target.result);
       if (!parsed.mySectors && !parsed.stocks) throw new Error('Invalid');
-      // 구버전 마이그레이션
       if (parsed.stocks && !parsed.mySectors) {
         parsed.mySectors = {};
         parsed.holdings  = {};
