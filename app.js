@@ -337,7 +337,8 @@ function openWriteKnowledge() {
   selectWfSector('수학');
   wfInitialPrice = 20;
   clearAttachment();
-  document.querySelectorAll('[data-ip]').forEach(b => b.classList.toggle('active', +b.dataset.ip === 20));
+  const ipInput = document.getElementById('wf-init-price-input');
+  if (ipInput) ipInput.value = 20;
   updatePpbVisibility();
 }
 
@@ -437,9 +438,10 @@ function calcAutoPricePerBuy(sector) {
   return Math.max(3, base + bonus + jitter);
 }
 
-function pickWfInitPrice(btn) {
-  wfInitialPrice = parseInt(btn.dataset.ip);
-  document.querySelectorAll('[data-ip]').forEach(b => b.classList.toggle('active', b === btn));
+function pickWfInitPriceInput(input) {
+  const val = parseInt(input.value) || 20;
+  if (val < 20) { input.value = 20; wfInitialPrice = 20; }
+  else wfInitialPrice = val;
 }
 
 

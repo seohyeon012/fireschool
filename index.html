@@ -296,12 +296,11 @@
 
         <!-- 신규 섹터인 경우만 표시 -->
         <div id="wf-init-price-row" class="wf-ppb-row">
-          <div class="wf-section-label">초기 주가 설정 <span class="wf-ppb-hint">(처음 발행 시 — 내가 정함)</span></div>
-          <div class="wf-ppb-btns">
-            <button class="wf-ppb-btn active" data-ip="20" onclick="pickWfInitPrice(this)">C20</button>
-            <button class="wf-ppb-btn" data-ip="30"  onclick="pickWfInitPrice(this)">C30</button>
-            <button class="wf-ppb-btn" data-ip="50"  onclick="pickWfInitPrice(this)">C50</button>
-            <button class="wf-ppb-btn" data-ip="100" onclick="pickWfInitPrice(this)">C100</button>
+          <div class="wf-section-label">초기 주가 설정 <span class="wf-ppb-hint">(처음 발행 시 — 최소 C20)</span></div>
+          <div class="wf-init-price-input-wrap">
+            <span class="wf-init-price-prefix">C</span>
+            <input type="number" id="wf-init-price-input" class="wf-init-price-input"
+                   min="20" value="20" oninput="pickWfInitPriceInput(this)">
           </div>
         </div>
 
