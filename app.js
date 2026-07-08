@@ -192,10 +192,10 @@ function skipAdminLogin() {
 function launchApp() {
   showOverlay('app');
   const profile = getProfile();
+  const displayName = isAdmin ? '노서현' : (profile?.name || '사용자');
+  document.getElementById('sidebar-user-name').textContent   = isAdmin ? '노서현 👑' : displayName;
+  document.getElementById('sidebar-user-avatar').textContent = displayName[0].toUpperCase();
   if (profile) {
-    document.getElementById('sidebar-user-name').textContent   = profile.name;
-    document.getElementById('sidebar-user-avatar').textContent = profile.name ? profile.name[0].toUpperCase() : '?';
-  }
   const savedTheme = LS.get('kse_theme');
   if (savedTheme === 'light') {
     document.body.classList.add('light-mode');
@@ -217,7 +217,14 @@ function signInWithGoogle() {
   });
 }
 
-function signOutUser() { showToast('데모 모드에서는 로그아웃이 없습니다'); }
+function signOutUser() {
+  isAdmin = false;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('admin-name-input').value = '';
+  document.getElementById('admin-pw-input').value = '';
+  document.getElementById('admin-login-error').classList.add('hidden');
+  showAdminLogin();
+}
 
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light-mode');
