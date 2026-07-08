@@ -9,232 +9,546 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app">
 
-  <!-- 티커 테이프 -->
-  <div class="ticker-wrap">
-    <div class="ticker-inner" id="ticker-inner">대기 중...</div>
+<!-- ══ 로그인 ══ -->
+<div id="screen-login" class="full-overlay hidden">
+  <div class="login-card">
+    <div class="login-icon">📊</div>
+    <h1 class="login-title">지식 증권거래소</h1>
+    <p class="login-sub">지식을 주식처럼 발행하고, 서로의 지식을 사고파세요</p>
+    <div id="login-firebase-warning" class="firebase-warning hidden">
+      ⚠️ Firebase 설정이 필요합니다.<br>
+      <code>firebase-config.js</code>에 실제 설정값을 입력해 주세요.
+    </div>
+    <button class="btn-google-signin" onclick="signInWithGoogle()">
+      <span class="google-g">G</span> Google로 로그인
+    </button>
+    <p class="login-error hidden" id="login-error">로그인에 실패했습니다. 다시 시도해주세요.</p>
   </div>
+</div>
 
-  <!-- ══ 어닝 시즌 팝업 ══ -->
+<!-- ══ 프로필 설정 ══ -->
+<div id="screen-profile-setup" class="full-overlay hidden">
+  <div class="setup-card">
+    <div class="setup-title">👤 프로필 설정</div>
+    <p class="setup-sub">처음 오셨군요! 간단한 정보를 입력해 주세요</p>
+    <div class="setup-google-info">
+      <span class="setup-google-label">Google 계정</span>
+      <span class="setup-google-email" id="ps-google-email"></span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">이름</label>
+      <input type="text" id="ps-name" class="form-input" placeholder="이름을 입력하세요">
+    </div>
+    <div class="form-row">
+      <label class="form-label">나이</label>
+      <input type="number" id="ps-age" class="form-input" placeholder="나이를 입력하세요" min="1" max="120">
+    </div>
+    <div class="form-row">
+      <label class="form-label">비밀번호</label>
+      <input type="password" id="ps-password" class="form-input" placeholder="이 앱에서 사용할 비밀번호">
+    </div>
+    <div class="form-row">
+      <label class="form-label">비밀번호 확인</label>
+      <input type="password" id="ps-password2" class="form-input" placeholder="비밀번호를 다시 입력하세요">
+    </div>
+    <p class="pw-error hidden" id="ps-pw-error">비밀번호가 일치하지 않습니다</p>
+    <button class="btn-primary w-full" style="margin-top:8px" onclick="saveProfileSetup()">시작하기 →</button>
+  </div>
+</div>
+
+<!-- ══ 온보딩 ══ -->
+<div id="screen-onboarding" class="full-overlay hidden">
+  <div class="onboarding-card">
+    <div class="ob-header">
+      <h2 class="ob-title">📚 앱 사용 가이드</h2>
+      <p class="ob-sub">지식 증권거래소의 핵심 개념을 알아보세요</p>
+    </div>
+    <div class="ob-list">
+      <div class="ob-item">
+        <div class="ob-icon">✏️</div>
+        <div class="ob-content">
+          <div class="ob-term">지식 입력 = 주식 발행</div>
+          <ul>
+            <li>섹터(수학·영어·과학 등)를 선택하고 배운 내용을 입력</li>
+            <li>입력 한 건 = 주식 1주 발행 (주가는 올라가지 않음)</li>
+            <li>입력할 때마다 C5 보상을 받아요</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ob-item">
+        <div class="ob-icon">📈</div>
+        <div class="ob-content">
+          <div class="ob-term">매수 = 주가 상승</div>
+          <ul>
+            <li>다른 사람의 지식 주식을 C로 매수할 수 있어요</li>
+            <li>매수할 때마다 해당 주식의 주가가 오릅니다</li>
+            <li>내 주식도 다른 사람이 매수하면 주가가 오릅니다!</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ob-item">
+        <div class="ob-icon">📉</div>
+        <div class="ob-content">
+          <div class="ob-term">주가 하락</div>
+          <ul>
+            <li>지식을 입력하지 않거나 매수가 뜸해지면 주가가 자동으로 하락해요</li>
+            <li>꾸준히 지식을 입력하고 관심을 받아야 주가가 유지됩니다</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ob-item">
+        <div class="ob-icon">🔄</div>
+        <div class="ob-content">
+          <div class="ob-term">복습 = 주가 회복</div>
+          <ul>
+            <li>내 주식의 주가가 떨어졌을 때, 복습으로 회복시킬 수 있어요</li>
+            <li>완벽 기억 +35pt · 흐릿한 기억 +20pt · 기억 안 남 +0pt</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ob-item">
+        <div class="ob-icon">💼</div>
+        <div class="ob-content">
+          <div class="ob-term">포트폴리오</div>
+          <ul>
+            <li>내가 발행한 주식 + 매입한 주식을 한눈에 볼 수 있어요</li>
+            <li>매입한 주식의 주가가 오르면 평가액도 올라갑니다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="ob-footer">
+      <button class="btn-primary ob-close" onclick="closeOnboarding()">시작하기 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 메인 앱 ══ -->
+<div id="app" class="hidden">
+
+  <!-- 팝업: 어닝 시즌 -->
   <div id="earning-popup" class="overlay hidden">
     <div class="popup-card earning-card">
       <div class="earning-badge">📊 EARNINGS SEASON</div>
-      <h2 class="earning-month" id="earning-month">5월 성과 리포트</h2>
+      <h2 class="earning-month" id="earning-month">성과 리포트</h2>
       <div class="earning-score-wrap">
         <div class="earning-score" id="earning-score">0</div>
         <div class="earning-label">종합 점수</div>
       </div>
       <div class="earning-rows" id="earning-rows"></div>
       <div class="market-announce" id="market-announce"></div>
-      <button class="btn-primary w-full" onclick="closeEarning()">리포트 확인</button>
+      <button class="btn-primary w-full" onclick="document.getElementById('earning-popup').classList.add('hidden')">확인</button>
     </div>
   </div>
 
-  <!-- ══ ETF 생성 팝업 ══ -->
-  <div id="etf-popup" class="overlay hidden">
-    <div class="popup-card">
-      <h3 class="popup-title">🔗 지식 ETF 생성</h3>
-      <p class="popup-sub">관련 종목을 묶으면 하나 복습할 때<br>연결 종목 전체가 함께 오릅니다</p>
-      <div class="cost-badge">10 🪙 소요</div>
-      <input type="text" id="etf-name-input" class="form-input" placeholder="ETF 이름 (예: 고등수학 ETF)">
-      <div class="etf-select-list" id="etf-select-list"></div>
-      <div class="popup-actions">
-        <button class="btn-ghost" onclick="document.getElementById('etf-popup').classList.add('hidden')">취소</button>
-        <button class="btn-primary" onclick="createEtf()">생성하기</button>
-      </div>
-    </div>
-  </div>
+  <!-- 숨김 파일 input -->
+  <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleImport(event)">
 
-  <!-- ══ 매도 확인 팝업 ══ -->
-  <div id="sell-popup" class="overlay hidden">
-    <div class="popup-card">
-      <div class="sell-icon-big">📉</div>
-      <h3 class="popup-title" id="sell-popup-title">종목 매도</h3>
-      <p class="popup-sub" id="sell-popup-desc">이 종목을 포트폴리오에서 제거합니다.</p>
-      <div class="popup-actions">
-        <button class="btn-ghost" onclick="document.getElementById('sell-popup').classList.add('hidden')">취소</button>
-        <button class="btn-danger" onclick="confirmSell()">매도 확정</button>
-      </div>
-    </div>
-  </div>
+  <!-- 토스트 -->
+  <div id="toast" class="toast"></div>
 
-  <!-- ══ 홈 화면 ══ -->
-  <div id="screen-home" class="screen active">
-
-    <div class="market-header">
+  <!-- ══ 사이드바 ══ -->
+  <nav class="sidebar-nav">
+    <div class="sn-brand">
+      <span class="sn-logo">📊</span>
       <div>
-        <div class="app-name">지식 증권거래소</div>
-        <div class="kospi-row">
-          <span class="kospi-label">지식 KOSPI</span>
-          <span class="kospi-val" id="kospi-val">—</span>
-          <span class="kospi-chg" id="kospi-chg"></span>
-        </div>
+        <div class="sn-title">지식 증권거래소</div>
+        <div class="sn-kospi-mini">KOSPI <span id="kospi-val">—</span></div>
       </div>
-      <div class="header-right">
-        <div class="market-chip" id="market-chip">🟢 정상</div>
-        <div class="coin-chip">🪙 <span id="coin-val">0</span></div>
+      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
+    </div>
+
+    <div class="sn-menu">
+      <button class="sn-btn active" id="nav-home" onclick="navigateTo('home')">
+        <span>📊</span><span>시장</span>
+      </button>
+      <button class="sn-btn sn-ipo-btn" id="nav-myknowledge" onclick="navigateTo('myknowledge')">
+        <span>✏️</span><span>내 지식</span>
+      </button>
+      <button class="sn-btn" id="nav-portfolio" onclick="navigateTo('portfolio')">
+        <span>💼</span><span>포트폴리오</span>
+      </button>
+    </div>
+
+    <div class="sn-bottom">
+      <div class="sn-streak" id="sn-streak" title="연속 학습일">🔥 <span id="streak-val">0</span>일 연속</div>
+      <div class="sn-market-row">
+        <div class="market-chip" id="market-chip">🟡 정상</div>
+        <span id="sidebar-balance" class="sn-balance">C—</span>
       </div>
-    </div>
-
-    <!-- 복습 필요 -->
-    <div id="urgent-wrap"></div>
-
-    <!-- 전체 종목 -->
-    <div class="home-section">
-      <div class="section-row">
-        <span class="section-ttl">📈 보유 종목</span>
-        <span class="stock-cnt" id="stock-cnt">0개</span>
+      <div class="sn-premium-banner" onclick="showPremiumModal()">
+        ✨ 프리미엄 — 월 2,500원<br>
+        <span class="sn-premium-sub">섹터 7개 추가 잠금 해제</span>
       </div>
-      <div id="stock-list"></div>
-      <div class="empty-home hidden" id="empty-home">
-        <div class="eh-ico">📭</div>
-        <p>상장된 종목이 없어요</p>
-        <button class="btn-ghost-sm" onclick="navigateTo('ipo')">+ 첫 종목 IPO하기</button>
+      <div class="sn-user-row">
+        <span class="sn-user-avatar" id="sidebar-user-avatar">?</span>
+        <span class="sn-user-name" id="sidebar-user-name">사용자</span>
       </div>
+      <button class="sn-btn" id="nav-settings" onclick="navigateTo('settings')">
+        <span>⚙️</span><span>설정</span>
+      </button>
     </div>
-  </div>
-
-  <!-- ══ 종목 상세 화면 ══ -->
-  <div id="screen-detail" class="screen">
-    <div class="detail-bar">
-      <button class="back-btn" onclick="goBack()">‹ 뒤로</button>
-      <div class="detail-sector-tag" id="d-sector">섹터</div>
-    </div>
-    <div class="detail-price-section">
-      <div class="d-name" id="d-name">종목명</div>
-      <div class="d-price-row">
-        <span class="d-price" id="d-price">₩100</span>
-        <span class="d-chg" id="d-chg">+0.0%</span>
-      </div>
-    </div>
-
-    <!-- 주가 차트 -->
-    <div class="chart-card">
-      <svg id="price-chart" viewBox="0 0 320 90" preserveAspectRatio="none" class="chart-svg"></svg>
-      <div class="chart-foot">
-        <span>7일 전</span><span>오늘</span>
-      </div>
-    </div>
-
-    <!-- ETF 연결 뱃지 -->
-    <div class="etf-link-badge hidden" id="etf-link-badge">
-      🔗 <span id="etf-link-name">ETF</span> — 복습 시 연결 종목 +3 동반 상승
-    </div>
-
-    <!-- 투자 보고서 -->
-    <div class="detail-section">
-      <div class="ds-title">📋 투자 보고서</div>
-      <div class="ds-content" id="d-content"></div>
-      <div class="ds-meta">
-        <span>상장일 <strong id="d-added">—</strong></span>
-        <span>마지막 복습 <strong id="d-review">—</strong></span>
-      </div>
-    </div>
-
-    <!-- 매수/매도 -->
-    <div class="detail-actions">
-      <button class="btn-buy" onclick="toggleReviewInput()">📈 매수 (복습)</button>
-      <button class="btn-sell-sm" onclick="openSellPopup()">📉 매도</button>
-    </div>
-    <div class="review-wrap hidden" id="review-wrap">
-      <textarea id="review-text" class="form-textarea" placeholder="추가로 공부한 내용을 입력하세요 (선택)"></textarea>
-      <button class="btn-primary w-full" onclick="submitReview()">복습 완료 📈 주가 상승</button>
-    </div>
-  </div>
-
-  <!-- ══ IPO 화면 ══ -->
-  <div id="screen-ipo" class="screen">
-    <div class="ipo-header">
-      <div class="ipo-title">🚀 신규 상장 (IPO)</div>
-      <div class="ipo-sub">새 지식을 포트폴리오에 추가하세요<br>공모가 ₩100에서 시작, 시간이 지나면 자동 하락</div>
-    </div>
-    <div class="form-wrap">
-      <div class="form-row">
-        <label class="form-label">종목명</label>
-        <input type="text" id="ipo-name" class="form-input" placeholder="예: 이차방정식 근의 공식">
-      </div>
-      <div class="form-row">
-        <label class="form-label">섹터</label>
-        <div class="sector-grid">
-          <button class="sec-pill active" data-s="수학"   onclick="pickSector(this)">📐 수학</button>
-          <button class="sec-pill" data-s="영어"   onclick="pickSector(this)">📖 영어</button>
-          <button class="sec-pill" data-s="과학"   onclick="pickSector(this)">🔬 과학</button>
-          <button class="sec-pill" data-s="역사"   onclick="pickSector(this)">🏛️ 역사</button>
-          <button class="sec-pill" data-s="국어"   onclick="pickSector(this)">✍️ 국어</button>
-          <button class="sec-pill" data-s="프로그래밍" onclick="pickSector(this)">💻 프로그래밍</button>
-          <button class="sec-pill" data-s="기타"   onclick="pickSector(this)">📌 기타</button>
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">투자 보고서 (공부 내용)</label>
-        <textarea id="ipo-content" class="form-textarea tall" placeholder="오늘 공부한 내용을 적어두세요.&#10;나중에 복습할 때 이 내용이 표시됩니다."></textarea>
-      </div>
-      <button class="btn-ipo" onclick="listStock()">🚀 상장하기</button>
-    </div>
-  </div>
-
-  <!-- ══ 포트폴리오 화면 ══ -->
-  <div id="screen-portfolio" class="screen">
-    <div class="port-header">
-      <div class="port-title">💼 내 포트폴리오</div>
-      <div class="port-stats">
-        <div class="port-stat">
-          <div class="ps-val" id="port-total">₩0</div>
-          <div class="ps-lbl">총 지식 자산</div>
-        </div>
-        <div class="port-stat">
-          <div class="ps-val green" id="port-avg">0%</div>
-          <div class="ps-lbl">평균 주가</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 코인 카드 -->
-    <div class="coin-card">
-      <div>
-        <div class="cc-amount">🪙 <span id="port-coin">0</span></div>
-        <div class="cc-desc">지식 코인 · 월말 배당 지급 (주가 70↑ 종목)</div>
-      </div>
-      <button class="btn-etf-create" onclick="openEtfPopup()">+ ETF</button>
-    </div>
-
-    <!-- ETF -->
-    <div class="port-section">
-      <div class="ps-title">🔗 지식 ETF</div>
-      <div id="etf-list"></div>
-      <div class="ps-empty hidden" id="etf-empty">
-        코인 10개로 관련 종목을 ETF로 묶어보세요
-      </div>
-    </div>
-
-    <!-- AI 추천 -->
-    <div class="port-section">
-      <div class="ps-title">🤖 AI 매도 추천</div>
-      <div id="ai-list"></div>
-    </div>
-
-    <!-- 섹터 분포 -->
-    <div class="port-section">
-      <div class="ps-title">📊 섹터 분포</div>
-      <div id="sector-dist"></div>
-    </div>
-  </div>
-
-  <!-- 네비게이션 -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" id="nav-home"      onclick="navigateTo('home')">
-      <span>📊</span><span class="nv-lbl">시장</span>
-    </button>
-    <button class="nav-btn nav-ipo-btn" id="nav-ipo"  onclick="navigateTo('ipo')">
-      <span class="plus-txt">+</span><span class="nv-lbl">IPO</span>
-    </button>
-    <button class="nav-btn" id="nav-portfolio"        onclick="navigateTo('portfolio')">
-      <span>💼</span><span class="nv-lbl">포트폴리오</span>
-    </button>
   </nav>
 
+  <!-- ══ 콘텐츠 영역 ══ -->
+  <div class="content-area">
+
+    <!-- 티커 테이프 -->
+    <div class="ticker-wrap">
+      <div class="ticker-inner" id="ticker-inner">📊 지식 증권거래소에 오신 것을 환영합니다</div>
+    </div>
+
+    <!-- ════ 홈: 시장 ════ -->
+    <div id="screen-home" class="screen active">
+      <div class="home-layout">
+
+        <!-- 왼쪽: 시장 목록 -->
+        <div class="home-main">
+          <div class="page-header">
+            <div class="kospi-row">
+              <span class="kospi-label">지식 KOSPI</span>
+              <span class="kospi-full" id="kospi-full">—</span>
+              <span class="kospi-chg" id="kospi-chg"></span>
+            </div>
+          </div>
+
+          <div class="search-filter-wrap">
+            <input type="text" id="search-input" class="search-input" placeholder="🔍 유저 이름 또는 섹터 검색..." oninput="filterStocks()">
+            <div class="filter-pills" id="filter-pills">
+              <button class="filter-pill active" data-f="all" onclick="setSectorFilter('all')">전체</button>
+              <button class="filter-pill" data-f="수학" onclick="setSectorFilter('수학')">수학</button>
+              <button class="filter-pill" data-f="영어" onclick="setSectorFilter('영어')">영어</button>
+              <button class="filter-pill" data-f="과학" onclick="setSectorFilter('과학')">과학</button>
+              <button class="filter-pill" data-f="역사" onclick="setSectorFilter('역사')">역사</button>
+              <button class="filter-pill" data-f="국어" onclick="setSectorFilter('국어')">국어</button>
+              <button class="filter-pill" data-f="프로그래밍" onclick="setSectorFilter('프로그래밍')">프로그래밍</button>
+              <button class="filter-pill" data-f="기타" onclick="setSectorFilter('기타')">기타</button>
+            </div>
+          </div>
+
+          <div class="home-section">
+            <div class="section-row">
+              <span class="section-ttl">📈 전체 종목</span>
+              <span class="stock-cnt" id="market-stock-count">0개 종목</span>
+            </div>
+            <div id="market-list"></div>
+            <div class="empty-home hidden" id="market-empty">
+              <div class="eh-ico">📭</div>
+              <p>검색 결과가 없습니다</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽: 대시보드 패널 -->
+        <div class="home-aside">
+          <div class="aside-card">
+            <div class="aside-ttl">📦 내 현황</div>
+            <div id="aside-summary"><div class="aside-empty">지식을 입력하면<br>현황이 표시됩니다</div></div>
+          </div>
+          <div class="aside-card">
+            <div class="aside-ttl">📊 오늘의 등락</div>
+            <div id="aside-today"><div class="aside-empty">—</div></div>
+          </div>
+          <div class="aside-card">
+            <div class="aside-ttl">📅 이번 주 활동</div>
+            <div id="aside-weekly"><div class="aside-empty">—</div></div>
+            <button class="aside-more-btn" onclick="navigateTo('settings')">자세히 보기 →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ 내 지식 ════ -->
+    <div id="screen-myknowledge" class="screen">
+      <div class="page-header">
+        <div class="page-ttl-row">
+          <span class="page-ttl">✏️ 내 지식</span>
+          <span class="page-sub">지식 입력 = 주식 1주 발행 · 타인 매수 시 주가 상승</span>
+        </div>
+        <button class="btn-primary-sm" onclick="openWriteKnowledge()">+ 지식 입력</button>
+      </div>
+
+      <!-- 지식 입력 폼 -->
+      <div id="write-form" class="write-form hidden">
+        <div class="wf-section-label">섹터 선택</div>
+        <div class="wf-sec-row">
+          <button class="wf-sec-btn active" data-s="수학"  onclick="pickWfSector(this)">📐 수학</button>
+          <button class="wf-sec-btn" data-s="영어"  onclick="pickWfSector(this)">📖 영어</button>
+          <button class="wf-sec-btn" data-s="과학"  onclick="pickWfSector(this)">🔬 과학</button>
+          <button class="wf-sec-btn" data-s="역사"  onclick="pickWfSector(this)">🏛️ 역사</button>
+          <button class="wf-sec-btn" data-s="국어"  onclick="pickWfSector(this)">✍️ 국어</button>
+          <button class="wf-sec-btn" data-s="프로그래밍" onclick="pickWfSector(this)">💻 프로그래밍</button>
+          <button class="wf-sec-btn" data-s="기타"  onclick="pickWfSector(this)">📌 기타</button>
+        </div>
+        <div class="wf-sec-row wf-sec-locked-row">
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 철학</button>
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 의학</button>
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 경제</button>
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 법학</button>
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 물리</button>
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 화학</button>
+          <button class="wf-sec-btn wf-sec-locked" onclick="showPremiumModal()">🔒 언어</button>
+          <div class="wf-premium-unlock-hint" onclick="showPremiumModal()">✨ 프리미엄으로 잠금 해제</div>
+        </div>
+
+        <!-- 신규 섹터인 경우만 표시 -->
+        <div id="wf-init-price-row" class="wf-ppb-row">
+          <div class="wf-section-label">초기 주가 설정 <span class="wf-ppb-hint">(처음 발행 시 — 내가 정함)</span></div>
+          <div class="wf-ppb-btns">
+            <button class="wf-ppb-btn" data-ip="10"  onclick="pickWfInitPrice(this)">C10</button>
+            <button class="wf-ppb-btn active" data-ip="20" onclick="pickWfInitPrice(this)">C20</button>
+            <button class="wf-ppb-btn" data-ip="30"  onclick="pickWfInitPrice(this)">C30</button>
+            <button class="wf-ppb-btn" data-ip="50"  onclick="pickWfInitPrice(this)">C50</button>
+            <button class="wf-ppb-btn" data-ip="100" onclick="pickWfInitPrice(this)">C100</button>
+          </div>
+        </div>
+
+        <div class="wf-section-label">주 제목</div>
+        <input type="text" id="wf-title" class="wf-title-input"
+               placeholder="예: 피타고라스 정리, 가정법 과거, React Hooks…">
+
+        <div class="wf-section-label" style="margin-top:10px">지식 내용</div>
+        <textarea id="wf-text" class="write-textarea" placeholder="제목에 대한 상세 내용을 입력하세요.&#10;(매수자는 제목만 보고 살지 결정합니다)" rows="4"></textarea>
+
+        <!-- 첨부파일 -->
+        <div class="wf-attach-row">
+          <input type="file" id="wf-file-input" accept="image/*,.pdf,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+                 style="display:none" onchange="handleAttachmentFile(this)">
+          <button class="btn-attach" type="button" onclick="document.getElementById('wf-file-input').click()">
+            📎 첨부파일
+          </button>
+          <div id="wf-attach-preview" class="wf-attach-preview hidden">
+            <span id="wf-attach-name" class="wf-attach-name"></span>
+            <span id="wf-attach-size" class="wf-attach-size"></span>
+            <button class="wf-attach-remove" onclick="clearAttachment()">✕</button>
+          </div>
+          <span class="wf-attach-hint">최대 500KB · 이미지/PDF/문서</span>
+        </div>
+
+        <div class="wf-hint">💡 입력한 내용이 지식주의 '항목(주식)'이 됩니다. 다른 사람이 매수 시 주가가 오릅니다. (+C5 보상)</div>
+        <div class="wf-actions">
+          <button class="btn-ghost" onclick="closeWriteKnowledge()">취소</button>
+          <button class="btn-primary" onclick="submitKnowledge()">📋 지식 등록 (1주 발행)</button>
+        </div>
+      </div>
+
+      <!-- 내 섹터 주식 목록 -->
+      <div id="my-stocks-list"></div>
+      <div class="empty-home hidden" id="empty-myknowledge">
+        <div class="eh-ico">✏️</div>
+        <p>아직 지식을 입력하지 않았어요</p>
+        <button class="btn-ghost-sm" onclick="openWriteKnowledge()">+ 첫 지식 입력하기</button>
+      </div>
+    </div>
+
+    <!-- ════ 종목 상세 ════ -->
+    <div id="screen-detail" class="screen">
+      <div class="detail-header">
+        <button class="back-btn" onclick="goBack()">← 뒤로</button>
+        <div class="detail-title-block">
+          <div id="d-name" class="d-name">—</div>
+          <div class="d-sector-row">
+            <span id="d-sector" class="d-sector">—</span>
+          </div>
+        </div>
+        <div class="d-price-block">
+          <div id="d-price" class="d-price">—</div>
+          <div id="d-chg" class="d-chg">—</div>
+        </div>
+      </div>
+
+      <!-- 발행 정보 -->
+      <div class="d-info-row">
+        <div class="d-info-item"><span class="d-info-lbl">발행 주수</span><span id="d-shares-issued" class="d-info-val">—</span></div>
+        <div class="d-info-item"><span class="d-info-lbl">최근 입력</span><span id="d-last-input" class="d-info-val">—</span></div>
+        <div class="d-info-item"><span class="d-info-lbl">최근 매수</span><span id="d-last-bought" class="d-info-val">없음</span></div>
+      </div>
+
+      <!-- 차트 (썸네일) -->
+      <div class="chart-thumb-wrap" onclick="openChartModal()" title="클릭해서 확대">
+        <canvas id="price-chart" class="chart-thumb"></canvas>
+        <div class="chart-expand-hint">🔍 확대</div>
+      </div>
+
+      <!-- 타인 주식: 지식 선택 매수 -->
+      <div id="detail-buy-section" class="detail-section hidden">
+        <div class="buy-kn-header">
+          <span class="buy-kn-title">📚 지식 선택 후 매수</span>
+          <span id="d-my-shares" class="d-my-shares-badge">미보유</span>
+        </div>
+        <input type="text" id="buy-search" class="buy-search-input"
+               placeholder="🔍 지식 검색 (예: 피타고라스, DO, WILL...)"
+               oninput="filterBuyKnowledge(this.value)">
+        <div id="buy-knowledge-list" class="buy-knowledge-list"></div>
+        <div class="buy-confirm-row">
+          <div class="buy-confirm-info">
+            <span id="buy-selected-label" class="buy-sel-label">0개 선택</span>
+            <span id="buy-total-cost-label" class="buy-total-cost">총 C0</span>
+          </div>
+          <button class="btn-buy-market" id="btn-buy-confirm" onclick="confirmBuySelected()" disabled>
+            📈 매수하기
+          </button>
+        </div>
+      </div>
+
+      <!-- 내 주식: 지식 추가 + 복습 -->
+      <div id="detail-own-section" class="detail-section hidden">
+        <div class="detail-actions">
+          <button class="btn-buy" onclick="addKnowledgeFromDetail()">✏️ 지식 추가</button>
+          <button class="btn-review-act" onclick="openReviewPanel()">🔄 복습하기</button>
+        </div>
+
+        <!-- 복습 패널 -->
+        <div id="review-panel" class="review-panel hidden">
+          <div class="review-panel-title">🔄 복습 — 기억 속에서 지식을 꺼내보세요</div>
+          <textarea id="review-text" class="review-textarea" rows="4" placeholder="배운 내용을 기억 속에서 꺼내 써보세요...&#10;(얼마나 기억하는지 자동으로 채점됩니다)"></textarea>
+          <div class="review-panel-actions">
+            <button class="btn-ghost" onclick="closeReviewPanel()">취소</button>
+            <button id="review-submit-btn" class="btn-primary" onclick="submitReview()">채점하기</button>
+            <button id="confirm-review-btn" class="btn-confirm hidden" onclick="confirmReview()">복습 확정</button>
+          </div>
+          <div id="review-result" class="hidden"></div>
+        </div>
+      </div>
+
+      <!-- 지식 항목 (투자보고서) -->
+      <div class="detail-section">
+        <div class="ds-title-row">
+          <span class="ds-title">📚 지식 항목</span>
+          <button class="ds-toggle-btn" id="entry-toggle-btn" onclick="toggleEntryList()">
+            <span id="d-entry-count">0건</span> <span class="ds-arrow">▼</span>
+          </button>
+        </div>
+        <div id="d-entries" class="hidden"></div>
+      </div>
+    </div>
+
+    <!-- ════ 포트폴리오 ════ -->
+    <div id="screen-portfolio" class="screen">
+      <div class="page-header">
+        <span class="page-ttl">💼 포트폴리오</span>
+      </div>
+
+      <!-- 요약 카드 -->
+      <div class="port-summary-card">
+        <div class="port-sum-item"><span class="port-sum-lbl">💰 잔액</span><span id="port-balance" class="port-sum-val">C—</span></div>
+        <div class="port-sum-item"><span class="port-sum-lbl">📥 매입 평가액</span><span id="port-holdings-val" class="port-sum-val">C—</span></div>
+        <div class="port-sum-item"><span class="port-sum-lbl">✏️ 발행 주가 합계</span><span id="port-my-val" class="port-sum-val">C—</span></div>
+        <div class="port-sum-item port-sum-total"><span class="port-sum-lbl">📊 총 자산</span><span id="port-total-val" class="port-sum-val">C—</span></div>
+      </div>
+
+      <!-- 매입 보유 -->
+      <div class="home-section">
+        <div class="section-row">
+          <span class="section-ttl">📥 매입 보유</span>
+        </div>
+        <div id="holdings-list"></div>
+      </div>
+
+      <!-- 내 발행 주식 -->
+      <div class="home-section">
+        <div class="section-row">
+          <span class="section-ttl">✏️ 내 발행 주식</span>
+        </div>
+        <div id="my-issued-list"></div>
+      </div>
+    </div>
+
+    <!-- ════ 설정 ════ -->
+    <div id="screen-settings" class="screen">
+      <div class="page-header">
+        <span class="page-ttl">⚙️ 설정</span>
+      </div>
+
+      <!-- 프로필 -->
+      <div class="settings-section">
+        <div class="ss-title">👤 프로필</div>
+        <div class="form-row"><label class="form-label">이메일</label><span class="form-static" id="ss-email">—</span></div>
+        <div class="form-row"><label class="form-label">이름</label><input type="text" id="ss-name" class="form-input" placeholder="이름"></div>
+        <div class="form-row"><label class="form-label">나이</label><input type="number" id="ss-age" class="form-input" placeholder="나이" min="1"></div>
+        <div class="form-row"><label class="form-label">비밀번호 변경</label><input type="password" id="ss-password" class="form-input" placeholder="새 비밀번호 (변경 시 입력)"></div>
+        <button class="btn-primary" onclick="saveProfile()">저장</button>
+      </div>
+
+      <!-- 활동 히트맵 -->
+      <div class="settings-section">
+        <div class="ss-title">📅 활동 히트맵 (최근 52주)</div>
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+        <div class="hm-legend">
+          <span>적음</span>
+          <div class="hm-cell hm-0"></div>
+          <div class="hm-cell hm-1"></div>
+          <div class="hm-cell hm-2"></div>
+          <div class="hm-cell hm-3"></div>
+          <span>많음</span>
+        </div>
+      </div>
+
+      <!-- 데이터 -->
+      <div class="settings-section">
+        <div class="ss-title">💾 데이터 관리</div>
+        <div class="ss-btn-row">
+          <button class="btn-ghost" onclick="exportData()">📤 내보내기</button>
+          <button class="btn-ghost" onclick="importData()">📥 가져오기</button>
+        </div>
+      </div>
+
+      <!-- 온보딩 -->
+      <div class="settings-section">
+        <div class="ss-title">📚 도움말</div>
+        <button class="btn-ghost" onclick="document.getElementById('screen-onboarding').classList.remove('hidden')">앱 사용 가이드 다시 보기</button>
+      </div>
+
+      <!-- 계정 -->
+      <div class="settings-section">
+        <div class="ss-title">🔒 계정</div>
+        <button class="btn-ghost" onclick="signOutUser()">로그아웃</button>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /app -->
+
+<!-- ══ 차트 모달 ══ -->
+<div id="chart-modal" class="chart-modal-overlay hidden" onclick="closeChartModal(event)">
+  <div class="chart-modal-card">
+    <div class="chart-modal-header">
+      <span id="chart-modal-title" class="chart-modal-ttl">주가 차트</span>
+      <div class="chart-modal-zoom-btns">
+        <button class="cz-btn active" data-z="7"    onclick="setModalZoom(7)">1주</button>
+        <button class="cz-btn"        data-z="30"   onclick="setModalZoom(30)">1달</button>
+        <button class="cz-btn"        data-z="9999" onclick="setModalZoom(9999)">전체</button>
+      </div>
+      <button class="chart-modal-close" onclick="closeChartModal()">✕</button>
+    </div>
+    <canvas id="modal-price-chart" class="chart-modal-canvas"></canvas>
+  </div>
 </div>
+
+<!-- ══ 프리미엄 모달 ══ -->
+<div id="premium-modal" class="chart-modal-overlay hidden" onclick="closePremiumModal(event)">
+  <div class="premium-modal-card">
+    <button class="chart-modal-close" onclick="closePremiumModal()">✕</button>
+    <div class="pm-crown">👑</div>
+    <div class="pm-title">프리미엄 멤버십</div>
+    <div class="pm-price">월 <strong>2,500원</strong></div>
+    <ul class="pm-benefits">
+      <li>🔓 잠긴 섹터 7개 추가 해제<br><span class="pm-benefit-sub">철학 · 의학 · 경제 · 법학 · 물리 · 화학 · 언어</span></li>
+      <li>📈 매수 가능 섹터 수 <strong>무제한</strong></li>
+      <li>📊 전체 시장 포트폴리오 분석</li>
+      <li>⚡ 시장 이벤트 우선 알림</li>
+    </ul>
+    <button class="btn-premium-upgrade" onclick="upgradePremium()">✨ 지금 시작하기</button>
+    <p class="pm-note">언제든지 취소 가능 · 자동 갱신</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
