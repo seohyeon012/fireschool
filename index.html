@@ -10,50 +10,63 @@
 </head>
 <body>
 
-<!-- ══ 로그인 ══ -->
+<!-- ══ 랜딩 ══ -->
 <div id="screen-login" class="full-overlay hidden">
   <div class="login-card">
     <div class="login-icon">📊</div>
     <h1 class="login-title">지식 증권거래소</h1>
     <p class="login-sub">지식을 주식처럼 발행하고, 서로의 지식을 사고파세요</p>
-    <div id="login-firebase-warning" class="firebase-warning hidden">
-      ⚠️ Firebase 설정이 필요합니다.<br>
-      <code>firebase-config.js</code>에 실제 설정값을 입력해 주세요.
-    </div>
-    <button class="btn-google-signin" onclick="signInWithGoogle()">
-      <span class="google-g">G</span> Google로 로그인
-    </button>
-    <p class="login-error hidden" id="login-error">로그인에 실패했습니다. 다시 시도해주세요.</p>
+    <button class="btn-primary w-full" style="margin-top:28px" onclick="showLoginForm()">로그인하기</button>
+    <p class="landing-signup-link" onclick="showSignupForm()">처음이신가요? <span>회원가입</span></p>
+    <p class="landing-admin-link" onclick="showAdminLogin()">관리자</p>
   </div>
 </div>
 
-<!-- ══ 프로필 설정 ══ -->
-<div id="screen-profile-setup" class="full-overlay hidden">
-  <div class="setup-card">
-    <div class="setup-title">👤 프로필 설정</div>
-    <p class="setup-sub">처음 오셨군요! 간단한 정보를 입력해 주세요</p>
-    <div class="setup-google-info">
-      <span class="setup-google-label">Google 계정</span>
-      <span class="setup-google-email" id="ps-google-email"></span>
-    </div>
-    <div class="form-row">
-      <label class="form-label">이름</label>
-      <input type="text" id="ps-name" class="form-input" placeholder="이름을 입력하세요">
-    </div>
-    <div class="form-row">
-      <label class="form-label">나이</label>
-      <input type="number" id="ps-age" class="form-input" placeholder="나이를 입력하세요" min="1" max="120">
+<!-- ══ 로그인 폼 ══ -->
+<div id="screen-login-form" class="full-overlay hidden">
+  <div class="login-card">
+    <div class="login-icon">🔑</div>
+    <h2 class="login-title" style="font-size:20px">로그인</h2>
+    <div class="form-row" style="margin-top:20px">
+      <label class="form-label">닉네임</label>
+      <input type="text" id="login-nick-input" class="form-input" placeholder="닉네임 입력">
     </div>
     <div class="form-row">
       <label class="form-label">비밀번호</label>
-      <input type="password" id="ps-password" class="form-input" placeholder="이 앱에서 사용할 비밀번호">
+      <input type="password" id="login-pw-input" class="form-input" placeholder="비밀번호 입력"
+             onkeydown="if(event.key==='Enter') tryLogin()">
+    </div>
+    <p class="admin-login-error hidden" id="login-form-error">닉네임 또는 비밀번호가 틀렸습니다.</p>
+    <div class="admin-login-actions" style="margin-top:16px">
+      <button class="btn-ghost" onclick="showLanding()">뒤로</button>
+      <button class="btn-primary" onclick="tryLogin()">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 회원가입 ══ -->
+<div id="screen-profile-setup" class="full-overlay hidden">
+  <div class="login-card">
+    <div class="login-icon">✏️</div>
+    <h2 class="login-title" style="font-size:20px">회원가입</h2>
+    <div class="form-row" style="margin-top:20px">
+      <label class="form-label">이름</label>
+      <input type="text" id="signup-name-input" class="form-input" placeholder="실제 이름">
     </div>
     <div class="form-row">
-      <label class="form-label">비밀번호 확인</label>
-      <input type="password" id="ps-password2" class="form-input" placeholder="비밀번호를 다시 입력하세요">
+      <label class="form-label">닉네임</label>
+      <input type="text" id="signup-nickname-input" class="form-input" placeholder="로그인에 사용할 닉네임">
     </div>
-    <p class="pw-error hidden" id="ps-pw-error">비밀번호가 일치하지 않습니다</p>
-    <button class="btn-primary w-full" style="margin-top:8px" onclick="saveProfileSetup()">시작하기 →</button>
+    <div class="form-row">
+      <label class="form-label">비밀번호</label>
+      <input type="password" id="signup-pw-input" class="form-input" placeholder="비밀번호 입력"
+             onkeydown="if(event.key==='Enter') trySignup()">
+    </div>
+    <p class="admin-login-error hidden" id="signup-error"></p>
+    <div class="admin-login-actions" style="margin-top:16px">
+      <button class="btn-ghost" onclick="showLanding()">뒤로</button>
+      <button class="btn-primary" onclick="trySignup()">가입하기</button>
+    </div>
   </div>
 </div>
 

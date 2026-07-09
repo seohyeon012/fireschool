@@ -134,33 +134,78 @@ function isFirebaseConfigured() {
 }
 
 function initAuth() {
-  currentUserId    = 'demo';
-  currentUserEmail = 'demo@example.com';
-  if (isFirebaseConfigured()) {
-    try {
-      if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      if (firebase.firestore) db = firebase.firestore();
-    } catch (e) {}
-  }
-  const profile = getProfile();
-  if (!profile) {
-    saveProfileData({ name: '노서현', age: 20, onboardingDone: false });
-    showOverlay('onboarding');
-  } else if (!profile.onboardingDone) {
-    showOverlay('onboarding');
+  const session = LS.get('kse2_session');
+  if (session?.userId) {
+    currentUserId = session.userId;
+    launchApp();
   } else {
-    showAdminLogin();
+    showOverlay('login');
   }
 }
 
 function showOverlay(name) {
-  ['login','profile-setup','onboarding'].forEach(s => {
-    document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== name);
+  ['login','login-form','profile-setup','onboarding'].forEach(s => {
+    const el = document.getElementById(`screen-${s}`);
+    if (el) el.classList.toggle('hidden', s !== name);
   });
   document.getElementById('app').classList.toggle('hidden', name !== 'app');
 }
 
+function showLanding()    { showOverlay('login'); }
+function showLoginForm()  {
+  document.getElementById('login-nick-input').value = '';
+  document.getElementById('login-pw-input').value = '';
+  document.getElementById('login-form-error').classList.add('hidden');
+  showOverlay('login-form');
+}
+function showSignupForm() {
+  document.getElementById('signup-name-input').value = '';
+  document.getElementById('signup-nickname-input').value = '';
+  document.getElementById('signup-pw-input').value = '';
+  document.getElementById('signup-error').classList.add('hidden');
+  showOverlay('profile-setup');
+}
+
+function tryLogin() {
+  const nickname = document.getElementById('login-nick-input').value.trim();
+  const password = document.getElementById('login-pw-input').value;
+  const errEl    = document.getElementById('login-form-error');
+  const users    = LS.get('kse2_users') || [];
+  const user     = users.find(u => u.nickname === nickname && u.password === password);
+  if (!user) { errEl.classList.remove('hidden'); return; }
+  currentUserId = nickname;
+  LS.set('kse2_session', { userId: nickname, name: user.name });
+  const profile = getProfile();
+  if (!profile || !profile.onboardingDone) { showOverlay('onboarding'); } else { launchApp(); }
+}
+
+function trySignup() {
+  const name     = document.getElementById('signup-name-input').value.trim();
+  const nickname = document.getElementById('signup-nickname-input').value.trim();
+  const password = document.getElementById('signup-pw-input').value;
+  const errEl    = document.getElementById('signup-error');
+  if (!name || !nickname || !password) {
+    errEl.textContent = '모든 항목을 입력해주세요.';
+    errEl.classList.remove('hidden'); return;
+  }
+  const users = LS.get('kse2_users') || [];
+  if (users.find(u => u.nickname === nickname)) {
+    errEl.textContent = '이미 사용 중인 닉네임입니다.';
+    errEl.classList.remove('hidden'); return;
+  }
+  users.push({ name, nickname, password });
+  LS.set('kse2_users', users);
+  currentUserId = nickname;
+  LS.set('kse2_session', { userId: nickname, name });
+  saveProfileData({ name, nickname, onboardingDone: false });
+  showOverlay('onboarding');
+}
+
 function showAdminLogin() {
+  ['login','login-form','profile-setup','onboarding'].forEach(s => {
+    const el = document.getElementById(`screen-${s}`);
+    if (el) el.classList.add('hidden');
+  });
   document.getElementById('screen-admin-login').classList.remove('hidden');
 }
 
@@ -170,6 +215,7 @@ function tryAdminLogin() {
   const errEl = document.getElementById('admin-login-error');
   if (name === '노서현' && pw === '0908') {
     isAdmin = true;
+    currentUserId = 'admin';
     document.getElementById('screen-admin-login').classList.add('hidden');
     document.getElementById('admin-pw-input').value = '';
     document.getElementById('admin-name-input').value = '';
@@ -186,13 +232,13 @@ function skipAdminLogin() {
   document.getElementById('admin-pw-input').value = '';
   document.getElementById('admin-name-input').value = '';
   document.getElementById('admin-login-error').classList.add('hidden');
-  launchApp();
+  showOverlay('login');
 }
 
 function launchApp() {
   showOverlay('app');
   const profile = getProfile();
-  const displayName = isAdmin ? '노서현' : (profile?.name || '사용자');
+  const displayName = isAdmin ? '노서현' : (profile?.nickname || profile?.name || currentUserId || '사용자');
   document.getElementById('sidebar-user-name').textContent   = isAdmin ? '노서현 👑' : displayName;
   document.getElementById('sidebar-user-avatar').textContent = displayName[0].toUpperCase();
   const savedTheme = LS.get('kse_theme');
@@ -218,7 +264,9 @@ function signInWithGoogle() {
 
 function signOutUser() {
   isAdmin = false;
-  location.reload();
+  currentUserId = null;
+  localStorage.removeItem('kse2_session');
+  showOverlay('login');
 }
 
 function toggleTheme() {
@@ -1981,7 +2029,7 @@ function closeOnboarding() {
   profile.onboardingDone = true;
   saveProfileData(profile);
   document.getElementById('screen-onboarding').classList.add('hidden');
-  if (document.getElementById('app').classList.contains('hidden')) showAdminLogin();
+  launchApp();
 }
 
 function prefillProfileSetup(user) {
