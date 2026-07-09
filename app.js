@@ -195,7 +195,6 @@ function launchApp() {
   const displayName = isAdmin ? '노서현' : (profile?.name || '사용자');
   document.getElementById('sidebar-user-name').textContent   = isAdmin ? '노서현 👑' : displayName;
   document.getElementById('sidebar-user-avatar').textContent = displayName[0].toUpperCase();
-  if (profile) {
   const savedTheme = LS.get('kse_theme');
   if (savedTheme === 'light') {
     document.body.classList.add('light-mode');
