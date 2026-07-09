@@ -551,39 +551,73 @@ function pickWfInitPriceInput(input) {
   else wfInitialPrice = val;
 }
 
-/* ── [Feature 3] AI 지식 검토 시뮬레이션 ── */
+/* ── [Feature 3] AI 지식 검토 ── */
+const SECTOR_KEYWORDS = {
+  '수학':      ['방정식','함수','미분','적분','행렬','수열','확률','통계','기하','증명','집합','삼각','계산','공식','풀이','수식','변수','그래프','부등식','인수분해','극한','벡터','로그','지수','다항식','계수','차수','근','해','최솟값','최댓값'],
+  '영어':      ['문법','단어','문장','어휘','독해','작문','발음','숙어','표현','번역','vocabulary','grammar','sentence','word','reading','writing','speaking','listening','tense','verb','noun','adjective','preposition','conjunction','영어','영작','회화'],
+  '과학':      ['물질','에너지','반응','실험','원소','화합물','힘','운동','전기','자기','빛','파동','생물','세포','진화','유전','생태','지구','원자','분자','온도','압력','밀도','속도','가속도','중력','산소','이산화탄소','광합성','호흡'],
+  '역사':      ['시대','왕','왕조','전쟁','혁명','문화','조선','고려','삼국','제국','문명','사건','인물','연대','근대','고대','중세','독립','식민','정치','사회','경제','유물','유적','조약','개혁','운동','봉기','항쟁'],
+  '국어':      ['문학','소설','시','수필','문법','맞춤법','어휘','표현','글쓰기','독해','문장','단락','주제','요약','작가','작품','문체','어법','서술','묘사','비유','상징','주인공','배경','갈등','해설','감상','분석'],
+  '프로그래밍':['코드','함수','변수','반복','조건','알고리즘','데이터','클래스','객체','배열','리스트','api','서버','데이터베이스','python','javascript','java','c언어','html','css','for','while','if','return','import','output','input','정렬','탐색','재귀'],
+  '철학':      ['논리','윤리','존재','인식','가치','진리','자유','도덕','사상','개념','이론','비판','관념','명제','사유','본질','현상','이성','감성','칸트','플라톤','아리스토텔레스','소크라테스','형이상학','인식론','존재론'],
+  '의학':      ['신체','질병','치료','약물','수술','진단','증상','건강','해부','생리','면역','세포','혈액','신경','뇌','바이러스','세균','감염','장기','심장','폐','간','신장','뼈','근육','혈압','당뇨','암','백신','항생제'],
+  '경제':      ['시장','수요','공급','가격','화폐','금리','인플레이션','gdp','무역','투자','소비','생산','기업','주식','채권','경제','금융','환율','물가','실업','성장','분배','세금','재정','통화','환경','자본','노동'],
+  '법학':      ['법률','헌법','형법','민법','판례','권리','의무','계약','소송','재판','법원','검사','변호사','처벌','규정','조항','범죄','형사','민사','불법','합법','피고','원고','증거','선고','구속','배상','손해','위반'],
+  '물리':      ['힘','운동','에너지','전기','자기','광학','파동','핵','양자','열역학','입자','질량','속도','가속도','마찰','중력','전류','전압','저항','진동','공명','빛','굴절','반사','렌즈','자기장','전자기'],
+  '화학':      ['원소','화합물','반응','분자','원자','산','염기','산화','환원','결합','이온','주기율','물질','용액','농도','촉매','전해질','유기','무기','산화수','몰','분자량','에탄올','포도당','단백질','지방','탄수화물'],
+  '언어':      ['문법','어휘','음운','형태','통사','의미','언어학','방언','사투리','번역','단어','표현','소통','발음','문자','습득','한국어','외국어','언어','모국어','이중언어','화용','담화','텍스트'],
+  '기타':      [],
+};
+
 function aiReviewKnowledge(title, text, callback) {
   const submitBtn = document.querySelector('.wf-actions .btn-primary');
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = '🔍 AI 검토 중...';
-  }
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '🔍 AI 검토 중...'; }
   showToast('🔍 AI 검토 중...');
 
   setTimeout(() => {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = '📋 지식 등록 (1주 발행)';
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📋 지식 등록 (1주 발행)'; }
+
+    const combined    = (title + ' ' + text).toLowerCase();
+    const textNoSpace = text.replace(/\s/g, '');
+
+    // ① 금칙어
+    if (BANNED_WORDS.some(w => combined.includes(w.toLowerCase()))) {
+      showToast('❌ 부적절한 표현이 포함되어 있습니다.'); callback(false); return;
     }
 
-    const combined = (title + ' ' + text).toLowerCase();
-
-    // 30자 미만 거절
-    if ((title + text).length < 30) {
-      showToast('❌ 내용이 너무 짧습니다. 30자 이상 입력해 주세요.');
-      callback(false);
-      return;
+    // ② 반복 문자 스팸 (같은 글자 5번 이상 연속: ㅇㅇㅇㅇㅇ, aaaaa 등)
+    if (/(.)\1{4,}/.test(textNoSpace)) {
+      showToast('❌ 의미 없는 반복 입력이 감지됐습니다. 실제 지식을 작성해주세요.'); callback(false); return;
     }
 
-    // 금칙어 검사
-    const hasBanned = BANNED_WORDS.some(w => combined.includes(w.toLowerCase()));
-    if (hasBanned) {
-      showToast('❌ 부적절한 표현이 포함되어 있습니다. 수정 후 재시도해 주세요.');
-      callback(false);
-      return;
+    // ③ 고유 문자 비율 — 스팸 탐지 (전체 글자 중 종류가 12% 미만이면 의미없는 나열)
+    if (textNoSpace.length > 0 && new Set(textNoSpace).size / textNoSpace.length < 0.12) {
+      showToast('❌ 내용이 너무 단조롭습니다. 실제 지식을 입력해주세요.'); callback(false); return;
     }
 
-    // 승인
+    // ④ 최소 분량: 공백 제외 30자 + 단어 5개 이상
+    const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    if (textNoSpace.length < 30 || wordCount < 5) {
+      showToast('❌ 내용이 너무 부족합니다. 더 자세히 서술해주세요.'); callback(false); return;
+    }
+
+    // ⑤ 섹터 연관성 — 선택한 섹터 키워드가 하나 이상 포함돼야 함
+    const sectorKws = SECTOR_KEYWORDS[wfSector] || [];
+    if (sectorKws.length > 0 && !sectorKws.some(kw => combined.includes(kw))) {
+      showToast(`❌ 내용이 '${wfSector}' 섹터와 맞지 않아 보입니다. 섹터를 확인하거나 관련 내용을 추가해주세요.`);
+      callback(false); return;
+    }
+
+    // ⑥ 제목-내용 일관성 — 제목 단어(2자 이상)의 30% 이상이 본문에 등장해야 함
+    const titleWords = title.split(/[\s,\.!?·]+/).filter(w => w.length >= 2);
+    if (titleWords.length >= 2) {
+      const matchRatio = titleWords.filter(w => text.includes(w)).length / titleWords.length;
+      if (matchRatio < 0.3) {
+        showToast('❌ 제목과 내용의 연관성이 낮습니다. 제목에 맞는 내용을 작성해주세요.');
+        callback(false); return;
+      }
+    }
+
     showToast('✅ AI 검토 완료! 교육적 내용으로 확인됐습니다.');
     callback(true);
   }, 800);
