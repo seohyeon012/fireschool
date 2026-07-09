@@ -219,11 +219,7 @@ function signInWithGoogle() {
 
 function signOutUser() {
   isAdmin = false;
-  document.getElementById('app').classList.add('hidden');
-  document.getElementById('admin-name-input').value = '';
-  document.getElementById('admin-pw-input').value = '';
-  document.getElementById('admin-login-error').classList.add('hidden');
-  showAdminLogin();
+  location.reload();
 }
 
 function toggleTheme() {
