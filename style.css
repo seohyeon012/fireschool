@@ -848,6 +848,13 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 .wf-sec-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .wf-ppb-row   { margin-bottom: 14px; }
 .wf-ppb-hint  { font-size: 10px; color: var(--sub); }
+#wf-stock-choice { margin-bottom: 14px; }
+.wf-stock-choice-label { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.wf-stock-choice-list { display: flex; flex-direction: column; gap: 6px; }
+.wf-stock-choice-btn { width: 100%; text-align: left; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--text); background: var(--surface); cursor: pointer; transition: all .15s; }
+.wf-stock-choice-btn:hover { border-color: var(--accent); color: var(--accent); }
+.wf-stock-choice-btn.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-weight: 600; }
+.wf-stock-choice-new { color: var(--sub); }
 .wf-init-price-input-wrap { display: flex; align-items: center; margin-top: 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); width: fit-content; overflow: hidden; }
 .wf-init-price-prefix { padding: 7px 8px 7px 12px; font-size: 14px; font-weight: 700; color: var(--yellow); }
 .wf-init-price-input  { border: none; background: none; color: var(--text); font-size: 14px; font-weight: 700; width: 80px; padding: 7px 10px 7px 0; outline: none; }

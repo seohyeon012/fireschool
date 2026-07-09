@@ -336,6 +336,9 @@
           <div class="wf-premium-unlock-hint" onclick="showPremiumModal()">✨ 프리미엄으로 잠금 해제</div>
         </div>
 
+        <!-- 기존 종목 선택 / 새 종목 만들기 -->
+        <div id="wf-stock-choice" class="hidden"></div>
+
         <!-- 신규 섹터인 경우만 표시 -->
         <div id="wf-init-price-row" class="wf-ppb-row">
           <div class="wf-section-label">초기 주가 설정 <span class="wf-ppb-hint">(처음 발행 시 — 최소 C20)</span></div>
@@ -346,9 +349,11 @@
           </div>
         </div>
 
-        <div class="wf-section-label">주 이름(종목명)</div>
-        <input type="text" id="wf-stock-name" class="wf-title-input"
-               placeholder="예: 김민준의 수학주 (섹터명 포함 필수)" style="margin-bottom:10px">
+        <div id="wf-stock-name-row">
+          <div class="wf-section-label">주 이름(종목명)</div>
+          <input type="text" id="wf-stock-name" class="wf-title-input"
+                 placeholder="예: 김민준의 수학주 (섹터명 포함 필수)" style="margin-bottom:10px">
+        </div>
 
         <div class="wf-section-label">주 제목</div>
         <input type="text" id="wf-title" class="wf-title-input"

@@ -368,6 +368,7 @@ let _currentChartHistory = [];
 let wfSector            = '수학';
 let wfInitialPrice      = 10;
 let wfAttachment        = null;
+let wfStockKey          = null; // null = new stock, string key = existing stock
 let selectedBuyIndices  = new Set();
 let sectorGroupMode     = false;   // [Feature 10]
 let currentSchoolLevel  = 'elementary'; // [Feature 8]
@@ -518,19 +519,64 @@ function openPortfolioAttachment(stockId, boughtEntryIndex) {
 
 function selectWfSector(sec) {
   wfSector = sec;
+  wfStockKey = null;
   document.querySelectorAll('.wf-sec-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.s === sec);
   });
-  updatePpbVisibility();
+  updateWfStockChoice();
 }
 
 function pickWfSector(btn) { selectWfSector(btn.dataset.s); }
 
-function updatePpbVisibility() {
-  const d       = getData();
-  const isNew   = !d.mySectors[wfSector];
-  const initRow = document.getElementById('wf-init-price-row');
-  if (initRow) initRow.style.display = isNew ? '' : 'none';
+function updatePpbVisibility() { updateWfStockChoice(); }
+
+function updateWfStockChoice() {
+  const d        = getData();
+  const existing = Object.entries(d.mySectors)
+    .filter(([k, s]) => (s.sector || k) === wfSector);
+
+  const choiceEl = document.getElementById('wf-stock-choice');
+  const nameRow  = document.getElementById('wf-stock-name-row');
+  const initRow  = document.getElementById('wf-init-price-row');
+
+  if (!existing.length) {
+    if (choiceEl) choiceEl.classList.add('hidden');
+    if (nameRow)  nameRow.classList.remove('hidden');
+    if (initRow)  initRow.style.display = '';
+    wfStockKey = null;
+    return;
+  }
+
+  if (choiceEl) {
+    choiceEl.classList.remove('hidden');
+    choiceEl.innerHTML = `
+      <div class="wf-stock-choice-label">이 섹터에 발행한 종목이 있습니다:</div>
+      <div class="wf-stock-choice-list">
+        ${existing.map(([k, s]) => `
+          <button class="wf-stock-choice-btn${wfStockKey === k ? ' active' : ''}"
+                  onclick="chooseExistingStock('${k}')">
+            📈 ${esc(s.stockName || (s.sector || k) + '주')} · ${s.sharesIssued||0}주
+          </button>`).join('')}
+        <button class="wf-stock-choice-btn wf-stock-choice-new${wfStockKey === null ? ' active' : ''}"
+                onclick="chooseNewStock()">
+          ➕ 새 종목 만들기
+        </button>
+      </div>`;
+  }
+
+  const isNew = (wfStockKey === null);
+  if (nameRow)  nameRow.classList.toggle('hidden', !isNew);
+  if (initRow)  initRow.style.display = isNew ? '' : 'none';
+}
+
+function chooseExistingStock(key) {
+  wfStockKey = key;
+  updateWfStockChoice();
+}
+
+function chooseNewStock() {
+  wfStockKey = null;
+  updateWfStockChoice();
 }
 
 function calcAutoPricePerBuy(sector) {
@@ -630,6 +676,16 @@ function submitKnowledge() {
   if (!title) { shake('wf-title'); showToast('❌ 제목을 입력해주세요'); return; }
   if (!text)  { shake('wf-text');  showToast('❌ 내용을 입력해주세요');  return; }
 
+  // 새 종목 생성 시: 종목명 필수 + 섹터명 포함 확인
+  if (!wfStockKey) {
+    if (!stockName) { shake('wf-stock-name'); showToast('❌ 종목명을 입력해주세요'); return; }
+    if (!stockName.includes(wfSector)) {
+      shake('wf-stock-name');
+      showToast(`❌ 종목명에 섹터명 '${wfSector}'이(가) 포함되어야 합니다`);
+      return;
+    }
+  }
+
   // AI 검토 후 저장
   aiReviewKnowledge(title, text, (approved) => {
     if (!approved) return;
@@ -641,8 +697,13 @@ function _doSaveKnowledge(title, text, stockName) {
   const d   = getData();
   const sec = wfSector;
 
-  if (!d.mySectors[sec]) {
-    d.mySectors[sec] = {
+  let stockKey;
+  if (wfStockKey) {
+    stockKey = wfStockKey;
+  } else {
+    // 새 종목 생성 — 같은 섹터에 이미 주식이 있으면 복합 키 사용
+    stockKey = d.mySectors[sec] ? `${sec}_${Date.now()}` : sec;
+    d.mySectors[stockKey] = {
       price:           wfInitialPrice,
       priceHistory:    [{ v: wfInitialPrice, d: today() }],
       shares:          [],
@@ -656,11 +717,11 @@ function _doSaveKnowledge(title, text, stockName) {
       addedDate:       today(),
       stockName:       stockName || null,
     };
-  } else if (stockName) {
-    d.mySectors[sec].stockName = stockName;
+    // 복합 키인 경우 sector 필드 저장
+    if (stockKey !== sec) d.mySectors[stockKey].sector = sec;
   }
 
-  const s = d.mySectors[sec];
+  const s = d.mySectors[stockKey];
   const entry = { title, text, date: today() };
   if (wfAttachment) entry.attachment = wfAttachment;
   s.shares.push(entry);
@@ -826,7 +887,7 @@ function getMarketStock(stockId) {
     const s   = d.mySectors[sec];
     if (s) {
       const profile = getProfile();
-      return { ...s, id: stockId, uid: currentUserId, creatorName: profile?.name || '나', sector: sec, isOwn: true };
+      return { ...s, id: stockId, uid: currentUserId, creatorName: profile?.name || '나', sector: s.sector || sec, isOwn: true };
     }
   }
   return null;
@@ -981,7 +1042,7 @@ function renderMarketList() {
 
   let all = DEMO_MARKET.map(s => ({ ...s, isOwn: false }));
   Object.entries(d.mySectors).forEach(([sec, s]) => {
-    all.push({ ...s, id: 'my_' + sec, uid: currentUserId, creatorName: myName, sector: sec, isOwn: true });
+    all.push({ ...s, id: 'my_' + sec, uid: currentUserId, creatorName: myName, sector: s.sector || sec, isOwn: true });
   });
 
   if (filterSector !== 'all') all = all.filter(s => s.sector === filterSector);
@@ -1152,7 +1213,7 @@ function renderHotSection() {
   const myName = getProfile()?.name || '나';
   let all = DEMO_MARKET.map(s => ({ ...s }));
   Object.entries(d.mySectors).forEach(([sec, s]) => {
-    all.push({ ...s, id: 'my_' + sec, creatorName: myName, sector: sec });
+    all.push({ ...s, id: 'my_' + sec, creatorName: myName, sector: s.sector || sec });
   });
 
   // 핫 종목 TOP 3
@@ -1228,13 +1289,14 @@ function renderMyKnowledge() {
   listEl.innerHTML = sectors.map(([sec, s]) => {
     const chg = priceChgPct(s.priceHistory);
     const urgentCls = s.price < URGENT_THRESHOLD ? 'sc-urgent' : '';
-    const displayName = s.stockName ? esc(s.stockName) : `${SECTOR_EMOJI[sec]||''} ${esc(sec)}주`;
+    const realSec = s.sector || sec;
+    const displayName = s.stockName ? esc(s.stockName) : `${SECTOR_EMOJI[realSec]||''} ${esc(realSec)}주`;
     return `
       <div class="stock-card ${urgentCls}" onclick="openMarketDetail('my_${sec}')">
         <div class="sc-left">
           <div class="sc-name">${displayName}</div>
           <div class="sc-meta">
-            <span style="color:${SECTOR_COLORS[sec]||'#6B7280'};font-size:11px">${s.sharesIssued||0}주 발행</span>
+            <span style="color:${SECTOR_COLORS[realSec]||'#6B7280'};font-size:11px">${s.sharesIssued||0}주 발행</span>
             <span class="sc-shares-cnt">· 최근 입력 ${s.lastInput||'—'}</span>
           </div>
         </div>
