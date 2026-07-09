@@ -216,6 +216,7 @@ function tryAdminLogin() {
   if (name === '노서현' && pw === '0908') {
     isAdmin = true;
     currentUserId = 'admin';
+    localStorage.removeItem('kse2_session'); // 혹시 남은 유저 세션 제거
     document.getElementById('screen-admin-login').classList.add('hidden');
     document.getElementById('admin-pw-input').value = '';
     document.getElementById('admin-name-input').value = '';
@@ -1926,15 +1927,23 @@ function renderUserStats() {
 
 /* ══ 설정 ══ */
 function renderSettings() {
-  const profile = getProfile();
-  const nameEl = document.getElementById('ss-real-name');
-  const nickEl = document.getElementById('ss-nickname');
-  if (nameEl) nameEl.textContent = profile?.name || (isAdmin ? '노서현' : '—');
-  if (nickEl) nickEl.value = isAdmin ? '노서현' : (profile?.nickname || currentUserId || '');
-  const curPw = document.getElementById('ss-cur-password');
-  const newPw = document.getElementById('ss-new-password');
-  if (curPw) curPw.value = '';
-  if (newPw) newPw.value = '';
+  const nameEl  = document.getElementById('ss-real-name');
+  const nickEl  = document.getElementById('ss-nickname');
+  const curPwEl = document.getElementById('ss-cur-password');
+  const newPwEl = document.getElementById('ss-new-password');
+
+  if (isAdmin) {
+    if (nameEl)  nameEl.textContent = '노서현';
+    if (nickEl)  { nickEl.value = '노서현'; nickEl.disabled = true; }
+    if (curPwEl) curPwEl.disabled = true;
+    if (newPwEl) newPwEl.disabled = true;
+  } else {
+    const profile = getProfile();
+    if (nameEl)  nameEl.textContent = profile?.name || '—';
+    if (nickEl)  { nickEl.value = profile?.nickname || currentUserId || ''; nickEl.disabled = false; }
+    if (curPwEl) { curPwEl.value = ''; curPwEl.disabled = false; }
+    if (newPwEl) { newPwEl.value = ''; newPwEl.disabled = false; }
+  }
   renderHeatmap();
   updatePremiumUI();
 }
