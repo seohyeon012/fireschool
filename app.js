@@ -1847,7 +1847,7 @@ function updatePremiumUI() {
 
   // 잠긴 섹터 버튼 업데이트
   const PREMIUM_EMOJI = { '철학':'🧠','의학':'🩺','경제':'💹','법학':'⚖️','물리':'⚛️','화학':'🧪','언어':'🗣️' };
-  document.querySelectorAll('.wf-sec-locked, .wf-sec-btn[data-s]').forEach(btn => {
+  document.querySelectorAll('.wf-sec-btn[data-s]').forEach(btn => {
     const sec = btn.dataset.s;
     if (!sec) return;
     const isLocked = ['철학','의학','경제','법학','물리','화학','언어'].includes(sec);
@@ -1855,11 +1855,31 @@ function updatePremiumUI() {
     if (isPremium) {
       btn.classList.remove('wf-sec-locked');
       btn.textContent = `${PREMIUM_EMOJI[sec]||''} ${sec}`;
+      btn.onclick = function() { pickWfSector(this); };
     } else {
       btn.classList.add('wf-sec-locked');
       btn.textContent = `🔒 ${sec}`;
+      btn.onclick = function() { pickWfSectorOrPremium(this); };
     }
   });
+
+  // 프리미엄 잠금 힌트 표시/숨김
+  document.querySelectorAll('.wf-premium-unlock-hint').forEach(el => {
+    el.classList.toggle('hidden', isPremium);
+  });
+
+  // "숨겨진 과목" 필터 버튼 — 프리미엄이면 숨김
+  const hiddenSectorBtn = document.querySelector('.filter-pill-premium');
+  if (hiddenSectorBtn) hiddenSectorBtn.classList.toggle('hidden', isPremium);
+
+  // AI 추천 PRO 뱃지 숨김
+  document.querySelectorAll('.premium-badge').forEach(el => {
+    el.classList.toggle('hidden', isPremium);
+  });
+
+  // 홈 AI 추천 카드 표시/숨김
+  const aiCard = document.getElementById('aside-ai-card');
+  if (aiCard) aiCard.classList.toggle('hidden', !isPremium);
 
   // 유저 현황 렌더
   if (isAdmin) renderUserStats();
@@ -1907,33 +1927,70 @@ function renderUserStats() {
 /* ══ 설정 ══ */
 function renderSettings() {
   const profile = getProfile();
-  const el = document.getElementById('ss-email');
-  if (el) el.textContent = currentUserEmail || 'demo@example.com';
-  if (profile) {
-    const nm = document.getElementById('ss-name');
-    const ag = document.getElementById('ss-age');
-    const pw = document.getElementById('ss-password');
-    if (nm) nm.value = profile.name || '';
-    if (ag) ag.value = profile.age  || '';
-    if (pw) pw.value = '';
-  }
+  const nameEl = document.getElementById('ss-real-name');
+  const nickEl = document.getElementById('ss-nickname');
+  if (nameEl) nameEl.textContent = profile?.name || (isAdmin ? '노서현' : '—');
+  if (nickEl) nickEl.value = isAdmin ? '노서현' : (profile?.nickname || currentUserId || '');
+  const curPw = document.getElementById('ss-cur-password');
+  const newPw = document.getElementById('ss-new-password');
+  if (curPw) curPw.value = '';
+  if (newPw) newPw.value = '';
   renderHeatmap();
   updatePremiumUI();
 }
 
 function saveProfile() {
-  const name = document.getElementById('ss-name').value.trim();
-  const age  = parseInt(document.getElementById('ss-age').value);
-  if (!name)         { shake('ss-name'); return; }
-  if (!age || age<1) { shake('ss-age');  return; }
+  const nickname = document.getElementById('ss-nickname').value.trim();
+  if (!nickname) { shake('ss-nickname'); return; }
+
+  const users = LS.get('kse2_users') || [];
   const profile = getProfile() || {};
-  profile.name = name; profile.age = age;
-  const pw = document.getElementById('ss-password').value;
-  if (pw) profile.sitePassword = pw;
+
+  // 닉네임 중복 체크 (본인 제외)
+  if (users.find(u => u.nickname === nickname && u.nickname !== currentUserId)) {
+    showToast('❌ 이미 사용 중인 닉네임입니다'); return;
+  }
+
+  // 비밀번호 변경
+  const curPw  = document.getElementById('ss-cur-password').value;
+  const newPw  = document.getElementById('ss-new-password').value;
+  if (newPw) {
+    const me = users.find(u => u.nickname === currentUserId);
+    if (!me || me.password !== curPw) { shake('ss-cur-password'); showToast('❌ 현재 비밀번호가 틀렸습니다'); return; }
+    me.password = newPw;
+    document.getElementById('ss-cur-password').value = '';
+    document.getElementById('ss-new-password').value = '';
+  }
+
+  // 닉네임 변경
+  const oldId = currentUserId;
+  const me = users.find(u => u.nickname === oldId);
+  if (me && !isAdmin) me.nickname = nickname;
+  LS.set('kse2_users', users);
+
+  if (!isAdmin) {
+    currentUserId = nickname;
+    LS.set('kse2_session', { userId: nickname, name: profile.name });
+  }
+  profile.nickname = nickname;
   saveProfileData(profile);
-  document.getElementById('sidebar-user-name').textContent   = name;
-  document.getElementById('sidebar-user-avatar').textContent = name[0].toUpperCase();
-  showToast('✅ 프로필이 저장되었습니다');
+
+  const displayName = isAdmin ? '노서현' : nickname;
+  document.getElementById('sidebar-user-name').textContent   = isAdmin ? '노서현 👑' : displayName;
+  document.getElementById('sidebar-user-avatar').textContent = displayName[0].toUpperCase();
+  showToast('✅ 저장되었습니다');
+}
+
+function deleteAccount() {
+  if (!confirm('정말 탈퇴하시겠습니까? 모든 데이터가 삭제됩니다.')) return;
+  const users = (LS.get('kse2_users') || []).filter(u => u.nickname !== currentUserId);
+  LS.set('kse2_users', users);
+  localStorage.removeItem(dataKey());
+  localStorage.removeItem(profileKey());
+  localStorage.removeItem('kse2_session');
+  currentUserId = null;
+  isAdmin = false;
+  showOverlay('login');
 }
 
 function renderHeatmap() {
