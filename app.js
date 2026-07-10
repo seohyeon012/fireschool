@@ -253,6 +253,7 @@ function launchApp() {
   renderHome();
   updateTicker();
   updatePremiumUI();
+  checkFollowNotifications();
 }
 
 function signInWithGoogle() {
@@ -369,6 +370,7 @@ let wfSector            = '수학';
 let wfInitialPrice      = 10;
 let wfAttachment        = null;
 let wfStockKey          = null; // null = new stock, string key = existing stock
+let boardSector         = '수학';
 let selectedBuyIndices  = new Set();
 let sectorGroupMode     = false;   // [Feature 10]
 let currentSchoolLevel  = 'elementary'; // [Feature 8]
@@ -996,6 +998,189 @@ function navigateTo(name) {
   if (name === 'portfolio')     renderPortfolio();
   if (name === 'settings')      renderSettings();
   if (name === 'school-level')  renderSchoolLevel();
+  if (name === 'board')         renderBoard();
+}
+
+/* ══ 토론방 ══ */
+const ALL_SECTORS = ['수학','영어','과학','역사','국어','프로그래밍','철학','의학','경제','법학','물리','화학','언어','기타'];
+
+function getBoard()    { return LS.get('kse2_board') || { posts: [] }; }
+function saveBoard(b)  { LS.set('kse2_board', b); }
+
+function isPremiumActive() {
+  const d = getData();
+  return isAdmin && (d.isPremium || false);
+}
+
+function renderBoard() {
+  // 섹터 탭
+  const tabEl = document.getElementById('board-sector-tabs');
+  if (tabEl) {
+    tabEl.innerHTML = ALL_SECTORS.map(sec =>
+      `<button class="board-sec-tab${sec === boardSector ? ' active' : ''}"
+               onclick="selectBoardSector('${sec}')">
+         ${SECTOR_EMOJI[sec]||''} ${sec}
+       </button>`
+    ).join('');
+  }
+
+  const b = getBoard();
+  const posts = (b.posts || []).filter(p => p.sector === boardSector)
+    .sort((a, b) => b.id - a.id);
+
+  const postsEl = document.getElementById('board-posts');
+  if (!postsEl) return;
+
+  if (!posts.length) {
+    postsEl.innerHTML = '<div class="board-empty">아직 글이 없습니다. 첫 글을 남겨보세요!</div>';
+  } else {
+    postsEl.innerHTML = posts.map(p => `
+      <div class="board-post" id="post-${p.id}">
+        <div class="bp-header">
+          <span class="bp-author">${esc(p.authorName)}</span>
+          <span class="bp-date">${p.date}</span>
+          ${isAdmin ? `<button class="bp-delete-btn" onclick="deleteBoardPost(${p.id})">🗑</button>` : ''}
+        </div>
+        <div class="bp-text">${esc(p.text).replace(/\n/g,'<br>')}</div>
+        <div class="bp-replies">
+          ${(p.replies||[]).map(r => `
+            <div class="bp-reply">
+              <span class="bp-reply-author">${esc(r.authorName)}</span>
+              <span class="bp-reply-text">${esc(r.text).replace(/\n/g,'<br>')}</span>
+              <span class="bp-reply-date">${r.date}</span>
+            </div>`).join('')}
+        </div>
+        ${isPremiumActive() ? `
+          <div class="bp-reply-form">
+            <input type="text" class="bp-reply-input" id="reply-input-${p.id}"
+                   placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitBoardReply(${p.id})">
+            <button class="bp-reply-btn" onclick="submitBoardReply(${p.id})">↑</button>
+          </div>` : ''}
+      </div>`).join('');
+  }
+
+  // 글쓰기 영역
+  const writeWrap = document.getElementById('board-write-wrap');
+  const hintEl    = document.getElementById('board-readonly-hint');
+  if (isPremiumActive()) {
+    writeWrap?.classList.remove('hidden');
+    hintEl?.classList.add('hidden');
+  } else {
+    writeWrap?.classList.add('hidden');
+    hintEl?.classList.remove('hidden');
+  }
+
+  // 알림 뱃지 초기화
+  updateFollowNotifBadge();
+}
+
+function selectBoardSector(sec) {
+  boardSector = sec;
+  renderBoard();
+}
+
+function submitBoardPost() {
+  if (!isPremiumActive()) { showToast('🔒 프리미엄 전용 기능입니다'); return; }
+  const input = document.getElementById('board-write-input');
+  const text  = (input?.value || '').trim();
+  if (!text) { showToast('❌ 내용을 입력해주세요'); return; }
+
+  const profile = getProfile();
+  const b = getBoard();
+  b.posts = b.posts || [];
+  b.posts.push({
+    id:         Date.now(),
+    authorId:   currentUserId,
+    authorName: profile?.name || profile?.nickname || currentUserId,
+    sector:     boardSector,
+    text,
+    date:       today(),
+    replies:    [],
+  });
+  saveBoard(b);
+  if (input) input.value = '';
+  renderBoard();
+  showToast('✅ 글이 등록됐습니다');
+}
+
+function submitBoardReply(postId) {
+  if (!isPremiumActive()) { showToast('🔒 프리미엄 전용 기능입니다'); return; }
+  const input = document.getElementById(`reply-input-${postId}`);
+  const text  = (input?.value || '').trim();
+  if (!text) return;
+
+  const profile = getProfile();
+  const b = getBoard();
+  const post = (b.posts || []).find(p => p.id === postId);
+  if (!post) return;
+  post.replies = post.replies || [];
+  post.replies.push({
+    authorId:   currentUserId,
+    authorName: profile?.name || profile?.nickname || currentUserId,
+    text,
+    date:       today(),
+  });
+  saveBoard(b);
+  renderBoard();
+}
+
+function deleteBoardPost(postId) {
+  if (!isAdmin) return;
+  if (!confirm('이 글을 삭제하시겠습니까?')) return;
+  const b = getBoard();
+  b.posts = (b.posts || []).filter(p => p.id !== postId);
+  saveBoard(b);
+  renderBoard();
+  showToast('🗑 글이 삭제됐습니다');
+}
+
+/* ══ 팔로우 / 알림 ══ */
+function toggleFollow() {
+  if (!isPremiumActive()) { showToast('🔒 알림받기는 프리미엄 전용입니다'); return; }
+  const d   = getData();
+  const uid = currentDetailId?.replace(/^my_/, '');
+  if (!uid || uid === currentUserId) return;
+  d.following = d.following || {};
+  if (d.following[uid]) {
+    delete d.following[uid];
+    showToast('🔕 알림을 해제했습니다');
+  } else {
+    d.following[uid] = today();
+    showToast('🔔 새 지식 발행 시 알림을 받습니다');
+  }
+  saveData(d);
+  renderFollowBtn(uid);
+}
+
+function renderFollowBtn(uid) {
+  const btn = document.getElementById('btn-follow-bell');
+  if (!btn) return;
+  const d = getData();
+  const isFollowing = !!(d.following && d.following[uid]);
+  btn.textContent = isFollowing ? '🔔 알림 ON' : '🔔 알림받기';
+  btn.classList.toggle('active', isFollowing);
+}
+
+function checkFollowNotifications() {
+  const d = getData();
+  if (!d.following || !Object.keys(d.following).length) return;
+  let newCount = 0;
+  Object.entries(d.following).forEach(([uid, lastSeen]) => {
+    const userData = LS.get(`kse2_data_${uid}`);
+    if (!userData) return;
+    Object.values(userData.mySectors || {}).forEach(s => {
+      if (s.lastInput && s.lastInput > lastSeen) newCount++;
+    });
+  });
+  const badge = document.getElementById('board-notif-badge');
+  if (badge) {
+    badge.classList.toggle('hidden', newCount === 0);
+    badge.textContent = newCount;
+  }
+}
+
+function updateFollowNotifBadge() {
+  checkFollowNotifications();
 }
 
 function goBack() { navigateTo(prevScreen || 'home'); }
@@ -1360,9 +1545,19 @@ function openMarketDetail(stockId) {
     const displayRating = myRating ? ((baseRating + myRating) / 2).toFixed(1) : baseRating.toFixed(1);
     document.getElementById('sp-rating').textContent = `★ ${displayRating}`;
     if (ratingPanel) ratingPanel.classList.add('hidden');
+    // 팔로우 버튼 (프리미엄, 자기 자신 제외)
+    const followBtn = document.getElementById('btn-follow-bell');
+    const uid = stockId.replace(/^my_/, '');
+    if (followBtn && isPremiumActive() && uid !== currentUserId) {
+      followBtn.classList.remove('hidden');
+      renderFollowBtn(uid);
+    } else if (followBtn) {
+      followBtn.classList.add('hidden');
+    }
   } else if (sellerCard) {
     sellerCard.classList.add('hidden');
     if (ratingPanel) ratingPanel.classList.add('hidden');
+    document.getElementById('btn-follow-bell')?.classList.add('hidden');
   }
 
   // 액션 영역

@@ -208,6 +208,10 @@
       <button class="sn-btn hidden" id="nav-school-level" onclick="navigateTo('school-level')">
         <span>🏫</span><span>학교급별</span>
       </button>
+      <button class="sn-btn" id="nav-board" onclick="navigateTo('board')">
+        <span>💬</span><span>토론방</span>
+        <span class="board-notif-badge hidden" id="board-notif-badge">0</span>
+      </button>
     </div>
 
     <div class="sn-bottom">
@@ -435,6 +439,7 @@
         <div class="sp-right">
           <div class="sp-rating" id="sp-rating">★ 4.0</div>
           <button class="btn-rate" onclick="openRatingPanel()">⭐ 평가하기</button>
+          <button class="btn-follow-bell hidden" id="btn-follow-bell" onclick="toggleFollow()">🔔 알림받기</button>
         </div>
       </div>
       <!-- 평가 패널 -->
@@ -493,6 +498,24 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ════ 토론방 ════ -->
+    <div id="screen-board" class="screen">
+      <div class="page-header">
+        <span class="page-ttl">💬 섹터 토론방</span>
+      </div>
+      <div class="board-sector-tabs" id="board-sector-tabs"></div>
+      <div class="board-posts" id="board-posts">
+        <div class="board-empty">섹터를 선택하면 토론을 볼 수 있습니다</div>
+      </div>
+      <div class="board-write-wrap" id="board-write-wrap">
+        <textarea id="board-write-input" class="board-write-input" placeholder="글을 입력하세요..." rows="2"></textarea>
+        <button class="btn-primary board-post-btn" onclick="submitBoardPost()">게시</button>
+      </div>
+      <div class="board-readonly-hint hidden" id="board-readonly-hint">
+        <span>🔒 글쓰기·댓글은 프리미엄 전용입니다</span>
+      </div>
     </div>
 
     <!-- ════ 포트폴리오 ════ -->
