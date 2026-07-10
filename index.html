@@ -185,15 +185,16 @@
   <div id="toast" class="toast"></div>
 
   <!-- ══ 사이드바 ══ -->
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" id="main-sidebar">
     <div class="sn-brand">
       <span class="sn-logo">📊</span>
-      <div>
+      <div class="sn-brand-text">
         <div class="sn-title">지식 증권거래소</div>
         <div class="sn-kospi-mini">KOSPI <span id="kospi-val">—</span></div>
       </div>
       <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
     </div>
+    <button class="sn-collapse-btn" id="sn-collapse-btn" onclick="toggleMainSidebar()" title="사이드바 접기">◀</button>
 
     <div class="sn-menu">
       <button class="sn-btn active" id="nav-home" onclick="navigateTo('home')">
@@ -508,21 +509,35 @@
       <div class="board-layout">
 
         <!-- 왼쪽: 내 활동 패널 -->
-        <div class="board-profile-panel">
-          <div class="bpp-title">내 활동</div>
+        <div class="board-profile-panel" id="board-profile-panel">
+          <div class="bpp-header">
+            <span class="bpp-title">내 활동</span>
+            <button class="bpp-toggle-btn" onclick="toggleBoardPanel()" title="패널 접기">◀</button>
+          </div>
           <div class="bpp-section">
-            <div class="bpp-sec-hd">✍️ 내가 쓴 글 <span class="bpp-count" id="bpp-my-count">0</span></div>
+            <div class="bpp-sec-hd" onclick="toggleBppSection('my')">
+              <span>✍️ 내가 쓴 글 <span class="bpp-count" id="bpp-my-count">0</span></span>
+              <span class="bpp-sec-arrow" id="bpp-arrow-my">▼</span>
+            </div>
             <div class="bpp-list" id="bpp-my-posts"></div>
           </div>
           <div class="bpp-section">
-            <div class="bpp-sec-hd">💬 내가 댓글 단 글 <span class="bpp-count" id="bpp-reply-count">0</span></div>
+            <div class="bpp-sec-hd" onclick="toggleBppSection('reply')">
+              <span>💬 내가 댓글 단 글 <span class="bpp-count" id="bpp-reply-count">0</span></span>
+              <span class="bpp-sec-arrow" id="bpp-arrow-reply">▼</span>
+            </div>
             <div class="bpp-list" id="bpp-replied-posts"></div>
           </div>
           <div class="bpp-section">
-            <div class="bpp-sec-hd">❤️ 찜한 글 <span class="bpp-count" id="bpp-like-count">0</span></div>
+            <div class="bpp-sec-hd" onclick="toggleBppSection('like')">
+              <span>❤️ 찜한 글 <span class="bpp-count" id="bpp-like-count">0</span></span>
+              <span class="bpp-sec-arrow" id="bpp-arrow-like">▼</span>
+            </div>
             <div class="bpp-list" id="bpp-liked-posts"></div>
           </div>
         </div>
+        <!-- 패널 닫혔을 때 열기 버튼 -->
+        <button class="bpp-open-btn hidden" id="bpp-open-btn" onclick="toggleBoardPanel()" title="내 활동 열기">▶</button>
 
         <!-- 오른쪽: 메인 -->
         <div class="board-main">

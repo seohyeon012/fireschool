@@ -254,6 +254,7 @@ function launchApp() {
   updateTicker();
   updatePremiumUI();
   checkFollowNotifications();
+  initSidebarState();
 }
 
 function signInWithGoogle() {
@@ -1002,7 +1003,8 @@ function navigateTo(name) {
 }
 
 /* ══ 토론방 ══ */
-const ALL_SECTORS = ['수학','영어','과학','역사','국어','프로그래밍','철학','의학','경제','법학','물리','화학','언어','기타'];
+const ALL_SECTORS     = ['수학','영어','과학','역사','국어','프로그래밍','철학','의학','경제','법학','물리','화학','언어','기타'];
+const PREMIUM_SECTORS = ['철학','의학','경제','법학','물리','화학','언어'];
 
 function getBoard()    { return LS.get('kse2_board') || { posts: [] }; }
 function saveBoard(b)  { LS.set('kse2_board', b); }
@@ -1017,19 +1019,27 @@ function renderBoard() {
   const d     = getData();
   const likes = d.boardLikes || [];
 
-  // 섹터 탭
+  const premium = isPremiumActive();
+  const visibleSectors = ALL_SECTORS.filter(s => premium || !PREMIUM_SECTORS.includes(s));
+
+  // 섹터 탭 (비프리미엄은 프리미엄 섹터 잠금 표시)
   const tabEl = document.getElementById('board-sector-tabs');
   if (tabEl) {
-    tabEl.innerHTML = ALL_SECTORS.map(sec =>
-      `<button class="board-sec-tab${sec === boardSector ? ' active' : ''}"
-               onclick="selectBoardSector('${sec}')">
-         ${SECTOR_EMOJI[sec]||''} ${sec}
-       </button>`
-    ).join('');
+    tabEl.innerHTML = visibleSectors.map(sec => {
+      const locked = !premium && PREMIUM_SECTORS.includes(sec);
+      return `<button class="board-sec-tab${sec === boardSector ? ' active' : ''}${locked ? ' locked' : ''}"
+               onclick="${locked ? 'showPremiumModal()' : `selectBoardSector('${sec}')`}">
+         ${locked ? '🔒' : (SECTOR_EMOJI[sec]||'')} ${sec}
+       </button>`;
+    }).join('');
   }
 
-  // 포스트 목록 (아코디언)
-  const posts = (b.posts || []).filter(p => p.sector === boardSector)
+  // 선택된 섹터가 비프리미엄에게 잠긴 경우 기본 섹터로 리셋
+  if (!premium && PREMIUM_SECTORS.includes(boardSector)) boardSector = '수학';
+
+  // 포스트 목록 (아코디언) — 비프리미엄은 프리미엄 섹터 글 미노출
+  const posts = (b.posts || [])
+    .filter(p => p.sector === boardSector && (premium || !PREMIUM_SECTORS.includes(p.sector)))
     .sort((a, bPost) => bPost.id - a.id);
 
   const postsEl = document.getElementById('board-posts');
@@ -1317,6 +1327,42 @@ function updateFollowNotifBadge() {
 }
 
 function goBack() { navigateTo(prevScreen || 'home'); }
+
+/* ══ 사이드바 토글 ══ */
+function toggleMainSidebar() {
+  const nav = document.getElementById('main-sidebar');
+  const btn = document.getElementById('sn-collapse-btn');
+  if (!nav) return;
+  const collapsed = nav.classList.toggle('collapsed');
+  if (btn) btn.textContent = collapsed ? '▶' : '◀';
+  localStorage.setItem('kse2_sidebar_collapsed', collapsed ? '1' : '');
+}
+
+function initSidebarState() {
+  if (localStorage.getItem('kse2_sidebar_collapsed')) {
+    const nav = document.getElementById('main-sidebar');
+    const btn = document.getElementById('sn-collapse-btn');
+    if (nav) nav.classList.add('collapsed');
+    if (btn) btn.textContent = '▶';
+  }
+}
+
+/* ══ 보드 프로필 패널 토글 ══ */
+function toggleBoardPanel() {
+  const panel   = document.getElementById('board-profile-panel');
+  const openBtn = document.getElementById('bpp-open-btn');
+  if (!panel) return;
+  const hidden = panel.classList.toggle('hidden');
+  openBtn?.classList.toggle('hidden', !hidden);
+}
+
+function toggleBppSection(name) {
+  const list  = document.getElementById(`bpp-${name === 'my' ? 'my-posts' : name === 'reply' ? 'replied-posts' : 'liked-posts'}`);
+  const arrow = document.getElementById(`bpp-arrow-${name}`);
+  if (!list) return;
+  const closed = list.classList.toggle('hidden');
+  if (arrow) arrow.textContent = closed ? '▶' : '▼';
+}
 
 /* ══ 홈: 시장 ══ */
 function renderHome() {

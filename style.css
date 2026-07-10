@@ -1186,6 +1186,52 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 /* 설정 버튼 행 */
 .ss-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* ── 메인 사이드바 토글 ── */
+.sn-collapse-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 6px 0; font-size: 11px; color: var(--sub);
+  background: none; border: none; border-top: 1px solid var(--border);
+  cursor: pointer; transition: color .12s, background .12s; flex-shrink: 0;
+}
+.sn-collapse-btn:hover { color: var(--text); background: var(--card); }
+
+.sidebar-nav.collapsed { width: 52px; }
+.sidebar-nav.collapsed .sn-brand-text,
+.sidebar-nav.collapsed .sn-btn > span:last-child,
+.sidebar-nav.collapsed .sn-bottom > *:not(.sn-collapse-btn) { display: none; }
+.sidebar-nav.collapsed .sn-btn { padding: 12px 0; justify-content: center; }
+.sidebar-nav.collapsed .sn-ipo-btn { margin: 4px; padding: 9px 0; }
+.sidebar-nav.collapsed .sn-collapse-btn { border-top: 1px solid var(--border); }
+.sidebar-nav { transition: width .2s ease; }
+.sn-brand-text { flex: 1; min-width: 0; }
+
+/* ── 보드 프로필 패널 ── */
+.bpp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.bpp-toggle-btn {
+  background: none; border: none; cursor: pointer; font-size: 11px;
+  color: var(--sub); padding: 2px 6px; border-radius: 4px; transition: all .12s;
+}
+.bpp-toggle-btn:hover { background: var(--border); color: var(--text); }
+.bpp-open-btn {
+  writing-mode: vertical-rl; text-orientation: mixed;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 0 8px 8px 0;
+  padding: 10px 6px; font-size: 11px; color: var(--sub); cursor: pointer;
+  flex-shrink: 0; align-self: flex-start; margin-top: 0; transition: all .12s;
+}
+.bpp-open-btn:hover { color: var(--accent); border-color: var(--accent); }
+.bpp-sec-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; font-weight: 600; color: var(--text);
+  margin-bottom: 6px; cursor: pointer; padding: 2px 0;
+  user-select: none;
+}
+.bpp-sec-hd:hover { color: var(--accent); }
+.bpp-sec-arrow { font-size: 9px; color: var(--sub); transition: transform .15s; }
+
+/* 프리미엄 전용 섹터 탭 잠금 */
+.board-sec-tab.locked { opacity: .45; cursor: pointer; }
+.board-sec-tab.locked:hover { border-color: var(--yellow); color: var(--yellow); opacity: 1; }
+
 /* ── 반응형 ── */
 @media (max-width: 640px) {
   :root { --sidebar-w: 56px; }
