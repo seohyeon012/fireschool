@@ -1208,7 +1208,7 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 
 .sidebar-nav.collapsed { width: 52px; }
 .sidebar-nav.collapsed .sn-brand-text,
-.sidebar-nav.collapsed .sn-btn > span:last-child,
+.sidebar-nav.collapsed .sn-btn > span:not(:first-child),
 .sidebar-nav.collapsed .sn-bottom > *:not(.sn-collapse-btn) { display: none; }
 .sidebar-nav.collapsed .sn-btn { padding: 12px 0; justify-content: center; }
 .sidebar-nav.collapsed .sn-ipo-btn { margin: 4px; padding: 9px 0; }
