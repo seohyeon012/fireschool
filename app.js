@@ -1013,6 +1013,10 @@ function isPremiumActive() {
 }
 
 function renderBoard() {
+  const b   = getBoard();
+  const d   = getData();
+  const likes = d.boardLikes || [];
+
   // 섹터 탭
   const tabEl = document.getElementById('board-sector-tabs');
   if (tabEl) {
@@ -1024,39 +1028,17 @@ function renderBoard() {
     ).join('');
   }
 
-  const b = getBoard();
+  // 포스트 목록
   const posts = (b.posts || []).filter(p => p.sector === boardSector)
-    .sort((a, b) => b.id - a.id);
+    .sort((a, bPost) => bPost.id - a.id);
 
   const postsEl = document.getElementById('board-posts');
-  if (!postsEl) return;
-
-  if (!posts.length) {
-    postsEl.innerHTML = '<div class="board-empty">아직 글이 없습니다. 첫 글을 남겨보세요!</div>';
-  } else {
-    postsEl.innerHTML = posts.map(p => `
-      <div class="board-post" id="post-${p.id}">
-        <div class="bp-header">
-          <span class="bp-author">${esc(p.authorName)}</span>
-          <span class="bp-date">${p.date}</span>
-          ${isAdmin ? `<button class="bp-delete-btn" onclick="deleteBoardPost(${p.id})">🗑</button>` : ''}
-        </div>
-        <div class="bp-text">${esc(p.text).replace(/\n/g,'<br>')}</div>
-        <div class="bp-replies">
-          ${(p.replies||[]).map(r => `
-            <div class="bp-reply">
-              <span class="bp-reply-author">${esc(r.authorName)}</span>
-              <span class="bp-reply-text">${esc(r.text).replace(/\n/g,'<br>')}</span>
-              <span class="bp-reply-date">${r.date}</span>
-            </div>`).join('')}
-        </div>
-        ${isPremiumActive() ? `
-          <div class="bp-reply-form">
-            <input type="text" class="bp-reply-input" id="reply-input-${p.id}"
-                   placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitBoardReply(${p.id})">
-            <button class="bp-reply-btn" onclick="submitBoardReply(${p.id})">↑</button>
-          </div>` : ''}
-      </div>`).join('');
+  if (postsEl) {
+    if (!posts.length) {
+      postsEl.innerHTML = '<div class="board-empty">아직 글이 없습니다. 첫 글을 남겨보세요!</div>';
+    } else {
+      postsEl.innerHTML = posts.map(p => _renderPost(p, likes)).join('');
+    }
   }
 
   // 글쓰기 영역
@@ -1070,12 +1052,108 @@ function renderBoard() {
     hintEl?.classList.remove('hidden');
   }
 
-  // 알림 뱃지 초기화
+  // 프로필 패널
+  renderBoardProfile(b, likes);
   updateFollowNotifBadge();
+}
+
+function _renderPost(p, likes) {
+  const liked = likes.includes(p.id);
+  return `
+    <div class="board-post" id="post-${p.id}">
+      <div class="bp-header">
+        <span class="bp-author">${esc(p.authorName)}</span>
+        <span class="bp-date">${p.date}</span>
+        <button class="bp-like-btn${liked ? ' liked' : ''}" onclick="toggleLike(${p.id})">
+          ${liked ? '❤️' : '🤍'} <span class="bp-like-count">${p.likes||0}</span>
+        </button>
+        ${isAdmin ? `<button class="bp-delete-btn" onclick="deleteBoardPost(${p.id})">🗑</button>` : ''}
+      </div>
+      <div class="bp-text">${esc(p.text).replace(/\n/g,'<br>')}</div>
+      <div class="bp-replies">
+        ${(p.replies||[]).map(r => `
+          <div class="bp-reply">
+            <span class="bp-reply-author">${esc(r.authorName)}</span>
+            <span class="bp-reply-text">${esc(r.text).replace(/\n/g,'<br>')}</span>
+            <span class="bp-reply-date">${r.date}</span>
+          </div>`).join('')}
+      </div>
+      ${isPremiumActive() ? `
+        <div class="bp-reply-form">
+          <input type="text" class="bp-reply-input" id="reply-input-${p.id}"
+                 placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitBoardReply(${p.id})">
+          <button class="bp-reply-btn" onclick="submitBoardReply(${p.id})">↑</button>
+        </div>` : ''}
+    </div>`;
+}
+
+function renderBoardProfile(b, likes) {
+  const allPosts = b.posts || [];
+
+  const myPosts     = allPosts.filter(p => p.authorId === currentUserId);
+  const repliedPosts = allPosts.filter(p =>
+    (p.replies || []).some(r => r.authorId === currentUserId)
+  );
+  const likedPosts  = allPosts.filter(p => likes.includes(p.id));
+
+  function miniItem(p) {
+    const preview = p.text.length > 30 ? p.text.slice(0, 30) + '…' : p.text;
+    return `<div class="bpp-item" onclick="jumpToPost(${p.id}, '${p.sector}')">
+      <span class="bpp-item-sec">${SECTOR_EMOJI[p.sector]||''} ${p.sector}</span>
+      <span class="bpp-item-text">${esc(preview)}</span>
+    </div>`;
+  }
+
+  const countEl = (id, arr) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = arr.length;
+  };
+  countEl('bpp-my-count',    myPosts);
+  countEl('bpp-reply-count', repliedPosts);
+  countEl('bpp-like-count',  likedPosts);
+
+  const render = (elId, arr) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = arr.length
+      ? arr.slice(0, 5).map(miniItem).join('')
+      : '<div class="bpp-empty">없음</div>';
+  };
+  render('bpp-my-posts',      myPosts);
+  render('bpp-replied-posts', repliedPosts);
+  render('bpp-liked-posts',   likedPosts);
+}
+
+function jumpToPost(postId, sector) {
+  boardSector = sector;
+  renderBoard();
+  setTimeout(() => {
+    const el = document.getElementById(`post-${postId}`);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('bp-highlight'); setTimeout(() => el.classList.remove('bp-highlight'), 1500); }
+  }, 100);
 }
 
 function selectBoardSector(sec) {
   boardSector = sec;
+  renderBoard();
+}
+
+function toggleLike(postId) {
+  const d = getData();
+  d.boardLikes = d.boardLikes || [];
+  const b = getBoard();
+  const post = (b.posts || []).find(p => p.id === postId);
+  if (!post) return;
+
+  if (d.boardLikes.includes(postId)) {
+    d.boardLikes = d.boardLikes.filter(id => id !== postId);
+    post.likes = Math.max(0, (post.likes || 1) - 1);
+  } else {
+    d.boardLikes.push(postId);
+    post.likes = (post.likes || 0) + 1;
+  }
+  saveData(d);
+  saveBoard(b);
   renderBoard();
 }
 
@@ -1096,6 +1174,7 @@ function submitBoardPost() {
     text,
     date:       today(),
     replies:    [],
+    likes:      0,
   });
   saveBoard(b);
   if (input) input.value = '';
@@ -1122,6 +1201,7 @@ function submitBoardReply(postId) {
   });
   saveBoard(b);
   renderBoard();
+  showToast('💬 댓글이 등록됐습니다');
 }
 
 function deleteBoardPost(postId) {

@@ -505,16 +505,40 @@
       <div class="page-header">
         <span class="page-ttl">💬 섹터 토론방</span>
       </div>
-      <div class="board-sector-tabs" id="board-sector-tabs"></div>
-      <div class="board-posts" id="board-posts">
-        <div class="board-empty">섹터를 선택하면 토론을 볼 수 있습니다</div>
-      </div>
-      <div class="board-write-wrap" id="board-write-wrap">
-        <textarea id="board-write-input" class="board-write-input" placeholder="글을 입력하세요..." rows="2"></textarea>
-        <button class="btn-primary board-post-btn" onclick="submitBoardPost()">게시</button>
-      </div>
-      <div class="board-readonly-hint hidden" id="board-readonly-hint">
-        <span>🔒 글쓰기·댓글은 프리미엄 전용입니다</span>
+      <div class="board-layout">
+
+        <!-- 왼쪽: 내 활동 패널 -->
+        <div class="board-profile-panel">
+          <div class="bpp-title">내 활동</div>
+          <div class="bpp-section">
+            <div class="bpp-sec-hd">✍️ 내가 쓴 글 <span class="bpp-count" id="bpp-my-count">0</span></div>
+            <div class="bpp-list" id="bpp-my-posts"></div>
+          </div>
+          <div class="bpp-section">
+            <div class="bpp-sec-hd">💬 내가 댓글 단 글 <span class="bpp-count" id="bpp-reply-count">0</span></div>
+            <div class="bpp-list" id="bpp-replied-posts"></div>
+          </div>
+          <div class="bpp-section">
+            <div class="bpp-sec-hd">❤️ 찜한 글 <span class="bpp-count" id="bpp-like-count">0</span></div>
+            <div class="bpp-list" id="bpp-liked-posts"></div>
+          </div>
+        </div>
+
+        <!-- 오른쪽: 메인 -->
+        <div class="board-main">
+          <div class="board-sector-tabs" id="board-sector-tabs"></div>
+          <div class="board-posts" id="board-posts">
+            <div class="board-empty">섹터를 선택하면 토론을 볼 수 있습니다</div>
+          </div>
+          <div class="board-write-wrap hidden" id="board-write-wrap">
+            <textarea id="board-write-input" class="board-write-input" placeholder="글을 입력하세요..." rows="2"></textarea>
+            <button class="btn-primary board-post-btn" onclick="submitBoardPost()">게시</button>
+          </div>
+          <div class="board-readonly-hint hidden" id="board-readonly-hint">
+            <span>🔒 글쓰기·댓글은 프리미엄 전용입니다</span>
+          </div>
+        </div>
+
       </div>
     </div>
 

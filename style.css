@@ -1203,6 +1203,25 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 }
 
 /* ══ 토론방 ══ */
+.board-layout {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.board-profile-panel {
+  width: 200px; flex-shrink: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px; position: sticky; top: 0;
+}
+.bpp-title { font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+.bpp-section { margin-bottom: 14px; }
+.bpp-sec-hd { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.bpp-count { font-size: 11px; font-weight: 700; color: var(--accent); margin-left: 4px; }
+.bpp-empty { font-size: 11px; color: var(--sub); padding: 4px 0; }
+.bpp-item { padding: 5px 6px; border-radius: 6px; cursor: pointer; transition: background .12s; }
+.bpp-item:hover { background: var(--border); }
+.bpp-item-sec { font-size: 10px; color: var(--sub); display: block; margin-bottom: 1px; }
+.bpp-item-text { font-size: 11px; color: var(--text); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.board-main { flex: 1; min-width: 0; }
 .board-sector-tabs {
   display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;
 }
@@ -1225,12 +1244,22 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 }
 .bp-author { font-size: 13px; font-weight: 700; color: var(--text); }
 .bp-date   { font-size: 11px; color: var(--sub); margin-left: auto; }
+.bp-like-btn {
+  background: none; border: none; cursor: pointer; font-size: 13px;
+  color: var(--sub); padding: 0 4px; display: flex; align-items: center; gap: 3px;
+  transition: transform .15s;
+}
+.bp-like-btn:hover { transform: scale(1.2); }
+.bp-like-btn.liked { color: var(--red); }
+.bp-like-count { font-size: 11px; }
 .bp-delete-btn {
   background: none; border: none; cursor: pointer; font-size: 13px;
   color: var(--sub); padding: 0 2px;
 }
 .bp-delete-btn:hover { color: var(--red); }
 .bp-text { font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
+@keyframes bp-flash { 0%,100% { background: var(--surface); } 50% { background: color-mix(in srgb, var(--accent) 15%, var(--surface)); } }
+.bp-highlight { animation: bp-flash .6s ease 2; }
 
 .bp-replies { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .bp-reply {
