@@ -342,7 +342,12 @@ input, textarea { font-family: inherit; }
 .aside-more-btn:hover { background: var(--border); }
 
 .home-section { }
-.section-row  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.section-row  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.color-legend { display: flex; gap: 12px; margin-bottom: 10px; }
+.cl-item      { font-size: 11px; font-weight: 600; }
+.cl-item.red  { color: var(--red); }
+.cl-item.blue { color: var(--blue); }
+.cl-item.sub  { color: var(--sub); }
 .section-ttl  { font-size: 14px; font-weight: 700; }
 .stock-cnt    { font-size: 12px; color: var(--sub); }
 
