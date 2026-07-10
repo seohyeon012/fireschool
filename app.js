@@ -2396,6 +2396,14 @@ function renderUserStats() {
 }
 
 /* ══ 설정 ══ */
+function togglePwSection() {
+  const sec   = document.getElementById('ss-pw-section');
+  const arrow = document.getElementById('ss-pw-arrow');
+  if (!sec) return;
+  const open = sec.classList.toggle('hidden');
+  if (arrow) arrow.textContent = open ? '▶' : '▼';
+}
+
 function renderSettings() {
   const nameEl  = document.getElementById('ss-real-name');
   const nickEl  = document.getElementById('ss-nickname');
