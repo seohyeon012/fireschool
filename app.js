@@ -1013,8 +1013,8 @@ function isPremiumActive() {
 }
 
 function renderBoard() {
-  const b   = getBoard();
-  const d   = getData();
+  const b     = getBoard();
+  const d     = getData();
   const likes = d.boardLikes || [];
 
   // 섹터 탭
@@ -1028,7 +1028,7 @@ function renderBoard() {
     ).join('');
   }
 
-  // 포스트 목록
+  // 포스트 목록 (아코디언)
   const posts = (b.posts || []).filter(p => p.sector === boardSector)
     .sort((a, bPost) => bPost.id - a.id);
 
@@ -1037,11 +1037,11 @@ function renderBoard() {
     if (!posts.length) {
       postsEl.innerHTML = '<div class="board-empty">아직 글이 없습니다. 첫 글을 남겨보세요!</div>';
     } else {
-      postsEl.innerHTML = posts.map(p => _renderPost(p, likes)).join('');
+      postsEl.innerHTML = posts.map(p => _renderPostRow(p, likes)).join('');
     }
   }
 
-  // 글쓰기 영역
+  // 글쓰기 버튼
   const writeWrap = document.getElementById('board-write-wrap');
   const hintEl    = document.getElementById('board-readonly-hint');
   if (isPremiumActive()) {
@@ -1057,34 +1057,80 @@ function renderBoard() {
   updateFollowNotifBadge();
 }
 
-function _renderPost(p, likes) {
-  const liked = likes.includes(p.id);
+// 아코디언 행: 제목만 표시
+function _renderPostRow(p, likes) {
+  const liked   = likes.includes(p.id);
+  const title   = esc(p.title || '(제목 없음)');
+  const replyCount = (p.replies||[]).length;
   return `
-    <div class="board-post" id="post-${p.id}">
-      <div class="bp-header">
-        <span class="bp-author">${esc(p.authorName)}</span>
-        <span class="bp-date">${p.date}</span>
-        <button class="bp-like-btn${liked ? ' liked' : ''}" onclick="toggleLike(${p.id})">
-          ${liked ? '❤️' : '🤍'} <span class="bp-like-count">${p.likes||0}</span>
-        </button>
-        ${isAdmin ? `<button class="bp-delete-btn" onclick="deleteBoardPost(${p.id})">🗑</button>` : ''}
+    <div class="board-post-row" id="post-${p.id}">
+      <div class="bpr-summary" onclick="togglePostExpand(${p.id})">
+        <span class="bpr-title">${title}</span>
+        <span class="bpr-meta">
+          <span class="bpr-author">${esc(p.authorName)}</span>
+          <span class="bpr-date">${p.date}</span>
+          ${replyCount ? `<span class="bpr-replies">💬${replyCount}</span>` : ''}
+          <span class="bpr-likes ${liked ? 'liked' : ''}">❤️${p.likes||0}</span>
+        </span>
+        <span class="bpr-arrow" id="arrow-${p.id}">▶</span>
       </div>
-      <div class="bp-text">${esc(p.text).replace(/\n/g,'<br>')}</div>
-      <div class="bp-replies">
-        ${(p.replies||[]).map(r => `
-          <div class="bp-reply">
-            <span class="bp-reply-author">${esc(r.authorName)}</span>
-            <span class="bp-reply-text">${esc(r.text).replace(/\n/g,'<br>')}</span>
-            <span class="bp-reply-date">${r.date}</span>
-          </div>`).join('')}
+      <div class="bpr-detail hidden" id="detail-${p.id}">
+        <div class="bp-body">${p.html || esc(p.text||'').replace(/\n/g,'<br>')}</div>
+        <div class="bp-footer-actions">
+          <button class="bp-like-btn${liked ? ' liked' : ''}" onclick="toggleLike(${p.id})">
+            ${liked ? '❤️' : '🤍'} <span class="bp-like-count">${p.likes||0}</span> 찜하기
+          </button>
+          ${isAdmin ? `<button class="bp-delete-btn" onclick="deleteBoardPost(${p.id})">🗑 삭제</button>` : ''}
+        </div>
+        <div class="bp-replies">
+          ${(p.replies||[]).map(r => `
+            <div class="bp-reply">
+              <span class="bp-reply-author">${esc(r.authorName)}</span>
+              <span class="bp-reply-text">${r.html || esc(r.text||'').replace(/\n/g,'<br>')}</span>
+              <span class="bp-reply-date">${r.date}</span>
+            </div>`).join('')}
+        </div>
+        ${isPremiumActive() ? `
+          <div class="bp-reply-form">
+            <input type="text" class="bp-reply-input" id="reply-input-${p.id}"
+                   placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitBoardReply(${p.id})">
+            <button class="bp-reply-btn" onclick="submitBoardReply(${p.id})">↑</button>
+          </div>` : `
+          <div class="bp-reply-lock" onclick="showPremiumModal()">🔒 댓글은 프리미엄 전용</div>`}
       </div>
-      ${isPremiumActive() ? `
-        <div class="bp-reply-form">
-          <input type="text" class="bp-reply-input" id="reply-input-${p.id}"
-                 placeholder="댓글 달기..." onkeydown="if(event.key==='Enter')submitBoardReply(${p.id})">
-          <button class="bp-reply-btn" onclick="submitBoardReply(${p.id})">↑</button>
-        </div>` : ''}
     </div>`;
+}
+
+function togglePostExpand(postId) {
+  const detail = document.getElementById(`detail-${postId}`);
+  const arrow  = document.getElementById(`arrow-${postId}`);
+  if (!detail) return;
+  const isOpen = !detail.classList.contains('hidden');
+  detail.classList.toggle('hidden', isOpen);
+  if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+/* 글쓰기 오버레이 */
+function openBoardWrite() {
+  if (!isPremiumActive()) { showPremiumModal(); return; }
+  const overlay = document.getElementById('board-write-overlay');
+  const tagEl   = document.getElementById('bwo-sector-tag');
+  if (tagEl) tagEl.textContent = `${SECTOR_EMOJI[boardSector]||''} ${boardSector}`;
+  const titleEl = document.getElementById('bwo-title');
+  const editor  = document.getElementById('bwo-editor');
+  if (titleEl) titleEl.value = '';
+  if (editor)  editor.innerHTML = '';
+  overlay?.classList.remove('hidden');
+  titleEl?.focus();
+}
+
+function closeBoardWrite() {
+  document.getElementById('board-write-overlay')?.classList.add('hidden');
+}
+
+function execFmt(cmd, val) {
+  document.getElementById('bwo-editor')?.focus();
+  document.execCommand(cmd, false, val || null);
 }
 
 function renderBoardProfile(b, likes) {
@@ -1158,26 +1204,33 @@ function toggleLike(postId) {
 }
 
 function submitBoardPost() {
-  if (!isPremiumActive()) { showToast('🔒 프리미엄 전용 기능입니다'); return; }
-  const input = document.getElementById('board-write-input');
-  const text  = (input?.value || '').trim();
-  if (!text) { showToast('❌ 내용을 입력해주세요'); return; }
+  if (!isPremiumActive()) { showPremiumModal(); return; }
+  const titleEl  = document.getElementById('bwo-title');
+  const editor   = document.getElementById('bwo-editor');
+  const title    = (titleEl?.value || '').trim();
+  const html     = editor?.innerHTML?.trim() || '';
+  const textOnly = editor?.innerText?.trim() || '';
+  if (!title)    { shake('bwo-title'); showToast('❌ 제목을 입력해주세요'); return; }
+  if (!textOnly) { showToast('❌ 내용을 입력해주세요'); return; }
 
-  const profile = getProfile();
+  const profile    = getProfile();
+  const authorName = isAdmin ? '노서현' : (profile?.nickname || profile?.name || currentUserId);
   const b = getBoard();
   b.posts = b.posts || [];
   b.posts.push({
     id:         Date.now(),
     authorId:   currentUserId,
-    authorName: profile?.name || profile?.nickname || currentUserId,
+    authorName,
     sector:     boardSector,
-    text,
+    title,
+    html,
+    text:       textOnly,
     date:       today(),
     replies:    [],
     likes:      0,
   });
   saveBoard(b);
-  if (input) input.value = '';
+  closeBoardWrite();
   renderBoard();
   showToast('✅ 글이 등록됐습니다');
 }
@@ -1216,7 +1269,7 @@ function deleteBoardPost(postId) {
 
 /* ══ 팔로우 / 알림 ══ */
 function toggleFollow() {
-  if (!isPremiumActive()) { showToast('🔒 알림받기는 프리미엄 전용입니다'); return; }
+  if (!isPremiumActive()) { showPremiumModal(); return; }
   const d   = getData();
   const uid = currentDetailId?.replace(/^my_/, '');
   if (!uid || uid === currentUserId) return;
@@ -1625,10 +1678,10 @@ function openMarketDetail(stockId) {
     const displayRating = myRating ? ((baseRating + myRating) / 2).toFixed(1) : baseRating.toFixed(1);
     document.getElementById('sp-rating').textContent = `★ ${displayRating}`;
     if (ratingPanel) ratingPanel.classList.add('hidden');
-    // 팔로우 버튼 (프리미엄, 자기 자신 제외)
+    // 팔로우 버튼 (자기 자신 제외, 모두에게 표시)
     const followBtn = document.getElementById('btn-follow-bell');
     const uid = stockId.replace(/^my_/, '');
-    if (followBtn && isPremiumActive() && uid !== currentUserId) {
+    if (followBtn && uid !== currentUserId) {
       followBtn.classList.remove('hidden');
       renderFollowBtn(uid);
     } else if (followBtn) {
