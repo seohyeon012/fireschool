@@ -1481,9 +1481,7 @@ function priceChgPct(h) {
 }
 
 function priceColor(p) {
-  if (p >= 70) return 'var(--green)';
-  if (p >= 40) return 'var(--yellow)';
-  return 'var(--red)';
+  return 'var(--text)';
 }
 
 function filterStocks() {
