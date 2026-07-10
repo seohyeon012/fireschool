@@ -2426,6 +2426,22 @@ function renderSettings() {
   updatePremiumUI();
 }
 
+function changePassword() {
+  if (isAdmin) { showToast('❌ 관리자 계정은 비밀번호를 변경할 수 없습니다'); return; }
+  const users  = LS.get('kse2_users') || [];
+  const curPw  = document.getElementById('ss-cur-password').value;
+  const newPw  = document.getElementById('ss-new-password').value;
+  if (!curPw) { shake('ss-cur-password'); showToast('❌ 현재 비밀번호를 입력해주세요'); return; }
+  if (!newPw) { shake('ss-new-password'); showToast('❌ 새 비밀번호를 입력해주세요'); return; }
+  const me = users.find(u => u.nickname === currentUserId);
+  if (!me || me.password !== curPw) { shake('ss-cur-password'); showToast('❌ 현재 비밀번호가 틀렸습니다'); return; }
+  me.password = newPw;
+  LS.set('kse2_users', users);
+  document.getElementById('ss-cur-password').value = '';
+  document.getElementById('ss-new-password').value = '';
+  showToast('✅ 비밀번호가 변경되었습니다');
+}
+
 function saveProfile() {
   const nickname = document.getElementById('ss-nickname').value.trim();
   if (!nickname) { shake('ss-nickname'); return; }
@@ -2436,17 +2452,6 @@ function saveProfile() {
   // 닉네임 중복 체크 (본인 제외)
   if (users.find(u => u.nickname === nickname && u.nickname !== currentUserId)) {
     showToast('❌ 이미 사용 중인 닉네임입니다'); return;
-  }
-
-  // 비밀번호 변경
-  const curPw  = document.getElementById('ss-cur-password').value;
-  const newPw  = document.getElementById('ss-new-password').value;
-  if (newPw) {
-    const me = users.find(u => u.nickname === currentUserId);
-    if (!me || me.password !== curPw) { shake('ss-cur-password'); showToast('❌ 현재 비밀번호가 틀렸습니다'); return; }
-    me.password = newPw;
-    document.getElementById('ss-cur-password').value = '';
-    document.getElementById('ss-new-password').value = '';
   }
 
   // 닉네임 변경
@@ -2469,6 +2474,7 @@ function saveProfile() {
 }
 
 function deleteAccount() {
+  if (isAdmin) { showToast('❌ 관리자 계정은 탈퇴할 수 없습니다'); return; }
   if (!confirm('정말 탈퇴하시겠습니까? 모든 데이터가 삭제됩니다.')) return;
   const users = (LS.get('kse2_users') || []).filter(u => u.nickname !== currentUserId);
   LS.set('kse2_users', users);
