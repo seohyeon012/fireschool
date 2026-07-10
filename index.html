@@ -773,23 +773,68 @@
 <div id="premium-modal" class="chart-modal-overlay hidden" onclick="closePremiumModal(event)">
   <div class="premium-modal-card">
     <button class="chart-modal-close" onclick="closePremiumModal()">✕</button>
-    <div class="pm-crown">👑</div>
-    <div class="pm-title">프리미엄 멤버십</div>
-    <div class="pm-price">월 <strong>2,500원</strong></div>
-    <ul class="pm-benefits">
-      <li>🔓 잠긴 섹터 7개 추가 해제<br><span class="pm-benefit-sub">철학 · 의학 · 경제 · 법학 · 물리 · 화학 · 언어</span></li>
-      <li>📈 매수 가능 섹터 수 <strong>무제한</strong></li>
-      <li>✨ AI 요약 기능<br><span class="pm-benefit-sub">구매한 지식을 AI가 핵심만 요약해 드려요</span></li>
-      <li>🎯 AI 시험기간 종목 추천<br><span class="pm-benefit-sub">시험 직전, 가장 잘 정리된 주식을 AI가 골라줘요</span></li>
-      <li>📋 AI 지식 리포트 작성<br><span class="pm-benefit-sub">내가 산 지식을 섹터별로 정리한 AI 리포트</span></li>
-      <li>🏫 학교급별 섹터 분류<br><span class="pm-benefit-sub">초·중·고·대학교별 맞춤 종목 필터링</span></li>
-      <li>💬 토론방 글쓰기 · 댓글달기<br><span class="pm-benefit-sub">서식 편집기로 풍부한 토론 참여</span></li>
-      <li>🔔 지식인 알림받기<br><span class="pm-benefit-sub">관심 있는 유저의 새 지식 발행 알림</span></li>
-      <li>📊 전체 시장 포트폴리오 분석</li>
-      <li>⚡ 시장 이벤트 우선 알림</li>
-    </ul>
-    <button class="btn-premium-upgrade" onclick="upgradePremium()">✨ 지금 시작하기</button>
-    <p class="pm-note">언제든지 취소 가능 · 자동 갱신</p>
+    <div class="pm-header">
+      <div class="pm-title">멤버십 플랜</div>
+      <div class="pm-subtitle">지식 증권거래소에서 더 많은 기능을 누려보세요</div>
+    </div>
+    <div class="pm-plans">
+      <!-- 일반 -->
+      <div class="pm-plan">
+        <div class="pm-plan-top">
+          <div class="pm-plan-label">일반</div>
+          <div class="pm-plan-price">무료</div>
+          <div class="pm-plan-period">기본 제공</div>
+        </div>
+        <ul class="pm-plan-feats">
+          <li class="pf-on">📊 기본 섹터 7개</li>
+          <li class="pf-on">✏️ 지식 발행 · 매수</li>
+          <li class="pf-on">💼 포트폴리오 관리</li>
+          <li class="pf-on">💬 토론방 열람</li>
+          <li class="pf-off">🔒 프리미엄 섹터</li>
+          <li class="pf-off">🔒 토론방 글쓰기</li>
+          <li class="pf-off">🔒 AI 기능</li>
+          <li class="pf-off">🔒 알림받기</li>
+        </ul>
+        <button class="pm-plan-btn pm-btn-ghost" disabled>현재 플랜</button>
+      </div>
+      <!-- 프리미엄 -->
+      <div class="pm-plan pm-plan-featured">
+        <div class="pm-feat-badge">추천</div>
+        <div class="pm-plan-top">
+          <div class="pm-plan-label">👑 프리미엄</div>
+          <div class="pm-plan-price">₩2,500</div>
+          <div class="pm-plan-period">/ 월</div>
+        </div>
+        <ul class="pm-plan-feats">
+          <li class="pf-on">🔓 잠긴 섹터 7개 추가<br><span class="pf-sub">철학·의학·경제·법학·물리·화학·언어</span></li>
+          <li class="pf-on">💬 토론방 글쓰기 · 댓글</li>
+          <li class="pf-on">✨ AI 요약 · 추천 · 리포트</li>
+          <li class="pf-on">🔔 지식인 알림받기</li>
+          <li class="pf-on">📊 전체 시장 포트폴리오 분석</li>
+          <li class="pf-on">🏫 학교급별 섹터 분류</li>
+          <li class="pf-on">⚡ 시장 이벤트 우선 알림</li>
+        </ul>
+        <button class="pm-plan-btn pm-btn-primary" onclick="upgradePremium()">✨ 지금 시작하기</button>
+      </div>
+      <!-- 단체 -->
+      <div class="pm-plan">
+        <div class="pm-plan-top">
+          <div class="pm-plan-label">🏢 단체</div>
+          <div class="pm-plan-price">₩1,000</div>
+          <div class="pm-plan-period">/ 인·월</div>
+        </div>
+        <ul class="pm-plan-feats">
+          <li class="pf-on">✅ 프리미엄 전체 기능</li>
+          <li class="pf-on">🏫 학급 · 팀 단위 관리</li>
+          <li class="pf-on">📋 관리자 대시보드</li>
+          <li class="pf-on">🎓 학교급별 커리큘럼 연동</li>
+          <li class="pf-on">📈 단체 이용 현황 리포트</li>
+          <li class="pf-on">🤝 전담 고객 지원</li>
+        </ul>
+        <button class="pm-plan-btn pm-btn-outline" onclick="contactGroup()">📧 도입 문의하기</button>
+      </div>
+    </div>
+    <p class="pm-note">프리미엄 · 언제든지 취소 가능 · 자동 갱신 &nbsp;|&nbsp; 단체 · 인원수 × 1,000원 / 월</p>
   </div>
 </div>
 

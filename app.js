@@ -1965,6 +1965,11 @@ function upgradePremium() {
   showToast('🚀 준비 중! 곧 결제 기능이 오픈됩니다 😊');
 }
 
+function contactGroup() {
+  document.getElementById('premium-modal').classList.add('hidden');
+  showToast('📧 noseohyeon079@gmail.com 으로 문의해 주세요!');
+}
+
 /* ── 지식 추가 (상세 화면에서) ── */
 function addKnowledgeFromDetail() {
   const sec = currentDetailId?.startsWith('my_') ? currentDetailId.slice(3) : null;
