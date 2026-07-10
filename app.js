@@ -1103,7 +1103,7 @@ function renderStockCardHtml(s) {
       </div>
       <div class="sc-right">
         <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
-        <div class="sc-chg ${chg>=0?'green':'red'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+        <div class="sc-chg ${chg>=0?'red':'blue'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
       </div>
     </div>`;
 }
@@ -1167,7 +1167,7 @@ function renderHomeAside() {
       ? movers.slice(0, 4).map(m => `
           <div class="aside-mover" onclick="openMarketDetail('${m.id}')">
             <span class="aside-mover-name">${esc(m.name)}</span>
-            <span class="aside-mover-chg ${m.chg>=0?'green':'red'}">${m.chg>=0?'▲':'▼'}${Math.abs(m.chg).toFixed(1)}%</span>
+            <span class="aside-mover-chg ${m.chg>=0?'red':'blue'}">${m.chg>=0?'▲':'▼'}${Math.abs(m.chg).toFixed(1)}%</span>
           </div>`).join('')
       : '<div class="aside-empty">오늘 변동 없음</div>';
   }
@@ -1302,7 +1302,7 @@ function renderMyKnowledge() {
         </div>
         <div class="sc-right">
           <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
-          <div class="sc-chg ${chg>=0?'green':'red'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+          <div class="sc-chg ${chg>=0?'red':'blue'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
         </div>
       </div>`;
   }).join('');
@@ -1334,7 +1334,7 @@ function openMarketDetail(stockId) {
   const chg   = priceChgPct(stock.priceHistory);
   const chgEl = document.getElementById('d-chg');
   chgEl.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(1) + '%';
-  chgEl.className   = 'd-chg ' + (chg >= 0 ? 'green' : 'red');
+  chgEl.className   = 'd-chg ' + (chg >= 0 ? 'red' : 'blue');
 
   // 발행 정보
   const siEl = document.getElementById('d-shares-issued');
@@ -1632,7 +1632,7 @@ function renderPortfolio() {
     if (holdTotalCost > 0) {
       const roi = (holdCurrentVal - holdTotalCost) / holdTotalCost * 100;
       roiEl.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
-      roiEl.style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+      roiEl.style.color = roi >= 0 ? 'var(--red)' : 'var(--blue)';
     } else {
       roiEl.textContent = '—%';
       roiEl.style.color = '';
@@ -1658,7 +1658,7 @@ function renderPortfolio() {
         const avgCost  = h.sharesOwned > 0 ? (h.totalCost || 0) / h.sharesOwned : 0;
         const diff     = curP - avgCost;
         const diffStr  = (diff >= 0 ? '+' : '') + diff.toFixed(1);
-        const diffColor = diff >= 0 ? 'var(--green)' : 'var(--red)';
+        const diffColor = diff >= 0 ? 'var(--red)' : 'var(--blue)';
         const pnlPctStr = (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(1);
 
         const blockId = `pkn-${id.replace(/[^a-z0-9]/gi,'_')}`;
@@ -1704,7 +1704,7 @@ function renderPortfolio() {
               </div>
               <div class="sc-right">
                 <div class="sc-price" style="color:${priceColor(curP)}">C${curP.toFixed(0)}</div>
-                <div class="sc-chg ${pnl>=0?'green':'red'}">${pnl>=0?'▲':'▼'}${Math.abs(pnlPct).toFixed(1)}%</div>
+                <div class="sc-chg ${pnl>=0?'red':'blue'}">${pnl>=0?'▲':'▼'}${Math.abs(pnlPct).toFixed(1)}%</div>
                 <button class="btn-sell-holding" onclick="event.stopPropagation();sellHolding('${id}')">매도</button>
               </div>
             </div>
@@ -1739,7 +1739,7 @@ function renderPortfolio() {
             </div>
             <div class="sc-right">
               <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
-              <div class="sc-chg ${chg>=0?'green':'red'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+              <div class="sc-chg ${chg>=0?'red':'blue'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
             </div>
           </div>`;
       }).join('');
