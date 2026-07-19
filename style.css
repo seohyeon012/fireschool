@@ -295,7 +295,7 @@ input, textarea { font-family: inherit; }
 }
 
 /* ── 화면 기본 ── */
-.screen { display: none; padding: 24px 28px; max-width: 880px; }
+.screen { display: none; padding: 24px 32px; max-width: 1140px; width: 100%; margin: 0 auto; box-sizing: border-box; }
 .screen.active { display: block; }
 
 /* ══ 홈 ══ */
