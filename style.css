@@ -365,10 +365,15 @@ input, textarea { font-family: inherit; }
 .sc-spark { width: 60px; height: 28px; flex-shrink: 0; }
 .sc-right { text-align: right; flex-shrink: 0; min-width: 90px; }
 .sc-price { font-size: 16px; font-weight: 700; font-family: monospace; }
-.sc-chg   { font-size: 12px; font-weight: 700; }
-.sc-chg.green { color: var(--green); }
-.sc-chg.red   { color: var(--red); }
-.sc-chg.blue  { color: var(--blue); }
+.sc-chg        { font-size: 12px; font-weight: 700; }
+.sc-chg.green  { color: var(--green); }
+.sc-chg.red    { color: var(--red); }
+.sc-chg.blue   { color: var(--blue); }
+.sc-crown      { font-size: 13px; margin-right: 2px; }
+.sc-sector-tag { font-size: 10px; color: var(--sub); background: var(--surface); border-radius: 4px; padding: 1px 5px; margin-left: 4px; }
+.wf-sector-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.wf-sec-suggestion { font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.wf-sec-suggestion:hover { border-color: var(--accent); }
 .sc-etf-tag {
   font-size: 9px; padding: 1px 5px;
   background: rgba(88,166,255,.15); color: var(--blue);

@@ -261,14 +261,6 @@
             <input type="text" id="search-input" class="search-input" placeholder="🔍 유저 이름 또는 섹터 검색..." oninput="filterStocks()">
             <div class="filter-pills" id="filter-pills">
               <button class="filter-pill active" data-f="all" onclick="setSectorFilter('all')">전체</button>
-              <button class="filter-pill" data-f="수학" onclick="setSectorFilter('수학')">수학</button>
-              <button class="filter-pill" data-f="영어" onclick="setSectorFilter('영어')">영어</button>
-              <button class="filter-pill" data-f="과학" onclick="setSectorFilter('과학')">과학</button>
-              <button class="filter-pill" data-f="역사" onclick="setSectorFilter('역사')">역사</button>
-              <button class="filter-pill" data-f="국어" onclick="setSectorFilter('국어')">국어</button>
-              <button class="filter-pill" data-f="프로그래밍" onclick="setSectorFilter('프로그래밍')">프로그래밍</button>
-              <button class="filter-pill" data-f="기타" onclick="setSectorFilter('기타')">기타</button>
-              <button class="filter-pill filter-pill-premium" onclick="showPremiumModal()">🔒 숨겨진 과목</button>
             </div>
           </div>
 
@@ -325,26 +317,10 @@
 
       <!-- 지식 입력 폼 -->
       <div id="write-form" class="write-form hidden">
-        <div class="wf-section-label">섹터 선택</div>
-        <div class="wf-sec-row">
-          <button class="wf-sec-btn active" data-s="수학"  onclick="pickWfSector(this)">📐 수학</button>
-          <button class="wf-sec-btn" data-s="영어"  onclick="pickWfSector(this)">📖 영어</button>
-          <button class="wf-sec-btn" data-s="과학"  onclick="pickWfSector(this)">🔬 과학</button>
-          <button class="wf-sec-btn" data-s="역사"  onclick="pickWfSector(this)">🏛️ 역사</button>
-          <button class="wf-sec-btn" data-s="국어"  onclick="pickWfSector(this)">✍️ 국어</button>
-          <button class="wf-sec-btn" data-s="프로그래밍" onclick="pickWfSector(this)">💻 프로그래밍</button>
-          <button class="wf-sec-btn" data-s="기타"  onclick="pickWfSector(this)">📌 기타</button>
-        </div>
-        <div class="wf-sec-row wf-sec-locked-row">
-          <button class="wf-sec-btn wf-sec-locked" data-s="철학" onclick="pickWfSectorOrPremium(this)">🔒 철학</button>
-          <button class="wf-sec-btn wf-sec-locked" data-s="의학" onclick="pickWfSectorOrPremium(this)">🔒 의학</button>
-          <button class="wf-sec-btn wf-sec-locked" data-s="경제" onclick="pickWfSectorOrPremium(this)">🔒 경제</button>
-          <button class="wf-sec-btn wf-sec-locked" data-s="법학" onclick="pickWfSectorOrPremium(this)">🔒 법학</button>
-          <button class="wf-sec-btn wf-sec-locked" data-s="물리" onclick="pickWfSectorOrPremium(this)">🔒 물리</button>
-          <button class="wf-sec-btn wf-sec-locked" data-s="화학" onclick="pickWfSectorOrPremium(this)">🔒 화학</button>
-          <button class="wf-sec-btn wf-sec-locked" data-s="언어" onclick="pickWfSectorOrPremium(this)">🔒 언어</button>
-          <div class="wf-premium-unlock-hint" onclick="showPremiumModal()">✨ 프리미엄으로 잠금 해제</div>
-        </div>
+        <div class="wf-section-label">카테고리 <span class="wf-ppb-hint">(직접 입력 — 예: 주식투자, 다이어트, 패션)</span></div>
+        <input type="text" id="wf-sector-input" class="wf-title-input"
+               placeholder="내 전문 분야를 입력하세요" oninput="onWfSectorInput(this)" style="margin-bottom:8px">
+        <div id="wf-sector-suggestions" class="wf-sector-suggestions"></div>
 
         <!-- 기존 종목 선택 / 새 종목 만들기 -->
         <div id="wf-stock-choice" class="hidden"></div>
@@ -362,7 +338,7 @@
         <div id="wf-stock-name-row">
           <div class="wf-section-label">주 이름(종목명)</div>
           <input type="text" id="wf-stock-name" class="wf-title-input"
-                 placeholder="예: 김민준의 수학주 (섹터명 포함 필수)" style="margin-bottom:10px">
+                 placeholder="예: 김민준의 주식투자" style="margin-bottom:10px">
         </div>
 
         <div class="wf-section-label">주 제목</div>

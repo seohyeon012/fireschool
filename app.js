@@ -523,9 +523,30 @@ function openPortfolioAttachment(stockId, boughtEntryIndex) {
 function selectWfSector(sec) {
   wfSector = sec;
   wfStockKey = null;
-  document.querySelectorAll('.wf-sec-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.s === sec);
-  });
+  updateWfStockChoice();
+}
+
+function onWfSectorInput(el) {
+  const val = el.value.trim();
+  wfSector = val || '기타';
+  // 기존 내 카테고리 자동완성 제안
+  const d = getData();
+  const mySecs = [...new Set(Object.values(d.mySectors).map(s => s.sector || '기타').filter(s => s && s.includes(val)))];
+  const sugEl = document.getElementById('wf-sector-suggestions');
+  if (sugEl) {
+    sugEl.innerHTML = mySecs.slice(0, 5).map(s =>
+      `<button class="wf-sec-suggestion" onclick="applyWfSectorSuggestion('${esc(s)}')">${esc(s)}</button>`
+    ).join('');
+  }
+  updateWfStockChoice();
+}
+
+function applyWfSectorSuggestion(sec) {
+  wfSector = sec;
+  const inp = document.getElementById('wf-sector-input');
+  if (inp) inp.value = sec;
+  const sugEl = document.getElementById('wf-sector-suggestions');
+  if (sugEl) sugEl.innerHTML = '';
   updateWfStockChoice();
 }
 
@@ -650,14 +671,7 @@ function aiReviewKnowledge(title, text, callback) {
       showToast('❌ 내용이 너무 부족합니다. 더 자세히 서술해주세요.'); callback(false); return;
     }
 
-    // ⑤ 섹터 연관성 — 선택한 섹터 키워드가 하나 이상 포함돼야 함
-    const sectorKws = SECTOR_KEYWORDS[wfSector] || [];
-    if (sectorKws.length > 0 && !sectorKws.some(kw => combined.includes(kw))) {
-      showToast(`❌ 내용이 '${wfSector}' 섹터와 맞지 않아 보입니다. 섹터를 확인하거나 관련 내용을 추가해주세요.`);
-      callback(false); return;
-    }
-
-    // ⑥ 제목-내용 일관성 — 제목 단어(2자 이상)의 30% 이상이 본문에 등장해야 함
+    // ⑤ 제목-내용 일관성 — 제목 단어(2자 이상)의 30% 이상이 본문에 등장해야 함
     const titleWords = title.split(/[\s,\.!?·]+/).filter(w => w.length >= 2);
     if (titleWords.length >= 2) {
       const matchRatio = titleWords.filter(w => text.includes(w)).length / titleWords.length;
@@ -679,14 +693,14 @@ function submitKnowledge() {
   if (!title) { shake('wf-title'); showToast('❌ 제목을 입력해주세요'); return; }
   if (!text)  { shake('wf-text');  showToast('❌ 내용을 입력해주세요');  return; }
 
-  // 새 종목 생성 시: 종목명 필수 + 섹터명 포함 확인
+  // 카테고리 읽기
+  const sectorInput = (document.getElementById('wf-sector-input')?.value || '').trim();
+  if (!sectorInput) { shake('wf-sector-input'); showToast('❌ 카테고리를 입력해주세요'); return; }
+  wfSector = sectorInput;
+
+  // 새 종목 생성 시: 종목명 필수
   if (!wfStockKey) {
     if (!stockName) { shake('wf-stock-name'); showToast('❌ 종목명을 입력해주세요'); return; }
-    if (!stockName.includes(wfSector)) {
-      shake('wf-stock-name');
-      showToast(`❌ 종목명에 섹터명 '${wfSector}'이(가) 포함되어야 합니다`);
-      return;
-    }
   }
 
   // AI 검토 후 저장
@@ -1409,12 +1423,23 @@ function renderMarketList() {
     all.push({ ...s, id: 'my_' + sec, uid: currentUserId, creatorName: myName, sector: s.sector || sec, isOwn: true });
   });
 
+  // 동적 필터 pills 렌더링
+  const allSectors = [...new Set(all.map(s => s.sector).filter(Boolean))].sort();
+  const pillsEl = document.getElementById('filter-pills');
+  if (pillsEl) {
+    pillsEl.innerHTML = `<button class="filter-pill${filterSector==='all'?' active':''}" data-f="all" onclick="setSectorFilter('all')">전체</button>`
+      + allSectors.map(s => `<button class="filter-pill${filterSector===s?' active':''}" data-f="${esc(s)}" onclick="setSectorFilter('${esc(s)}')">${esc(s)}</button>`).join('');
+  }
+
   if (filterSector !== 'all') all = all.filter(s => s.sector === filterSector);
   if (filterQuery) {
     const q = filterQuery.toLowerCase();
     all = all.filter(s => s.creatorName.toLowerCase().includes(q) || s.sector.toLowerCase().includes(q));
   }
   all.sort((a, b) => b.price - a.price);
+
+  // 상위 3개 ID 추출 (👑 왕관용)
+  const topIds = new Set(all.slice(0, 3).map(s => s.id));
 
   const cntEl = document.getElementById('market-stock-count');
   if (cntEl) cntEl.textContent = `${all.length}개 종목`;
@@ -1431,42 +1456,40 @@ function renderMarketList() {
   emptyEl?.classList.add('hidden');
 
   if (sectorGroupMode) {
-    // 섹터별 그룹핑
     const grouped = {};
     all.forEach(s => {
       if (!grouped[s.sector]) grouped[s.sector] = [];
       grouped[s.sector].push(s);
     });
     listEl.innerHTML = Object.entries(grouped).map(([sector, stocks]) => `
-      <div class="sector-group-header">${SECTOR_EMOJI[sector]||''} ${esc(sector)} (${stocks.length}개)</div>
-      ${stocks.map(s => renderStockCardHtml(s)).join('')}
+      <div class="sector-group-header">${esc(sector)} (${stocks.length}개)</div>
+      ${stocks.map(s => renderStockCardHtml(s, topIds.has(s.id))).join('')}
     `).join('');
   } else {
-    listEl.innerHTML = all.map(s => renderStockCardHtml(s)).join('');
+    listEl.innerHTML = all.map(s => renderStockCardHtml(s, topIds.has(s.id))).join('');
   }
 }
 
-function renderStockCardHtml(s) {
+function renderStockCardHtml(s, isTop) {
   const chg   = priceChgPct(s.priceHistory);
   const color = SECTOR_COLORS[s.sector] || '#6B7280';
-  // [Feature 11] stockName 표시
-  const displayName = s.stockName
-    ? `${SECTOR_EMOJI[s.sector]||''} ${esc(s.stockName)}`
-    : `${SECTOR_EMOJI[s.sector]||''} ${esc(s.sector)}주`;
+  const displayName = s.stockName ? esc(s.stockName) : `${esc(s.sector)}주`;
   return `
     <div class="stock-card" onclick="openMarketDetail('${s.id}')">
       <div class="sc-left">
         <div class="sc-name">
+          ${isTop ? '<span class="sc-crown">👑</span>' : ''}
           ${displayName}
           ${s.isOwn ? '<span class="sc-own-tag">내 발행</span>' : ''}
         </div>
         <div class="sc-meta">
           <span class="sc-creator" style="color:${color}">${esc(s.creatorName)}</span>
-          <span class="sc-shares-cnt">· ${s.sharesIssued||0}주 발행</span>
+          <span class="sc-sector-tag">${esc(s.sector)}</span>
+          <span class="sc-shares-cnt">· ${s.sharesIssued||0}주</span>
         </div>
       </div>
       <div class="sc-right">
-        <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
+        <div class="sc-price">C${s.price.toFixed(0)}</div>
         <div class="sc-chg ${chg>=0?'red':'blue'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
       </div>
     </div>`;
