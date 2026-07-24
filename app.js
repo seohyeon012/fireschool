@@ -577,6 +577,8 @@ function openPortfolioAttachment(stockId, boughtEntryIndex) {
 function selectWfSector(sec) {
   wfSector = sec;
   wfStockKey = null;
+  const inp = document.getElementById('wf-sector-input');
+  if (inp) inp.value = sec;
   updateWfStockChoice();
 }
 
