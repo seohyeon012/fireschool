@@ -1754,7 +1754,7 @@ function renderMyKnowledge() {
     const realSec = s.sector || sec;
     const displayName = s.stockName ? esc(s.stockName) : `${SECTOR_EMOJI[realSec]||''} ${esc(realSec)}주`;
     return `
-      <div class="stock-card ${urgentCls}" onclick="openMarketDetail('my_${sec}')">
+      <div class="stock-card ${urgentCls}" onclick="openMarketDetail('my_${esc(sec)}')">
         <div class="sc-left">
           <div class="sc-name">${displayName}</div>
           <div class="sc-meta">
@@ -1765,9 +1765,39 @@ function renderMyKnowledge() {
         <div class="sc-right">
           <div class="sc-price" style="color:${priceColor(s.price)}">C${s.price.toFixed(0)}</div>
           <div class="sc-chg ${chg>=0?'red':'blue'}">${chg>=0?'▲':'▼'}${Math.abs(chg).toFixed(1)}%</div>
+          <button class="sc-delete-btn" onclick="event.stopPropagation();confirmDeleteStock('${esc(sec)}')" title="주식 삭제">🗑️</button>
         </div>
       </div>`;
   }).join('');
+}
+
+function confirmDeleteStock(sec) {
+  const d = getData();
+  const s = d.mySectors[sec];
+  if (!s) return;
+  const name = s.stockName || `${s.sector || sec}주`;
+  if (!confirm(`"${name}" 주식을 삭제할까요?\n발행된 지식 ${s.sharesIssued||0}건이 모두 사라집니다.`)) return;
+  deleteMyStock(sec);
+}
+
+async function deleteMyStock(sec) {
+  const d = getData();
+  const userId = currentUserId || 'demo';
+  // Supabase에서도 삭제 시도
+  const sbIds = [
+    `${userId}_${sec}`,
+    `${userId}_${sec}_${Date.now()}`,
+  ];
+  if (sb) {
+    // 해당 유저의 이 섹터 주식 전부 삭제
+    await sb.from('kse_stocks').delete().eq('user_id', userId).eq('sector', sec);
+  }
+  // localStorage에서 삭제
+  delete d.mySectors[sec];
+  saveData(d);
+  showToast('🗑️ 주식이 삭제됐습니다');
+  renderMyKnowledge();
+  renderMarketList();
 }
 
 /* ══ 상세 화면 ══ */
