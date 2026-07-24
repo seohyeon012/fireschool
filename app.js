@@ -5,6 +5,59 @@
    지식 = 주식 발행 / 타인 매수 = 주가 상승
    ══════════════════════════════ */
 
+/* ── Supabase ── */
+const SUPABASE_URL = 'https://drllcjroqpgnitrwacnx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_mUl6xOx5EDakJMKVPGTjAQ_CMp1RBQR';
+const sb = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function sbSaveStock(stockKey, s, userId, userName) {
+  if (!sb) return;
+  const row = {
+    id: `${userId}_${stockKey}`,
+    user_id: userId,
+    user_name: userName,
+    stock_name: s.stockName || null,
+    sector: s.sector || stockKey,
+    price: s.price,
+    price_history: s.priceHistory || [],
+    shares_issued: s.sharesIssued || 0,
+    price_per_buy: s.pricePerBuy || 5,
+    last_input: s.lastInput || null,
+    last_update: s.lastUpdate || Date.now(),
+    added_date: s.addedDate || null,
+  };
+  await sb.from('kse_stocks').upsert(row, { onConflict: 'id' });
+}
+
+async function sbSavePost(stockKey, userId, title, content) {
+  if (!sb) return;
+  await sb.from('kse_posts').insert({
+    stock_id: `${userId}_${stockKey}`,
+    title,
+    content,
+  });
+}
+
+async function sbFetchMarket() {
+  if (!sb) return [];
+  const { data, error } = await sb.from('kse_stocks').select('*, kse_posts(title, created_at)').order('price', { ascending: false });
+  if (error || !data) return [];
+  return data.map(row => ({
+    id: row.id,
+    uid: row.user_id,
+    creatorName: row.user_name,
+    stockName: row.stock_name,
+    sector: row.sector,
+    price: row.price,
+    priceHistory: row.price_history || [],
+    sharesIssued: row.shares_issued || 0,
+    pricePerBuy: row.price_per_buy || 5,
+    shares: (row.kse_posts || []).map(p => ({ title: p.title, date: p.created_at?.slice(0,10) })),
+    isOwn: false,
+    fromCloud: true,
+  }));
+}
+
 /* ── 상수 ── */
 const STARTING_BALANCE = 200;
 const REVIEW_PERFECT   = 35;
@@ -361,6 +414,7 @@ let isAdmin             = false;
 let currentDetailId     = null;
 let filterSector        = 'all';
 let filterQuery         = '';
+let sbMarketCache       = [];  // Supabase에서 받아온 타유저 종목 캐시
 let pendingReviewData   = null;
 let chartZoom           = 7;
 let priceChartInstance  = null;
@@ -753,11 +807,17 @@ function _doSaveKnowledge(title, text, stockName) {
   saveData(d);
   clearAttachment();
   closeWriteKnowledge();
-  showToast(`✅ ${SECTOR_EMOJI[sec]||''} ${sec} 주식 1주 발행 완료! +C${WRITE_REWARD}`);
+  showToast(`✅ ${sec} 주식 1주 발행 완료! +C${WRITE_REWARD}`);
   updateBalanceDisplay();
   updateStreak();
   renderMyKnowledge();
   updateTicker();
+
+  // Supabase 동기화
+  const profile = getProfile();
+  const uName = profile?.nickname || profile?.name || currentUserId || '익명';
+  sbSaveStock(stockKey, s, currentUserId || 'demo', uName);
+  sbSavePost(stockKey, currentUserId || 'demo', title, text);
 }
 
 /* ══ 시장 매수 — 지식 선택 방식 ══ */
@@ -1414,14 +1474,24 @@ function toggleSectorGroupMode() {
   renderMarketList();
 }
 
-function renderMarketList() {
+async function renderMarketList() {
   const d       = getData();
-  const myName  = getProfile()?.name || '나';
+  const myName  = getProfile()?.nickname || getProfile()?.name || '나';
 
-  let all = DEMO_MARKET.map(s => ({ ...s, isOwn: false }));
-  Object.entries(d.mySectors).forEach(([sec, s]) => {
-    all.push({ ...s, id: 'my_' + sec, uid: currentUserId, creatorName: myName, sector: s.sector || sec, isOwn: true });
-  });
+  // Supabase에서 타유저 종목 가져오기 (내 종목 ID 제외)
+  try {
+    const cloud = await sbFetchMarket();
+    const myIds = new Set(Object.keys(d.mySectors).map(k => `${currentUserId}_${k}`));
+    sbMarketCache = cloud.filter(s => !myIds.has(s.id));
+  } catch(e) { /* 오프라인이면 캐시 유지 */ }
+
+  // 내 종목
+  const myStocks = Object.entries(d.mySectors).map(([sec, s]) => ({
+    ...s, id: 'my_' + sec, uid: currentUserId, creatorName: myName, sector: s.sector || sec, isOwn: true
+  }));
+  // 타유저 종목 (Supabase 캐시, 없으면 DEMO_MARKET 폴백)
+  const otherStocks = sbMarketCache.length > 0 ? sbMarketCache : DEMO_MARKET.map(s => ({ ...s, isOwn: false }));
+  let all = [...otherStocks, ...myStocks];
 
   // 동적 필터 pills 렌더링
   const allSectors = [...new Set(all.map(s => s.sector).filter(Boolean))].sort();
