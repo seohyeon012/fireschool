@@ -111,62 +111,60 @@ function mkHist(days, finalPrice) {
 
 const DEMO_MARKET = [
   {
-    id: 'demo_1', uid: 'u_alice', creatorName: '김민준', sector: '수학',
-    price: 48, pricePerBuy: 15, sharesIssued: 9,
-    lastInput: offset(-2), lastBought: offset(-1),
-    rating: 4.2,
-    priceHistory: mkHist(365, 48),
+    id: 'demo_1', uid: 'u_invest', creatorName: '주식고수 민준',
+    stockName: '주식투자 핵심전략', sector: '주식투자',
+    price: 247, pricePerBuy: 22, sharesIssued: 38,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.9,
+    priceHistory: mkHist(365, 247),
     shares: [
-      { title: '피타고라스 정리', text: '직각삼각형에서 a² + b² = c²가 성립한다. 빗변의 제곱 = 나머지 두 변의 제곱합.', date: offset(-8) },
-      { title: '이차방정식 근의 공식', text: 'x = (-b ± √(b²-4ac)) / 2a. 판별식 D = b²-4ac. D>0 두 실근, D=0 중근, D<0 허근.', date: offset(-6) },
-      { title: '삼각함수 기본 항등식', text: 'sin²θ + cos²θ = 1. 단위원에서 x=cosθ, y=sinθ. tanθ = sinθ/cosθ.', date: offset(-4) },
-      { title: '등차수열과 합 공식', text: 'n번째 항: a_n = a + (n-1)d. 합: S_n = n(2a+(n-1)d)/2. a=첫항, d=공차.', date: offset(-2) },
+      { title: '손절매 법칙 — -8% 룰', text: '-8% 되면 묻지도 따지지도 말고 손절. 감정 개입 없이 기계적으로 실행하는 것이 핵심.', date: offset(-4) },
+      { title: '52주 신고가 매매법', text: '52주 신고가 돌파 시 모멘텀 상승 가능성 높음. 거래량 동반 여부 반드시 확인.', date: offset(-2) },
+      { title: 'PER 밸류에이션 기초', text: 'PER = 주가/EPS. 동종업계 평균 PER와 비교해 저평가 여부 판단. 성장주는 높은 PER 가능.', date: offset(0) },
     ]
   },
   {
-    id: 'demo_2', uid: 'u_bob', creatorName: '이서연', sector: '영어',
-    price: 24, pricePerBuy: 10, sharesIssued: 4,
-    lastInput: offset(-1), lastBought: offset(-3),
-    rating: 3.8,
-    priceHistory: mkHist(365, 24),
+    id: 'demo_2', uid: 'u_diet', creatorName: '헬스트레이너 서연',
+    stockName: '다이어트 루틴 바이블', sector: '헬스/다이어트',
+    price: 184, pricePerBuy: 16, sharesIssued: 29,
+    lastInput: offset(-1), lastBought: offset(-1), rating: 4.7,
+    priceHistory: mkHist(365, 184),
     shares: [
-      { title: '가정법 과거', text: 'If + 주어 + were/과거동사, 주어 + would/could + 동사원형. 현재 사실의 반대를 가정할 때 사용.', date: offset(-3) },
-      { title: '관계대명사 정리', text: '선행사가 사람→who/that, 사물→which/that. 소유격은 whose. 목적격은 생략 가능.', date: offset(-1) },
+      { title: '간헐적 단식 16:8 완전정복', text: '16시간 공복 + 8시간 식사 윈도우. 인슐린 감수성 향상, 지방 연소 최적화.', date: offset(-5) },
+      { title: '근성장 3요소', text: '점진적 과부하 + 충분한 단백질(체중×2g) + 수면 7-8시간. 이 3가지가 전부.', date: offset(-1) },
     ]
   },
   {
-    id: 'demo_3', uid: 'u_carol', creatorName: '박지호', sector: '프로그래밍',
-    price: 73, pricePerBuy: 20, sharesIssued: 15,
-    lastInput: offset(0), lastBought: offset(0),
-    rating: 4.7,
-    priceHistory: mkHist(365, 73),
+    id: 'demo_3', uid: 'u_fashion', creatorName: '스타일리스트 지호',
+    stockName: '패션 코디 마스터클래스', sector: '패션/스타일',
+    price: 319, pricePerBuy: 28, sharesIssued: 52,
+    lastInput: offset(0), lastBought: offset(0), rating: 4.9,
+    priceHistory: mkHist(365, 319),
     shares: [
-      { title: '빅오 표기법', text: 'O(1) 상수, O(log n) 로그, O(n) 선형, O(n²) 이차. 알고리즘의 시간/공간 복잡도를 표기하는 방법.', date: offset(-10) },
-      { title: '동적 프로그래밍(DP)', text: '큰 문제를 부분 문제로 분할하고 메모이제이션으로 중복 계산을 방지. top-down/bottom-up 두 방식 존재.', date: offset(-7) },
-      { title: 'React Hooks 핵심 3가지', text: 'useState(상태 관리), useEffect(사이드 이펙트 처리), useCallback(함수 메모이제이션). 함수형 컴포넌트 필수.', date: offset(-4) },
-      { title: 'Git Flow 브랜치 전략', text: 'main(배포), develop(개발 통합), feature/(기능 개발), hotfix/(긴급 수정). 협업 시 브랜치 관리 전략.', date: offset(-2) },
-      { title: 'REST API 메서드', text: 'GET(조회), POST(생성), PUT(전체 수정), PATCH(부분 수정), DELETE(삭제). Stateless 원칙.', date: offset(0) },
+      { title: '체형별 핏 선택법', text: 'A라인 - 허리 강조, H라인 - 미니멀, Y라인 - 어깨 강조. 내 체형의 장점 살리기.', date: offset(-5) },
+      { title: '색상 배합 법칙', text: '무채색+포인트 1컬러가 가장 안전. 비슷한 채도끼리 조합. 3가지 색상 초과는 피하기.', date: offset(-2) },
+      { title: '기본템 10가지', text: '흰 셔츠, 네이비 슬랙스, 베이지 코트, 화이트 스니커즈... 10가지만 있으면 365일 코디 가능.', date: offset(0) },
     ]
   },
   {
-    id: 'demo_4', uid: 'u_dan', creatorName: '최아름', sector: '과학',
-    price: 32, pricePerBuy: 10, sharesIssued: 5,
-    lastInput: offset(-4), lastBought: offset(-2),
-    rating: 4.0,
-    priceHistory: mkHist(365, 32),
+    id: 'demo_4', uid: 'u_realestate', creatorName: '부동산전문가 아름',
+    stockName: '부동산 투자 인사이트', sector: '부동산',
+    price: 403, pricePerBuy: 30, sharesIssued: 67,
+    lastInput: offset(-2), lastBought: offset(-1), rating: 4.8,
+    priceHistory: mkHist(365, 403),
     shares: [
-      { title: '산화-환원 반응', text: '산화=전자 잃음/수소 잃음/산소 얻음. 환원=그 반대. 산화와 환원은 항상 동시에 발생(산화환원 동시성).', date: offset(-4) },
-      { title: '뉴턴 운동 3법칙', text: '1법칙=관성(힘 없으면 등속직선운동), 2법칙=F=ma(가속도 법칙), 3법칙=작용·반작용(크기 같고 방향 반대).', date: offset(-2) },
+      { title: '입지 분석 3요소', text: '교통(역세권), 학군(초등학교), 편의시설(마트/병원). 이 3가지 갖추면 하방경직성 확보.', date: offset(-6) },
+      { title: '갭투자 리스크 관리', text: '전세가율 70% 이상, 역전세 리스크 필수 점검. 공실 가능성과 금리 시나리오 계산 필수.', date: offset(-2) },
     ]
   },
   {
-    id: 'demo_5', uid: 'u_eve', creatorName: '정우진', sector: '역사',
-    price: 11, pricePerBuy: 10, sharesIssued: 2,
-    lastInput: offset(-6), lastBought: offset(-5),
-    rating: 3.5,
-    priceHistory: mkHist(365, 11),
+    id: 'demo_5', uid: 'u_dev', creatorName: '개발자 우진',
+    stockName: 'AI/IT 개발 실전 노하우', sector: 'IT/개발',
+    price: 138, pricePerBuy: 18, sharesIssued: 21,
+    lastInput: offset(-2), lastBought: offset(-1), rating: 4.5,
+    priceHistory: mkHist(365, 138),
     shares: [
-      { title: '갑오개혁(1894)', text: '신분제·과거제 폐지, 조혼 금지, 재정·군사 근대화. 청일전쟁 이후 일본의 압력 하에 추진된 근대적 개혁.', date: offset(-6) },
+      { title: 'ChatGPT 프롬프트 공식', text: '역할 지정 + 맥락 설명 + 출력 형식 지정 = 원하는 답 90% 확률.', date: offset(-3) },
+      { title: 'REST API 설계 원칙', text: 'GET/POST/PUT/PATCH/DELETE 정확히 구분, 명사+복수형 URL, 버전 관리 필수(/v1/).', date: offset(-1) },
     ]
   },
 ];
@@ -466,6 +464,13 @@ function applyUserSectorFluctuation() {
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', () => {
+  // v3 데이터 리셋 — 기존 모든 유저/세션 삭제
+  if (localStorage.getItem('kse_app_ver') !== '3') {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('kse2_') || k.startsWith('kse_'))
+      .forEach(k => localStorage.removeItem(k));
+    localStorage.setItem('kse_app_ver', '3');
+  }
   initAuth();
   applyDemoFluctuation();
   applyUserSectorFluctuation();

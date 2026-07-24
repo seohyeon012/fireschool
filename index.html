@@ -11,14 +11,41 @@
 <body>
 
 <!-- ══ 랜딩 ══ -->
-<div id="screen-login" class="full-overlay hidden">
-  <div class="login-card">
-    <div class="login-icon">📊</div>
-    <h1 class="login-title">지식 증권거래소</h1>
-    <p class="login-sub">지식을 주식처럼 발행하고, 서로의 지식을 사고파세요</p>
-    <button class="btn-primary w-full" style="margin-top:28px" onclick="showLoginForm()">로그인하기</button>
-    <p class="landing-signup-link" onclick="showSignupForm()">처음이신가요? <span>회원가입</span></p>
-    <p class="landing-admin-link" onclick="showAdminLogin()">관리자</p>
+<div id="screen-login" class="full-overlay landing-overlay hidden">
+  <div class="landing-bg-grid"></div>
+  <div class="landing-split">
+    <!-- 왼쪽: 히어로 -->
+    <div class="landing-left">
+      <span class="landing-badge">📊 KNOWLEDGE EXCHANGE</span>
+      <h1 class="landing-headline">지식이 곧<br><span class="grad-text">자산</span>이 된다</h1>
+      <p class="landing-desc">내 지식을 주식으로 발행하고,<br>다른 사람의 통찰을 사고파는 새로운 플랫폼</p>
+      <div class="landing-stats">
+        <div class="lstat"><div class="lstat-n">1,247</div><div class="lstat-l">발행된 지식주</div></div>
+        <div class="lstat-div"></div>
+        <div class="lstat"><div class="lstat-n">328</div><div class="lstat-l">활성 투자자</div></div>
+        <div class="lstat-div"></div>
+        <div class="lstat"><div class="lstat-n">C2.4M</div><div class="lstat-l">누적 거래량</div></div>
+      </div>
+      <div class="landing-tickers">
+        <div class="ltick up">📈 부동산 투자 인사이트  ▲41.2%</div>
+        <div class="ltick up">📈 패션 코디 마스터클래스  ▲23.7%</div>
+        <div class="ltick up">📈 주식투자 핵심전략  ▲18.4%</div>
+        <div class="ltick down">📉 요리 레시피 아카이브  ▼3.1%</div>
+        <div class="ltick up">📈 다이어트 루틴 바이블  ▲9.6%</div>
+      </div>
+    </div>
+    <!-- 오른쪽: 로그인 카드 -->
+    <div class="landing-right">
+      <div class="login-card landing-login-card">
+        <div class="login-card-glow"></div>
+        <div class="login-icon">📊</div>
+        <h1 class="login-title">지식 증권거래소</h1>
+        <p class="login-sub">지식을 주식처럼 발행하고<br>서로의 지식을 사고파세요</p>
+        <button class="btn-primary w-full btn-landing" onclick="showLoginForm()">로그인하기</button>
+        <p class="landing-signup-link" onclick="showSignupForm()">처음이신가요? <span>회원가입</span></p>
+        <p class="landing-admin-link" onclick="showAdminLogin()">관리자</p>
+      </div>
+    </div>
   </div>
 </div>
 
