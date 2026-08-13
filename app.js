@@ -111,60 +111,121 @@ function mkHist(days, finalPrice) {
 
 const DEMO_MARKET = [
   {
-    id: 'demo_1', uid: 'u_invest', creatorName: '주식고수 민준',
-    stockName: '주식투자 핵심전략', sector: '주식투자',
-    price: 247, pricePerBuy: 22, sharesIssued: 38,
-    lastInput: offset(-1), lastBought: offset(0), rating: 4.9,
-    priceHistory: mkHist(365, 247),
-    shares: [
-      { title: '손절매 법칙 — -8% 룰', text: '-8% 되면 묻지도 따지지도 말고 손절. 감정 개입 없이 기계적으로 실행하는 것이 핵심.', date: offset(-4) },
-      { title: '52주 신고가 매매법', text: '52주 신고가 돌파 시 모멘텀 상승 가능성 높음. 거래량 동반 여부 반드시 확인.', date: offset(-2) },
-      { title: 'PER 밸류에이션 기초', text: 'PER = 주가/EPS. 동종업계 평균 PER와 비교해 저평가 여부 판단. 성장주는 높은 PER 가능.', date: offset(0) },
-    ]
-  },
-  {
-    id: 'demo_2', uid: 'u_diet', creatorName: '헬스트레이너 서연',
-    stockName: '다이어트 루틴 바이블', sector: '헬스/다이어트',
-    price: 184, pricePerBuy: 16, sharesIssued: 29,
-    lastInput: offset(-1), lastBought: offset(-1), rating: 4.7,
-    priceHistory: mkHist(365, 184),
-    shares: [
-      { title: '간헐적 단식 16:8 완전정복', text: '16시간 공복 + 8시간 식사 윈도우. 인슐린 감수성 향상, 지방 연소 최적화.', date: offset(-5) },
-      { title: '근성장 3요소', text: '점진적 과부하 + 충분한 단백질(체중×2g) + 수면 7-8시간. 이 3가지가 전부.', date: offset(-1) },
-    ]
-  },
-  {
-    id: 'demo_3', uid: 'u_fashion', creatorName: '스타일리스트 지호',
-    stockName: '패션 코디 마스터클래스', sector: '패션/스타일',
-    price: 319, pricePerBuy: 28, sharesIssued: 52,
+    id: 'demo_1', uid: 'admin', creatorName: '관리자',
+    stockName: '특수문자·기호 모음', sector: '특수문자/기호',
+    price: 312, pricePerBuy: 20, sharesIssued: 54,
     lastInput: offset(0), lastBought: offset(0), rating: 4.9,
-    priceHistory: mkHist(365, 319),
+    priceHistory: mkHist(365, 312),
     shares: [
-      { title: '체형별 핏 선택법', text: 'A라인 - 허리 강조, H라인 - 미니멀, Y라인 - 어깨 강조. 내 체형의 장점 살리기.', date: offset(-5) },
-      { title: '색상 배합 법칙', text: '무채색+포인트 1컬러가 가장 안전. 비슷한 채도끼리 조합. 3가지 색상 초과는 피하기.', date: offset(-2) },
-      { title: '기본템 10가지', text: '흰 셔츠, 네이비 슬랙스, 베이지 코트, 화이트 스니커즈... 10가지만 있으면 365일 코디 가능.', date: offset(0) },
+      { title: '자주 쓰는 특수문자 TOP 30', text: '♥ ♡ ★ ☆ ✓ ✗ ✔ ✘ ♠ ♣ ♦ ♤ ♧ ♢ ◆ ◇ ■ □ ▲ △ ▼ ▽ ● ○ ◎ ※ → ← ↑ ↓', date: offset(-2) },
+      { title: '이모티콘·화살표 기호', text: '→ ⇒ ⟹ ↳ ↗ ↘ ↙ ↖ ⇄ ⇆ ⇌ ↔ ↕ ⬆ ⬇ ⬅ ➡ 🔺 🔻 🔼 🔽', date: offset(-1) },
+      { title: '수학·단위 기호', text: '± × ÷ ≠ ≤ ≥ ∞ ∑ √ π ∫ ≈ ∝ ∂ ° ′ ″ ℃ ℉ ㎝ ㎞ ㎡ ㎥ ㎏ ㎎', date: offset(0) },
+      { title: '복사해서 바로 쓰는 따옴표·괄호', text: '「 」『 』【 】〔 〕〈 〉《 》〖 〗〘 〙〚 〛" " ' ' ‹ › « »', date: offset(0) },
     ]
   },
   {
-    id: 'demo_4', uid: 'u_realestate', creatorName: '부동산전문가 아름',
-    stockName: '부동산 투자 인사이트', sector: '부동산',
-    price: 403, pricePerBuy: 30, sharesIssued: 67,
-    lastInput: offset(-2), lastBought: offset(-1), rating: 4.8,
-    priceHistory: mkHist(365, 403),
+    id: 'demo_2', uid: 'admin', creatorName: '관리자',
+    stockName: '무료 폰트 사이트 모음', sector: '폰트/디자인',
+    price: 278, pricePerBuy: 18, sharesIssued: 47,
+    lastInput: offset(0), lastBought: offset(0), rating: 4.9,
+    priceHistory: mkHist(365, 278),
     shares: [
-      { title: '입지 분석 3요소', text: '교통(역세권), 학군(초등학교), 편의시설(마트/병원). 이 3가지 갖추면 하방경직성 확보.', date: offset(-6) },
-      { title: '갭투자 리스크 관리', text: '전세가율 70% 이상, 역전세 리스크 필수 점검. 공실 가능성과 금리 시나리오 계산 필수.', date: offset(-2) },
+      { title: '눈누 — 국내 최대 한글 무료 폰트', text: '눈누(noonnu.cc) — 상업적 이용 가능한 한글 무료 폰트 1,000개 이상. 카테고리·분위기별 필터, 미리보기 제공. 필수 북마크.', date: offset(-3) },
+      { title: 'Google Fonts — 영문/다국어 폰트', text: 'fonts.google.com — 1,500개 이상 무료 오픈소스 폰트. 웹폰트 삽입 코드 자동 생성. 한국어 폰트도 상당수 포함(Noto Sans KR 등).', date: offset(-2) },
+      { title: 'Dafont — 독특한 영문 폰트', text: 'dafont.com — 개인 창작 폰트 위주. 손글씨·픽셀·SF 등 독특한 스타일 다수. 상업용 여부 개별 확인 필요.', date: offset(-1) },
+      { title: 'FontSquirrel — 검증된 무료 상업용', text: 'fontsquirrel.com — 상업용 무료 폰트만 엄선. 웹폰트 변환기(@font-face 키트) 내장. 퀄리티 높은 폰트 위주.', date: offset(0) },
+      { title: 'Adobe Fonts — 크리에이티브 클라우드', text: 'fonts.adobe.com — CC 구독자 무료. 2만 개 이상 프리미엄 폰트. 포토샵·일러스트레이터에 바로 동기화.', date: offset(0) },
     ]
   },
   {
-    id: 'demo_5', uid: 'u_dev', creatorName: '개발자 우진',
-    stockName: 'AI/IT 개발 실전 노하우', sector: 'IT/개발',
-    price: 138, pricePerBuy: 18, sharesIssued: 21,
-    lastInput: offset(-2), lastBought: offset(-1), rating: 4.5,
-    priceHistory: mkHist(365, 138),
+    id: 'demo_3', uid: 'admin', creatorName: '관리자',
+    stockName: '일본 애니메이션 명대사', sector: '애니/명대사',
+    price: 445, pricePerBuy: 25, sharesIssued: 78,
+    lastInput: offset(0), lastBought: offset(0), rating: 5.0,
+    priceHistory: mkHist(365, 445),
     shares: [
-      { title: 'ChatGPT 프롬프트 공식', text: '역할 지정 + 맥락 설명 + 출력 형식 지정 = 원하는 답 90% 확률.', date: offset(-3) },
-      { title: 'REST API 설계 원칙', text: 'GET/POST/PUT/PATCH/DELETE 정확히 구분, 명사+복수형 URL, 버전 관리 필수(/v1/).', date: offset(-1) },
+      { title: '나루토 — "포기하는 건 죽는 것보다 나쁘다"', text: '「諦めることは死ぬことよりも悪い」— 우치하 이타치. 포기란 살아있으면서 이미 죽은 것과 같다는 뜻. 절대 포기하지 말라는 메시지.', date: offset(-7) },
+      { title: '귀멸의 칼날 — "강함이란 무엇인가"', text: '「弱い者ほどすぐ怒る」— 탄지로. 약한 자일수록 쉽게 화를 낸다. 진정한 강함은 분노를 억제할 줄 아는 것.', date: offset(-5) },
+      { title: '원피스 — 꿈을 포기하는 사람에게', text: '「夢を追う者を笑う奴は、夢を叶えた者に笑われる」— 몽키 D. 루피. 꿈을 비웃는 사람은 꿈을 이룬 사람에게 비웃음을 당한다.', date: offset(-4) },
+      { title: '진격의 거인 — 자유의 의미', text: '「戦え。戦え。戦え。この世界の中で、諦めたら負けだ」— 에렌 예거. 싸워라, 이 세상에서 포기하는 순간 지는 것이다.', date: offset(-2) },
+      { title: '너의 이름은 — 기억과 감각', text: '「会いたいと、心の奥で叫んでいた」— 타키. 마음 깊은 곳에서 만나고 싶다고 외치고 있었다. 잊고 싶지 않은 감정의 본질.', date: offset(-1) },
+      { title: '하이큐 — 패배에 대하여', text: '「負けは弱さじゃない。立ち上がらないことが弱さだ」— 우카이 감독. 지는 것이 약함이 아니라, 다시 일어서지 않는 것이 약함이다.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_4', uid: 'admin', creatorName: '관리자',
+    stockName: '공부 BGM·ASMR 채널 모음', sector: '공부BGM/ASMR',
+    price: 193, pricePerBuy: 15, sharesIssued: 36,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.8,
+    priceHistory: mkHist(365, 193),
+    shares: [
+      { title: 'Lo-fi Hip Hop — 집중력 최강 장르', text: '유튜브 "Lofi Girl" 채널 — 24시간 스트리밍. 가사 없는 잔잔한 비트로 집중력 극대화. "beats to relax/study to" 검색.', date: offset(-4) },
+      { title: '스터디 위드미 채널 BEST 3', text: '1) 공부하는 유나 2) StudyMD 3) 공부자극 영상. 실시간 같이 공부하는 느낌. 포모도로 타이머 영상 추천.', date: offset(-3) },
+      { title: '빗소리 ASMR — 집중력 부스터', text: '유튜브 "Relaxing Rain Sounds" — 빗소리+천둥 조합이 백색소음 효과. 커피숍 소음 ASMR도 효과적. 볼륨 40% 정도가 적당.', date: offset(-1) },
+      { title: '클래식 공부 음악 추천', text: '모차르트 피아노 소나타 K.331 / 바흐 골드베르크 변주곡 / 드뷔시 달빛. 복잡한 화성 없어 뇌 부하 최소화.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_5', uid: 'admin', creatorName: '관리자',
+    stockName: '무료 이미지·영상 사이트 모음', sector: '무료리소스',
+    price: 234, pricePerBuy: 17, sharesIssued: 41,
+    lastInput: offset(-1), lastBought: offset(-1), rating: 4.7,
+    priceHistory: mkHist(365, 234),
+    shares: [
+      { title: 'Unsplash — 고화질 무료 사진', text: 'unsplash.com — 상업적 이용 가능한 고화질 사진 무제한 무료. 카테고리·색상별 검색. 크리에이터 크레딧 표기 권장.', date: offset(-5) },
+      { title: 'Pexels — 사진+영상 둘 다', text: 'pexels.com — 사진뿐 아니라 무료 스톡 영상(동영상)도 제공. 4K 해상도 영상 포함. 가입 없이 다운로드 가능.', date: offset(-3) },
+      { title: 'Pixabay — 벡터·일러스트까지', text: 'pixabay.com — 사진+벡터+일러스트+영상+음악까지. 4백만 개 이상 콘텐츠. GIF도 있음.', date: offset(-2) },
+      { title: 'Flaticon — 무료 아이콘 1천만 개', text: 'flaticon.com — SVG/PNG/EPS 다운로드. 카테고리별 아이콘팩. 무료 플랜은 크레딧 표기 필요. Freepik 계열.', date: offset(-1) },
+      { title: 'Freepik — 디자인 템플릿 종합', text: 'freepik.com — 배너·포스터·프레젠테이션 템플릿. AI 생성 이미지 포함. 무료 플랜 크레딧 표기 필요.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_6', uid: 'admin', creatorName: '관리자',
+    stockName: 'AI 무료 툴 완전정복', sector: 'AI툴/생산성',
+    price: 387, pricePerBuy: 24, sharesIssued: 63,
+    lastInput: offset(0), lastBought: offset(0), rating: 4.9,
+    priceHistory: mkHist(365, 387),
+    shares: [
+      { title: 'ChatGPT — 만능 AI 어시스턴트', text: 'chat.openai.com — GPT-4o 무료 사용 가능. 글쓰기·번역·코딩·요약·아이디어 발상. "너는 ~전문가야" 역할 지정 후 질문하면 퀄리티 급상승.', date: offset(-3) },
+      { title: 'Perplexity — AI 검색 엔진', text: 'perplexity.ai — 구글 대체 AI 검색. 출처 링크 제공, 환각 최소화. 최신 정보 반영. "Deep Research" 기능으로 논문급 리서치 가능.', date: offset(-2) },
+      { title: 'Canva AI — 디자인 자동화', text: 'canva.com — Magic Design(텍스트→디자인), Magic Write(AI 글쓰기), Background Remover. 프레젠테이션·SNS 콘텐츠 10분 완성.', date: offset(-1) },
+      { title: 'Suno — AI 음악 생성', text: 'suno.com — 가사+장르 입력하면 완성된 노래 생성. 하루 50곡 무료. 유튜브 BGM·광고 음악 제작에 활용.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_7', uid: 'admin', creatorName: '관리자',
+    stockName: '엑셀·단축키 모음', sector: '업무꿀팁',
+    price: 156, pricePerBuy: 14, sharesIssued: 28,
+    lastInput: offset(-2), lastBought: offset(-1), rating: 4.6,
+    priceHistory: mkHist(365, 156),
+    shares: [
+      { title: '엑셀 필수 단축키 20개', text: 'Ctrl+Z(실행취소) Ctrl+C/V(복사/붙여넣기) Ctrl+F(찾기) Ctrl+H(바꾸기) Ctrl+1(셀서식) F2(편집) F4(절대참조) Ctrl+Shift+L(필터) Alt+Enter(줄바꿈)', date: offset(-5) },
+      { title: '윈도우 필수 단축키', text: 'Win+D(바탕화면) Win+E(탐색기) Win+L(잠금) Win+V(클립보드) Alt+Tab(창전환) Ctrl+Shift+Esc(작업관리자) Win+Shift+S(캡처) Win+.(이모지)', date: offset(-2) },
+      { title: '구글 검색 고급 연산자', text: '"정확한 문구" / site:naver.com / filetype:pdf / -제외어 / intitle:제목검색 / before:2024 after:2023 / related:site.com — 원하는 자료 10배 빠르게 찾기.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_8', uid: 'admin', creatorName: '관리자',
+    stockName: '생활 꿀팁 백과사전', sector: '생활꿀팁',
+    price: 204, pricePerBuy: 16, sharesIssued: 39,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.8,
+    priceHistory: mkHist(365, 204),
+    shares: [
+      { title: '택배 박스 테이프 깔끔하게 뜯기', text: '헤어드라이어로 10초 가열 후 떼면 풀 자국 없이 깔끔하게 제거. 스티커 잔여물에도 동일하게 적용.', date: offset(-4) },
+      { title: '스마트폰 배터리 오래 쓰는 법', text: '20~80% 구간 유지가 최적. 완전 방전 피하기. 야간 충전 시 최적화 충전 기능 ON. 배터리 절약 앱은 오히려 역효과.', date: offset(-3) },
+      { title: '맥주캔으로 스마트폰 스피커 2배', text: '맥주캔 옆면에 스마트폰 크기 구멍 뚫고 넣으면 공명 효과로 음량 2배. 야외 캠핑에서 유용.', date: offset(-1) },
+      { title: '냉장고 냄새 제거 꿀팁', text: '베이킹소다 작은 그릇에 담아 냉장고 안에 놓기. 커피찌꺼기도 효과적. 교체 주기는 1~2개월.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_9', uid: 'u_invest', creatorName: '주식고수 민준',
+    stockName: '주식투자 핵심전략', sector: '주식투자',
+    price: 291, pricePerBuy: 22, sharesIssued: 48,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.8,
+    priceHistory: mkHist(365, 291),
+    shares: [
+      { title: '손절매 법칙 — -8% 룰', text: '-8% 되면 묻지도 따지지도 말고 손절. 감정 개입 없이 기계적으로 실행하는 것이 핵심.', date: offset(-3) },
+      { title: '52주 신고가 매매법', text: '52주 신고가 돌파 시 모멘텀 상승 가능성 높음. 거래량 동반 여부 반드시 확인.', date: offset(-1) },
     ]
   },
 ];
@@ -587,15 +648,23 @@ function selectWfSector(sec) {
   updateWfStockChoice();
 }
 
+const SUGGESTED_SECTORS = [
+  '특수문자/기호','폰트/디자인','애니/명대사','공부BGM/ASMR','무료리소스',
+  'AI툴/생산성','업무꿀팁','생활꿀팁','주식투자','헬스/다이어트',
+  '패션/스타일','부동산','요리/레시피','여행꿀팁','영어회화',
+  '심리/자기계발','드라마명대사','게임공략','IT/개발','맞춤법/문법',
+];
+
 function onWfSectorInput(el) {
   const val = el.value.trim();
-  wfSector = val || '기타';
-  // 기존 내 카테고리 자동완성 제안
+  wfSector = val;
   const d = getData();
-  const mySecs = [...new Set(Object.values(d.mySectors).map(s => s.sector || '기타').filter(s => s && s.includes(val)))];
+  const mySecs = [...new Set(Object.values(d.mySectors).map(s => s.sector).filter(Boolean))];
+  const allSugs = [...new Set([...mySecs, ...SUGGESTED_SECTORS])];
+  const filtered = val ? allSugs.filter(s => s.includes(val)) : SUGGESTED_SECTORS;
   const sugEl = document.getElementById('wf-sector-suggestions');
   if (sugEl) {
-    sugEl.innerHTML = mySecs.slice(0, 5).map(s =>
+    sugEl.innerHTML = filtered.slice(0, 8).map(s =>
       `<button class="wf-sec-suggestion" onclick="applyWfSectorSuggestion('${esc(s)}')">${esc(s)}</button>`
     ).join('');
   }
