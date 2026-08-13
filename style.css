@@ -1503,6 +1503,12 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
   background: radial-gradient(ellipse, rgba(88,166,255,.18) 0%, transparent 70%);
   pointer-events: none;
 }
+.wf-sec-hot {
+  background: rgba(248,81,73,.1) !important;
+  border-color: rgba(248,81,73,.35) !important;
+  color: var(--red) !important;
+  font-weight: 700;
+}
 .sc-delete-btn {
   margin-top: 4px;
   font-size: 13px; padding: 2px 6px;

@@ -218,6 +218,18 @@ const DEMO_MARKET = [
     ]
   },
   {
+    id: 'demo_celeb', uid: 'admin', creatorName: '관리자',
+    stockName: '연예인 소식 모음', sector: '연예인 소식',
+    price: 521, pricePerBuy: 30, sharesIssued: 89,
+    lastInput: offset(0), lastBought: offset(0), rating: 5.0,
+    priceHistory: mkHist(365, 521),
+    shares: [
+      { title: '연예인 인스타 팔로우 필수 계정', text: '국내 팔로워 TOP — @roses_are_rosie @real_psy @dlwlrma @vousmevoyez. 최신 근황·화보 업데이트 가장 빠름.', date: offset(-1) },
+      { title: '연예인 최신 컴백·활동 일정 보는 법', text: '네이버 NOW / 멜론 차트 / Weverse 앱 — 컴백 일정·팬미팅·콘서트 정보 실시간 업데이트. 팬 카페보다 공식 채널이 더 빠름.', date: offset(0) },
+      { title: '연예인 관련 유용한 사이트 모음', text: 'Naver 연예 / Daum 연예 / OSEN / 스타뉴스 — 속보 빠름. 해외 K팝 소식은 Allkpop / Soompi가 영어권 팬덤 반응까지 확인 가능.', date: offset(0) },
+    ]
+  },
+  {
     id: 'demo_9', uid: 'u_invest', creatorName: '주식고수 민준',
     stockName: '주식투자 핵심전략', sector: '주식투자',
     price: 291, pricePerBuy: 22, sharesIssued: 48,
@@ -648,11 +660,11 @@ function selectWfSector(sec) {
   updateWfStockChoice();
 }
 
+const HOT_SECTORS = ['특수문자/기호', '연예인 소식', '애니/명대사'];
 const SUGGESTED_SECTORS = [
-  '특수문자/기호','폰트/디자인','애니/명대사','공부BGM/ASMR','무료리소스',
-  'AI툴/생산성','업무꿀팁','생활꿀팁','주식투자','헬스/다이어트',
-  '패션/스타일','부동산','요리/레시피','여행꿀팁','영어회화',
-  '심리/자기계발','드라마명대사','게임공략','IT/개발','맞춤법/문법',
+  ...HOT_SECTORS,
+  '생활꿀팁', 'AI툴/생산성', '폰트/디자인',
+  '공부BGM/ASMR', '업무꿀팁', '무료리소스', '헬스/다이어트',
 ];
 
 function onWfSectorInput(el) {
@@ -660,13 +672,14 @@ function onWfSectorInput(el) {
   wfSector = val;
   const d = getData();
   const mySecs = [...new Set(Object.values(d.mySectors).map(s => s.sector).filter(Boolean))];
-  const allSugs = [...new Set([...mySecs, ...SUGGESTED_SECTORS])];
+  const allSugs = [...new Set([...HOT_SECTORS, ...mySecs, ...SUGGESTED_SECTORS])];
   const filtered = val ? allSugs.filter(s => s.includes(val)) : SUGGESTED_SECTORS;
   const sugEl = document.getElementById('wf-sector-suggestions');
   if (sugEl) {
-    sugEl.innerHTML = filtered.slice(0, 8).map(s =>
-      `<button class="wf-sec-suggestion" onclick="applyWfSectorSuggestion('${esc(s)}')">${esc(s)}</button>`
-    ).join('');
+    sugEl.innerHTML = filtered.slice(0, 10).map((s, i) => {
+      const isHot = HOT_SECTORS.includes(s);
+      return `<button class="wf-sec-suggestion${isHot ? ' wf-sec-hot' : ''}" onclick="applyWfSectorSuggestion('${esc(s)}')">${isHot ? '🔥 ' : ''}${esc(s)}</button>`;
+    }).join('');
   }
   updateWfStockChoice();
 }
