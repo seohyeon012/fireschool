@@ -1420,7 +1420,8 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
    ══════════════════════════════ */
 .landing-overlay {
   background: var(--bg) !important;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .landing-bg-grid {
   position: absolute; inset: 0; pointer-events: none;
@@ -1525,5 +1526,19 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
   background: linear-gradient(135deg, #58A6FF 0%, #7C3AED 100%) !important;
   border-radius: 10px !important;
   letter-spacing: .02em;
+}
+
+/* 랜딩 페이지 반응형 */
+@media (max-width: 800px) {
+  .landing-split {
+    flex-direction: column;
+    gap: 32px;
+    padding: 24px 20px;
+    align-items: stretch;
+  }
+  .landing-headline { font-size: 38px; }
+  .landing-right { width: 100%; }
+  .landing-left { gap: 18px; }
+  .landing-tickers { display: none; }
 }
 
