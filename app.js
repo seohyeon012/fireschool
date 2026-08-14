@@ -240,6 +240,138 @@ const DEMO_MARKET = [
       { title: '52주 신고가 매매법', text: '52주 신고가 돌파 시 모멘텀 상승 가능성 높음. 거래량 동반 여부 반드시 확인.', date: offset(-1) },
     ]
   },
+  {
+    id: 'demo_drama', uid: 'admin', creatorName: '관리자',
+    stockName: '한국 드라마 명대사', sector: '드라마명대사',
+    price: 412, pricePerBuy: 20, sharesIssued: 72,
+    lastInput: offset(0), lastBought: offset(0), rating: 5.0,
+    priceHistory: mkHist(365, 412),
+    shares: [
+      { title: '태양의 후예 — 유시진', text: '「제가 계속 살고 싶어지는 이유를 만들지 마세요. 그래야 제가 계속 살아남을 수 있으니까.」 — 유시진 대위(송중기). 사랑과 임무 사이에서 흔들리는 군인의 고백. 시즌 최고 시청률 30% 돌파 명장면.', date: offset(-7) },
+      { title: '나의 아저씨 — 모두가 무게를 지고 산다', text: '「다 버티고 있는 거예요. 다들.」 — 이지안(아이유). 모두가 자신의 무가치함과 싸우며 살아가고 있다. 지쳐있는 사람에게 건네는 가장 솔직한 위로.', date: offset(-6) },
+      { title: '나의 해방일지 — 숭배해 주세요', text: '「저를 숭배해 주세요.」 — 염미정(김지원). 사랑이 아닌 구원을 원하는 현대 직장인의 고백. 일상의 억압에서 해방되고 싶은 마음을 직접적으로 표현한 명대사.', date: offset(-5) },
+      { title: '모범택시 — 복수 대행', text: '「저는 당신의 복수를 대행합니다.」 — 김도기(이제훈). 법으로 처벌받지 못한 악인들을 직접 응징하는 무지개 운수의 선언. 사이다 복수극의 정수.', date: offset(-4) },
+      { title: '협상 — 하채윤의 신념', text: '「인질이 살아있는 한 협상은 끝나지 않는다.」 — 하채윤(손예진). 2018년 영화 협상의 명장면. 극한 상황에서도 포기하지 않는 협상가의 의지.', date: offset(-3) },
+      { title: '나의 해방일지 — 구 씨에게', text: '「나를 구원해 줄 사람이 필요해요. 사랑해 주는 사람 말고.」 — 염미정. 사랑과 구원의 차이를 정면으로 말한 대사. 많은 시청자에게 깊은 공감을 얻음.', date: offset(-1) },
+    ]
+  },
+  {
+    id: 'demo_realestate', uid: 'admin', creatorName: '관리자',
+    stockName: '부동산 기초 완전정복', sector: '부동산',
+    price: 267, pricePerBuy: 18, sharesIssued: 44,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.7,
+    priceHistory: mkHist(365, 267),
+    shares: [
+      { title: '전세 vs 월세 — 어떤 게 유리할까', text: '전세: 목돈 필요하지만 매달 지출 없음. 월세: 초기 부담 낮지만 매달 고정 지출. 전세자금대출 이자 vs 월세 비교 후 결정. 보통 대출이자 < 월세면 전세 유리.', date: offset(-4) },
+      { title: '청약 당첨 전략 — 가점 올리는 법', text: '가점 항목: 무주택 기간(최대 32점) + 부양가족 수(최대 35점) + 청약통장 가입기간(최대 17점). 총 84점 만점. 가입기간과 무주택 유지가 핵심.', date: offset(-2) },
+      { title: '부동산 필수 용어 정리', text: '전용면적(실제 생활 공간) / 공급면적(전용+주거공용) / 계약면적(공급+기타공용) / 용적률(건물 총면적÷대지면적) / 건폐율(건물 바닥면적÷대지면적).', date: offset(-1) },
+      { title: '임장 체크리스트', text: '교통(역까지 도보 몇 분?) / 주변 편의시설(마트·병원·학교) / 일조량·층간소음 / 관리비 항목 확인 / 등기부등본 열람(근저당·가압류 여부).', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_cooking', uid: 'admin', creatorName: '관리자',
+    stockName: '자취 요리 레시피 모음', sector: '요리/레시피',
+    price: 198, pricePerBuy: 15, sharesIssued: 37,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.8,
+    priceHistory: mkHist(365, 198),
+    shares: [
+      { title: '계란 요리 10분 완성 5가지', text: '① 스크램블(버터+약불+천천히 젓기) ② 반숙(끓는 물 6분30초) ③ 달걀찜(물:계란=1:1, 전자레인지 2분) ④ 계란말이(간장+설탕+참기름) ⑤ 에그인헬(토마토소스+계란).', date: offset(-3) },
+      { title: '냉장고 파먹기 — 황금 볶음밥', text: '밥 1공기 + 계란 1개 + 남은 반찬 아무거나 + 참기름 1스푼 + 간장 1스푼. 강불에서 빠르게 볶는 게 핵심. 밥알이 날아다닐 정도로 센 불 유지.', date: offset(-2) },
+      { title: '소스 황금 비율 공식', text: '간장:설탕:물:식초 = 3:2:2:1 (기본 양념장). 고추장:설탕:물엿:다진마늘:참기름 = 2:1:1:0.5:0.5 (비빔장). 된장찌개: 된장 1.5스푼+고추장 0.5스푼.', date: offset(-1) },
+      { title: '자취생 필수 요리 도구', text: '최소 구비: 10인치 후라이팬(IH 겸용) / 냄비 1개 / 도마+칼 / 실리콘 뒤집개 / 계량스푼. 전기밥솥은 1인용(3합). 에어프라이어 있으면 요리 폭 3배 확장.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_travel', uid: 'admin', creatorName: '관리자',
+    stockName: '여행 꿀팁 완전정복', sector: '여행꿀팁',
+    price: 231, pricePerBuy: 16, sharesIssued: 42,
+    lastInput: offset(-2), lastBought: offset(-1), rating: 4.7,
+    priceHistory: mkHist(365, 231),
+    shares: [
+      { title: '항공권 최저가 잡는 법', text: '① 스카이스캐너 알림 설정 ② 화·수·목 출발 가장 저렴 ③ 출발 6~8주 전이 최적 타이밍 ④ 시크릿 모드로 검색(쿠키 가격상승 방지) ⑤ 얼리버드 vs 막판 할인 둘 다 체크.', date: offset(-4) },
+      { title: '숙소 예약 꿀팁', text: '부킹닷컴 vs 에어비앤비 가격 비교 필수. 게스트하우스 도미토리로 숙박비 70% 절감. 호텔은 직접 예약 시 추가 혜택(조식·업그레이드) 요청 가능. 마지막 순간 할인 앱 HotelTonight.', date: offset(-3) },
+      { title: '환전 수수료 최소화 방법', text: '① 인터넷 환전 예약 후 공항 수령 ② 트래블월렛·트래블로그 카드 사용(ATM 인출 수수료 최저) ③ 달러→현지화 이중환전 피하기 ④ 공항 환전소는 수수료 높음(비상시만).', date: offset(-1) },
+      { title: '짐 싸기 체크리스트', text: '여권(유효기간 6개월 이상) / 여행자보험 가입증 / 현지 유심 or 포켓와이파이 / 상비약(지사제·소화제·밴드) / 멀티어댑터 / 보조배터리(100Wh 이하) / 압축팩.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_english', uid: 'admin', creatorName: '관리자',
+    stockName: '영어회화 실전 표현', sector: '영어회화',
+    price: 219, pricePerBuy: 15, sharesIssued: 40,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.8,
+    priceHistory: mkHist(365, 219),
+    shares: [
+      { title: '원어민이 진짜 쓰는 표현 TOP 10', text: 'How\'s it going? / What\'s up? / My bad.(내 잘못이야) / No worries.(괜찮아) / Hang on.(잠깐만) / I\'m beat.(지쳤어) / That\'s a bummer.(안됐다) / It\'s on me.(내가 낼게) / Catch you later. / Fair enough.(그렇군).', date: offset(-5) },
+      { title: '비즈니스 영어 필수 이메일 표현', text: 'I hope this email finds you well. / Please find attached. / As per our discussion / I look forward to hearing from you. / Could you please clarify? / Thank you for your prompt response. / I will get back to you shortly.', date: offset(-3) },
+      { title: '영어 공부 앱 BEST 3', text: '① 듀오링고(Duolingo) — 게임형 학습, 매일 5분 습관화 ② 케임브리지 영어(Cambridge English) — 문법 정확도 최강 ③ 스픽(Speak) — AI 말하기 연습, 원어민 발음 교정. 셋 다 무료 기본 플랜.', date: offset(-1) },
+      { title: '발음 교정 핵심 포인트', text: 'L vs R: light(빛) vs right(오른쪽). F vs P: fan vs pan. V vs B: vet vs bet. th 발음: think(혀를 살짝 내밀고 공기 내보내기). 한국인이 가장 틀리는 4가지.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_psych', uid: 'admin', creatorName: '관리자',
+    stockName: '심리학·자기계발 핵심', sector: '심리/자기계발',
+    price: 243, pricePerBuy: 17, sharesIssued: 45,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.9,
+    priceHistory: mkHist(365, 243),
+    shares: [
+      { title: '번아웃 극복 3단계', text: '1단계: 증상 인정(무기력·냉소·효능감 저하) → 2단계: 완전한 휴식(디지털 디톡스 포함) → 3단계: 작은 성취부터 재시작. 번아웃은 의지력 부족이 아니라 과부하 신호.', date: offset(-4) },
+      { title: '미루는 습관 고치기 — 2분 규칙', text: '지금 당장 2분 안에 할 수 있는 일은 즉시 실행. 큰 과제는 첫 2분만 시작하기(착수 장벽 낮추기). 포모도로: 25분 집중 + 5분 휴식 반복. 완벽주의를 포기할수록 생산성 오름.', date: offset(-3) },
+      { title: '인간관계 심리학 — 좋아하게 만드는 법', text: '상대방 이름 자주 부르기 / 진심으로 경청하기 / 약점 살짝 보이기(취약성의 역설) / 부탁 들어주기 → 호감 상승(벤자민 프랭클린 효과) / 칭찬은 구체적으로.', date: offset(-2) },
+      { title: '아침 루틴 — 하루를 바꾸는 10분', text: '기상 직후 물 한 잔(신진대사 촉진) → 3분 스트레칭 → 오늘 할 일 3가지만 적기 → 긍정 확언 1줄(나는 충분히 잘하고 있다). 폰 체크는 30분 후로 미루기.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_game', uid: 'admin', creatorName: '관리자',
+    stockName: '게임 공략 모음집', sector: '게임공략',
+    price: 178, pricePerBuy: 14, sharesIssued: 33,
+    lastInput: offset(-2), lastBought: offset(-1), rating: 4.6,
+    priceHistory: mkHist(365, 178),
+    shares: [
+      { title: '리그오브레전드 — 티어 올리는 법', text: '① 챔피언 3개 이하로 좁히기 ② 미니맵 3초마다 체크 ③ 죽지 않는 것이 킬보다 중요 ④ CS(미니언 처치) 10분에 80개 목표 ⑤ 경기 후 리플레이로 실수 확인. 승률보다 성장에 집중.', date: offset(-4) },
+      { title: '발로란트 — 에임 향상 루틴', text: '① 게임 전 에임랩 10분 워밍업 ② 크로스헤어 항상 머리 높이 유지 ③ 이동 중 사격 금지(멈추고 쏘기) ④ 감도 설정: 400DPI × 0.4~0.6 eDPI 권장 ⑤ 에코 라운드 경제 관리 필수.', date: offset(-3) },
+      { title: '무료 게임 추천 2024', text: '① 패스 오브 엑자일(액션RPG) ② 워프레임(SF 액션) ③ 도타2(AOS) ④ 크리티컬 옵스(모바일 FPS) ⑤ 원신(오픈월드RPG — 부분유료). 모두 스팀 또는 앱스토어 무료 다운로드.', date: offset(-1) },
+      { title: '배틀그라운드 생존 전략', text: '① 초반 외곽 드랍으로 안전 파밍 ② 안전권 가장자리 위치 유지 ③ 차량은 소음 노출 주의 — 도보 이동 병행 ④ 엎드리기보다 밀어붙이는 적극 교전이 승률 높음 ⑤ 결승권은 언덕 뒤.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_it', uid: 'admin', creatorName: '관리자',
+    stockName: 'IT·개발 필수 지식', sector: 'IT/개발',
+    price: 334, pricePerBuy: 19, sharesIssued: 56,
+    lastInput: offset(0), lastBought: offset(0), rating: 4.9,
+    priceHistory: mkHist(365, 334),
+    shares: [
+      { title: 'Git 필수 명령어 치트시트', text: 'git init / git clone URL / git add . / git commit -m "메시지" / git push origin main / git pull / git branch 브랜치명 / git checkout 브랜치명 / git merge 브랜치명 / git log --oneline / git status', date: offset(-5) },
+      { title: '개발자 필수 VS Code 단축키', text: 'Ctrl+P(파일 열기) / Ctrl+Shift+P(명령어) / Alt+클릭(멀티커서) / Ctrl+D(단어 선택 반복) / Alt+↑↓(줄 이동) / Ctrl+/(주석처리) / F12(정의로 이동) / Ctrl+`(터미널) / Ctrl+Z/Shift+Z(실행취소/재실행).', date: offset(-3) },
+      { title: '코딩 공부 로드맵 — 취업까지', text: 'HTML/CSS(1개월) → JavaScript 기초(2개월) → React 또는 Vue(2개월) → Node.js 백엔드(2개월) → DB(SQL 기초) → 포트폴리오 3개 → GitHub 잔디 채우기 → 프로그래머스 문제풀이 병행.', date: offset(-2) },
+      { title: '무료 개발 학습 사이트', text: '① 생활코딩(한국어 입문 최강) ② MDN Web Docs(HTML/CSS/JS 레퍼런스) ③ freeCodeCamp(영어, 무료 자격증) ④ 프로그래머스(코딩 테스트 연습) ⑤ Udemy(할인가 1.2만원 강의).', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_spelling', uid: 'admin', creatorName: '관리자',
+    stockName: '맞춤법·문법 완전정복', sector: '맞춤법/문법',
+    price: 187, pricePerBuy: 14, sharesIssued: 35,
+    lastInput: offset(-3), lastBought: offset(-1), rating: 4.8,
+    priceHistory: mkHist(365, 187),
+    shares: [
+      { title: '가장 많이 틀리는 맞춤법 TOP 10', text: '않하다→안하다(X) 안하다→않 하다(X) / 됬다→됐다 / 어떻해→어떡해 / 왠지→왜인지(O) / 로써·로서 구분 / 든지·던지 / 지양·지향 / 있다가→이따가 / 웬→왠(왜인지의 준말).', date: offset(-4) },
+      { title: '헷갈리는 띄어쓰기 핵심 규칙', text: '의존명사는 띄어 쓴다 — 할 수 있다 / 할 것 같다 / 갈 때 / 먹을 만하다. 보조용언도 띄어 쓴다 — 먹어 보다 / 해 주다 / 알아 두다. 합성어는 붙여 쓴다 — 손발·눈코·오가다.', date: offset(-2) },
+      { title: '비슷한 듯 다른 단어 구별법', text: '낫다(비교·회복) vs 낮다(높이) / 맞추다(일치) vs 맞히다(정답) / 부치다(편지·부쳐먹다) vs 붙이다(붙여넣기) / 잃다(분실) vs 잊다(망각) / 바라다(희망) vs 바래다(색이 변함).', date: offset(-1) },
+      { title: '문장 부호 올바른 사용법', text: '마침표(.) — 서술문 끝. 물음표(?) — 의문문. 느낌표(!) — 감탄. 쉼표(,) — 열거·접속어 뒤. 콜론(:) — 예시 제시. 줄임표(……) — 6개 점. 가운뎃점(·) — 열거. 큰따옴표("") — 인용·강조.', date: offset(0) },
+    ]
+  },
+  {
+    id: 'demo_fashion', uid: 'admin', creatorName: '관리자',
+    stockName: '패션·스타일 가이드', sector: '패션/스타일',
+    price: 213, pricePerBuy: 15, sharesIssued: 38,
+    lastInput: offset(-1), lastBought: offset(0), rating: 4.7,
+    priceHistory: mkHist(365, 213),
+    shares: [
+      { title: '체형별 코디 핵심 원칙', text: '키 작은 체형: 하이웨이스트+모노톤으로 다리 길어 보이기. 어깨 넓은 체형: V넥+세로줄무늬. 하체 넓은 체형: 다크컬러 하의+볼륨있는 상의. 마른 체형: 레이어드+패턴으로 볼륨감 연출.', date: offset(-4) },
+      { title: '저렴하게 옷 잘 사는 법', text: '① 무신사·에이블리 정기 세일 캘린더 체크 ② 에브리데이먼데이·아크뮤 등 소규모 브랜드 직접 구매 ③ 당근·번개장터 중고 거래 ④ 알리익스프레스 기본 아이템(티셔츠·이너) ⑤ 아울렛 시즌오프 방문.', date: offset(-3) },
+      { title: '계절별 필수 기본 아이템', text: '봄: 오버핏 셔츠+슬랙스. 여름: 린넨 반팔+숏츠. 가을: 가죽 재킷+청바지. 겨울: 울 코트+터틀넥. 신발: 화이트 스니커즈(4계절). 가방: 토트백+크로스백. 색상: 블랙·화이트·네이비 기본 3색.', date: offset(-1) },
+      { title: '중고거래로 명품 득템하기', text: '번개장터·크림·솔드아웃에서 정품 인증 후 구매. 명품 브랜드 코드·시리얼 번호 확인. 구매 시 영수증·먼지봉투·박스 유무 체크. 빈티지샵 직접 방문하면 숨겨진 명품 발견 가능.', date: offset(0) },
+    ]
+  },
 ];
 
 function offset(days) {
