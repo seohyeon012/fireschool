@@ -59,7 +59,7 @@ async function sbFetchMarket() {
 }
 
 /* ── 상수 ── */
-const STARTING_BALANCE = 200;
+const STARTING_BALANCE = 1000;
 const REVIEW_PERFECT   = 35;
 const REVIEW_HAZY      = 20;
 const REVIEW_FORGOT    = 0;
@@ -140,7 +140,7 @@ const DEMO_MARKET = [
   {
     id: 'demo_3', uid: 'admin', creatorName: '관리자',
     stockName: '일본 애니메이션 명대사', sector: '애니/명대사',
-    price: 445, pricePerBuy: 25, sharesIssued: 78,
+    price: 445, pricePerBuy: 20, sharesIssued: 78,
     lastInput: offset(0), lastBought: offset(0), rating: 5.0,
     priceHistory: mkHist(365, 445),
     shares: [
@@ -182,7 +182,7 @@ const DEMO_MARKET = [
   {
     id: 'demo_6', uid: 'admin', creatorName: '관리자',
     stockName: 'AI 무료 툴 완전정복', sector: 'AI툴/생산성',
-    price: 387, pricePerBuy: 24, sharesIssued: 63,
+    price: 387, pricePerBuy: 20, sharesIssued: 63,
     lastInput: offset(0), lastBought: offset(0), rating: 4.9,
     priceHistory: mkHist(365, 387),
     shares: [
@@ -220,7 +220,7 @@ const DEMO_MARKET = [
   {
     id: 'demo_celeb', uid: 'admin', creatorName: '관리자',
     stockName: '연예인 소식 모음', sector: '연예인 소식',
-    price: 521, pricePerBuy: 30, sharesIssued: 89,
+    price: 521, pricePerBuy: 25, sharesIssued: 89,
     lastInput: offset(0), lastBought: offset(0), rating: 5.0,
     priceHistory: mkHist(365, 521),
     shares: [
@@ -232,7 +232,7 @@ const DEMO_MARKET = [
   {
     id: 'demo_9', uid: 'u_invest', creatorName: '주식고수 민준',
     stockName: '주식투자 핵심전략', sector: '주식투자',
-    price: 291, pricePerBuy: 22, sharesIssued: 48,
+    price: 291, pricePerBuy: 20, sharesIssued: 48,
     lastInput: offset(-1), lastBought: offset(0), rating: 4.8,
     priceHistory: mkHist(365, 291),
     shares: [
