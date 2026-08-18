@@ -717,9 +717,16 @@ body.light-mode .market-chip.recession { background: rgba(207,34,46,.12); }
 .filter-pill-premium:hover { background: rgba(245,200,66,0.15) !important; border-color: var(--yellow) !important; }
 .filter-pill.fav { border-color: var(--accent); color: var(--accent); }
 .filter-pill.fav.active { background: var(--accent); color: #fff; }
-.pill-star { margin-left: 4px; font-size: 10px; opacity: .7; cursor: pointer; }
-.pill-star:hover { opacity: 1; }
-.pill-expand { border-style: dashed; color: var(--sub); font-size: 10px; }
+.pill-star {
+  margin-left: 5px; font-size: 13px; opacity: .55; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 2px; border-radius: 3px; transition: opacity .15s, color .15s;
+  line-height: 1;
+}
+.pill-star:hover { opacity: 1; color: var(--yellow, #f5c842); }
+.filter-pill.fav .pill-star { opacity: 1; color: var(--yellow, #f5c842); }
+.pill-expand { border-style: dashed; color: var(--sub); font-size: 11px; }
+.pill-hint { font-size: 11px; color: var(--sub); opacity: .55; padding: 0 4px; align-self: center; }
 
 /* ── 필터 결과 없음 ── */
 .filter-empty { text-align: center; padding: 36px 0; color: var(--sub); }

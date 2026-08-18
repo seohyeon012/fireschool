@@ -1742,18 +1742,24 @@ async function renderMarketList() {
   if (pillsEl) {
     const favs = getFavSectors();
     const hasFavs = favs.length > 0;
-    const visibleSectors = pillsExpanded ? allSectors : (hasFavs ? allSectors.filter(s => favs.includes(s)) : allSectors);
+    // 즐겨찾기 있고 접힌 상태 → 즐겨찾기만, 나머지는 전체 표시
+    const showFavOnly = hasFavs && !pillsExpanded;
+    const visibleSectors = showFavOnly ? allSectors.filter(s => favs.includes(s)) : allSectors;
     const allBtn = `<button class="filter-pill${filterSector==='all'?' active':''}" data-f="all" onclick="setSectorFilter('all')">전체</button>`;
     const sectorBtns = visibleSectors.map(s => {
       const isFav = favs.includes(s);
-      return `<button class="filter-pill${filterSector===s?' active':''}${isFav?' fav':''}" data-f="${esc(s)}" onclick="setSectorFilter('${esc(s)}')">${esc(s)}<span class="pill-star" onclick="event.stopPropagation();toggleFavSector('${esc(s)}')" title="즐겨찾기">${isFav?'★':'☆'}</span></button>`;
+      return `<button class="filter-pill${filterSector===s?' active':''}${isFav?' fav':''}" data-f="${esc(s)}" onclick="setSectorFilter('${esc(s)}')">${esc(s)}<span class="pill-star" onclick="event.stopPropagation();toggleFavSector('${esc(s)}')" title="${isFav?'즐겨찾기 해제':'즐겨찾기 추가'}">${isFav?'★':'☆'}</span></button>`;
     }).join('');
     const hiddenCount = allSectors.length - visibleSectors.length;
-    const toggleBtn = hasFavs
-      ? (pillsExpanded
-          ? `<button class="filter-pill pill-expand" onclick="togglePillsExpanded()">접기 ▲</button>`
-          : `<button class="filter-pill pill-expand" onclick="togglePillsExpanded()">모든 카테고리 보기 (${hiddenCount}개 더) ▼</button>`)
-      : '';
+    // 토글 버튼: 즐겨찾기 없으면 안내 문구, 있으면 펼치기/접기
+    let toggleBtn;
+    if (!hasFavs) {
+      toggleBtn = `<span class="pill-hint">☆ 눌러서 즐겨찾기</span>`;
+    } else if (pillsExpanded) {
+      toggleBtn = `<button class="filter-pill pill-expand" onclick="togglePillsExpanded()">접기 ▲</button>`;
+    } else {
+      toggleBtn = `<button class="filter-pill pill-expand" onclick="togglePillsExpanded()">전체 카테고리 (${hiddenCount}개 더) ▼</button>`;
+    }
     pillsEl.innerHTML = allBtn + sectorBtns + toggleBtn;
   }
 
