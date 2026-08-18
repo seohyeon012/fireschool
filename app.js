@@ -618,6 +618,25 @@ let isAdmin             = false;
 let currentDetailId     = null;
 let filterSector        = 'all';
 let filterQuery         = '';
+let pillsExpanded       = false;
+
+function getFavSectors() {
+  try { return JSON.parse(localStorage.getItem('kse_fav_sectors') || '[]'); } catch { return []; }
+}
+function saveFavSectors(arr) {
+  localStorage.setItem('kse_fav_sectors', JSON.stringify(arr));
+}
+function toggleFavSector(sec) {
+  const favs = getFavSectors();
+  const idx = favs.indexOf(sec);
+  if (idx >= 0) favs.splice(idx, 1); else favs.push(sec);
+  saveFavSectors(favs);
+  renderMarketList();
+}
+function togglePillsExpanded() {
+  pillsExpanded = !pillsExpanded;
+  renderMarketList();
+}
 let sbMarketCache       = [];  // Supabase에서 받아온 타유저 종목 캐시
 let pendingReviewData   = null;
 let chartZoom           = 7;
@@ -1717,12 +1736,25 @@ async function renderMarketList() {
   const otherStocks = sbMarketCache.length > 0 ? sbMarketCache : DEMO_MARKET.map(s => ({ ...s, isOwn: false }));
   let all = [...otherStocks, ...myStocks];
 
-  // 동적 필터 pills 렌더링
+  // 동적 필터 pills 렌더링 (즐겨찾기 / 전체 토글)
   const allSectors = [...new Set(all.map(s => s.sector).filter(Boolean))].sort();
   const pillsEl = document.getElementById('filter-pills');
   if (pillsEl) {
-    pillsEl.innerHTML = `<button class="filter-pill${filterSector==='all'?' active':''}" data-f="all" onclick="setSectorFilter('all')">전체</button>`
-      + allSectors.map(s => `<button class="filter-pill${filterSector===s?' active':''}" data-f="${esc(s)}" onclick="setSectorFilter('${esc(s)}')">${esc(s)}</button>`).join('');
+    const favs = getFavSectors();
+    const hasFavs = favs.length > 0;
+    const visibleSectors = pillsExpanded ? allSectors : (hasFavs ? allSectors.filter(s => favs.includes(s)) : allSectors);
+    const allBtn = `<button class="filter-pill${filterSector==='all'?' active':''}" data-f="all" onclick="setSectorFilter('all')">전체</button>`;
+    const sectorBtns = visibleSectors.map(s => {
+      const isFav = favs.includes(s);
+      return `<button class="filter-pill${filterSector===s?' active':''}${isFav?' fav':''}" data-f="${esc(s)}" onclick="setSectorFilter('${esc(s)}')">${esc(s)}<span class="pill-star" onclick="event.stopPropagation();toggleFavSector('${esc(s)}')" title="즐겨찾기">${isFav?'★':'☆'}</span></button>`;
+    }).join('');
+    const hiddenCount = allSectors.length - visibleSectors.length;
+    const toggleBtn = hasFavs
+      ? (pillsExpanded
+          ? `<button class="filter-pill pill-expand" onclick="togglePillsExpanded()">접기 ▲</button>`
+          : `<button class="filter-pill pill-expand" onclick="togglePillsExpanded()">모든 카테고리 보기 (${hiddenCount}개 더) ▼</button>`)
+      : '';
+    pillsEl.innerHTML = allBtn + sectorBtns + toggleBtn;
   }
 
   if (filterSector !== 'all') all = all.filter(s => s.sector === filterSector);
