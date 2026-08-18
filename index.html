@@ -18,8 +18,15 @@
     <!-- 왼쪽: 히어로 -->
     <div class="landing-left">
       <span class="landing-badge">📊 KNOWLEDGE EXCHANGE</span>
-      <h1 class="landing-headline">지식이 곧<br><span class="grad-text">자산</span>이 된다</h1>
-      <p class="landing-desc">내 지식을 주식으로 발행하고,<br>다른 사람의 통찰을 사고파는 새로운 플랫폼</p>
+      <h1 class="landing-headline">내가 아는 게<br><span class="grad-text">주식</span>이 된다</h1>
+      <p class="landing-desc">지식을 올리면 코인을 벌고, 서로의 지식을 사고파는<br>건전한 지식 공유 커뮤니티</p>
+      <div class="landing-how">
+        <div class="lhow-step"><span class="lhow-num">1</span><span class="lhow-txt">📝 아는 것을 올린다</span></div>
+        <div class="lhow-arrow">→</div>
+        <div class="lhow-step"><span class="lhow-num">2</span><span class="lhow-txt">📈 주가가 오른다</span></div>
+        <div class="lhow-arrow">→</div>
+        <div class="lhow-step"><span class="lhow-num">3</span><span class="lhow-txt">💰 코인을 번다</span></div>
+      </div>
       <div class="landing-stats">
         <div class="lstat"><div class="lstat-n">1,247</div><div class="lstat-l">발행된 지식주</div></div>
         <div class="lstat-div"></div>
@@ -283,6 +290,10 @@
               <span class="kospi-full" id="kospi-full">—</span>
               <span class="kospi-chg" id="kospi-chg"></span>
             </div>
+          </div>
+
+          <div class="community-notice">
+            📚 지식 공유 커뮤니티 · 비속어·혐오 콘텐츠는 즉시 삭제됩니다 · <span onclick="showToast('신고 기능은 각 지식 카드에서 이용하세요.')" style="cursor:pointer;text-decoration:underline">신고하기</span>
           </div>
 
           <div class="search-filter-wrap">
@@ -846,6 +857,23 @@
     <p class="pm-note">프리미엄 · 언제든지 취소 가능 · 자동 갱신 &nbsp;|&nbsp; 단체 · 인원수 × 1,000원 / 월</p>
   </div>
 </div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">📊 지식 증권거래소</div>
+    <p class="footer-desc">내가 아는 것이 가치가 되는 건전한 지식 공유 커뮤니티입니다.<br>누구나 지식을 올리고, 서로의 통찰을 코인으로 사고팔 수 있습니다.</p>
+    <div class="footer-links">
+      <span onclick="showToast('서비스 목적: 지식 공유 커뮤니티 · 비영리 운영')">서비스 소개</span>
+      <span>·</span>
+      <span onclick="showToast('문의: noseohyeon079@gmail.com')">문의하기</span>
+      <span>·</span>
+      <span onclick="showToast('수집 정보: 닉네임·비밀번호(암호화) · 외부 제공 없음')">개인정보 처리방침</span>
+      <span>·</span>
+      <span onclick="showToast('비속어·혐오·허위 정보 게시 금지 · 위반 시 즉시 삭제')">이용약관</span>
+    </div>
+    <p class="footer-copy">© 2026 지식 증권거래소 · 건전한 지식 공유를 지향합니다</p>
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
