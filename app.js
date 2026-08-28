@@ -1758,8 +1758,10 @@ async function renderMarketList() {
   const myStocks = Object.entries(d.mySectors).map(([sec, s]) => ({
     ...s, id: 'my_' + sec, uid: currentUserId, creatorName: myName, sector: s.sector || sec, isOwn: true
   }));
-  // 타유저 종목 (Supabase 캐시, 없으면 DEMO_MARKET 폴백)
-  const otherStocks = sbMarketCache.length > 0 ? sbMarketCache : DEMO_MARKET.map(s => ({ ...s, isOwn: false }));
+  // 타유저 종목: DEMO_MARKET 항상 포함 + Supabase 데이터(ID 중복 제외)
+  const demoIds = new Set(DEMO_MARKET.map(s => s.id));
+  const cloudExtra = sbMarketCache.filter(s => !demoIds.has(s.id));
+  const otherStocks = [...DEMO_MARKET.map(s => ({ ...s, isOwn: false })), ...cloudExtra];
   let all = [...otherStocks, ...myStocks];
 
   // 동적 필터 pills 렌더링 (즐겨찾기 / 전체 토글)
