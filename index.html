@@ -326,6 +326,10 @@
 
         <!-- 오른쪽: 대시보드 패널 -->
         <div class="home-aside">
+          <div class="aside-card" id="aside-hot-card">
+            <div class="aside-ttl">🔥 지금 핫한 종목</div>
+            <div class="aside-empty">로딩 중...</div>
+          </div>
           <div class="aside-card">
             <div class="aside-ttl">📦 내 현황</div>
             <div id="aside-summary"><div class="aside-empty">지식을 입력하면<br>현황이 표시됩니다</div></div>
@@ -461,6 +465,7 @@
           <div class="sp-rating" id="sp-rating">★ 4.0</div>
           <button class="btn-rate" onclick="openRatingPanel()">⭐ 평가하기</button>
           <button class="btn-follow-bell hidden" id="btn-follow-bell" onclick="toggleFollow()">🔔 알림받기</button>
+          <button class="btn-report" id="btn-report" onclick="reportStock()">🚨 신고하기</button>
         </div>
       </div>
       <!-- 평가 패널 -->

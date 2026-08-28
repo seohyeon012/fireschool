@@ -1621,6 +1621,32 @@ function renderFollowBtn(uid) {
   btn.classList.toggle('active', isFollowing);
 }
 
+/* ══ 신고하기 ══ */
+function reportStock() {
+  const stockId = currentDetailId;
+  if (!stockId) return;
+  const key = 'kse_reports_' + stockId;
+  const already = localStorage.getItem(key);
+  if (already) { showToast('이미 신고한 콘텐츠입니다.'); return; }
+  if (!confirm('이 콘텐츠를 신고하시겠습니까?\n비속어·혐오·허위 정보가 포함된 경우 신고해 주세요.')) return;
+  localStorage.setItem(key, '1');
+  // 신고 횟수 누적 (전역)
+  const countKey = 'kse_report_count_' + stockId;
+  const prev = parseInt(localStorage.getItem(countKey) || '0', 10);
+  localStorage.setItem(countKey, String(prev + 1));
+  showToast('신고가 접수되었습니다. 검토 후 조치합니다.');
+  const btn = document.getElementById('btn-report');
+  if (btn) { btn.textContent = '✅ 신고됨'; btn.disabled = true; }
+}
+
+function checkReportedStock(stockId) {
+  const btn = document.getElementById('btn-report');
+  if (!btn || !stockId) return;
+  const already = localStorage.getItem('kse_reports_' + stockId);
+  btn.textContent = already ? '✅ 신고됨' : '🚨 신고하기';
+  btn.disabled = !!already;
+}
+
 function checkFollowNotifications() {
   const d = getData();
   if (!d.following || !Object.keys(d.following).length) return;
@@ -1916,15 +1942,9 @@ function renderHomeAside() {
 }
 
 function renderHotSection() {
-  // 기존 핫 카드가 있으면 제거 후 재생성
-  let hotCard = document.getElementById('aside-hot-card');
-  if (!hotCard) {
-    hotCard = document.createElement('div');
-    hotCard.id = 'aside-hot-card';
-    hotCard.className = 'aside-card';
-    const asideEl = document.querySelector('.home-aside');
-    if (asideEl) asideEl.appendChild(hotCard);
-  }
+  // HTML에 미리 선언된 카드 사용 (위치 고정)
+  const hotCard = document.getElementById('aside-hot-card');
+  if (!hotCard) return;
 
   const d      = getData();
   const myName = getProfile()?.name || '나';
@@ -1943,11 +1963,13 @@ function renderHotSection() {
   });
   const topSector = Object.entries(sectorMap).sort((a, b) => b[1] - a[1])[0];
 
+  const rankBadge = ['🥇', '🥈', '🥉'];
   hotCard.innerHTML = `
     <div class="aside-ttl">🔥 지금 핫한 종목</div>
     ${top3.map((s, i) => `
-      <div class="aside-mover" onclick="openMarketDetail('${s.id}')">
-        <span class="aside-mover-name">${i+1}. ${esc(s.creatorName)}의 ${s.sector}주</span>
+      <div class="aside-mover hot-rank-row" onclick="openMarketDetail('${s.id}')">
+        <span class="hot-rank-badge">${rankBadge[i]}</span>
+        <span class="aside-mover-name">${esc(s.creatorName)}의 ${s.sector}주</span>
         <span class="aside-stat-val" style="font-size:11px">${s.sharesIssued||0}주</span>
       </div>`).join('')}
     <div class="aside-ttl" style="margin-top:10px">📈 핫한 섹터</div>
@@ -2116,10 +2138,14 @@ function openMarketDetail(stockId) {
     } else if (followBtn) {
       followBtn.classList.add('hidden');
     }
+    // 신고 버튼: 타인 주식에만 표시
+    const reportBtn = document.getElementById('btn-report');
+    if (reportBtn) { reportBtn.classList.remove('hidden'); checkReportedStock(stockId); }
   } else if (sellerCard) {
     sellerCard.classList.add('hidden');
     if (ratingPanel) ratingPanel.classList.add('hidden');
     document.getElementById('btn-follow-bell')?.classList.add('hidden');
+    document.getElementById('btn-report')?.classList.add('hidden');
   }
 
   // 액션 영역
